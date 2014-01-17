@@ -137,7 +137,8 @@ Desktop.ini
 *.egg
 *.egg-info
 dist
-build
+# This was interfering with directory structure
+# build
 eggs
 parts
 bin
