@@ -3,8 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Users\Cameron\Documents\Visual Studio 2012\Projects\FANN-2.2.0-Source\src\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Cameron\Documents\Visual Studio 2012\Projects\FANN-2.2.0-Source\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\coding_libraries\FANN-2.2.0-Source\src\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\coding_libraries\FANN-2.2.0-Source\bin\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />

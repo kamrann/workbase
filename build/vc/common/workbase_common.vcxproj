@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{78D223D2-D266-4DA3-89C6-73100A132FD1}</ProjectGuid>
+    <RootNamespace>workbase_common</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\eigen.props" />
+    <Import Project="..\gles_angle.props" />
+    <Import Project="..\workbase.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\eigen.props" />
+    <Import Project="..\gles_angle.props" />
+    <Import Project="..\workbase.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\code\common\util\camera.h" />
+    <ClInclude Include="..\..\..\code\common\util\combinatorics.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\cubic_spline.h" />
+    <ClInclude Include="..\..\..\code\common\util\dimensionality.h" />
+    <ClInclude Include="..\..\..\code\common\util\enum_flags.h" />
+    <ClInclude Include="..\..\..\code\common\util\gl_helpers\gl_helpers.h" />
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\basis_mesh.h" />
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\camera_mesh.h" />
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\mesh.h" />
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\primitives.h" />
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\random.h" />
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\transform_hierarchy.h" />
+    <ClInclude Include="..\..\..\code\common\util\wb_string.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\wb_math.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\stl_util.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_base.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_base_impl.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_copy.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\meta_dependencies.h" />
+    <ClInclude Include="..\..\..\code\common\util\mpl_math.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\orientation.h" />
+    <ClInclude Include="..\..\..\code\common\util\pareto.h" />
+    <ClInclude Include="..\..\..\code\common\util\pareto_ct.h" />
+    <ClInclude Include="..\..\..\code\common\util\proportional_selection.h" />
+    <ClInclude Include="..\..\..\code\common\util\sysutil.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\text_io.h" />
+    <ClInclude Include="..\..\..\code\common\util\variant_type_access.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

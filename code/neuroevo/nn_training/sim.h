@@ -229,7 +229,7 @@ public:
 		return ss.str();
 	}
 
-	void run_epoch()
+	void run_epoch(std::ostream& os)
 	{
 		rgen.seed(//static_cast< uint32_t >(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff));
 			ga_epoch_rseed + ga.generation);
@@ -245,8 +245,8 @@ public:
 			// Create next generation
 			size_t num_valid = ga.epoch();
 
-#if 1
-			std::cout << "Solution population validity: " << (100.0 * num_valid / PopulationSize) << std::endl;
+#if 0
+			os << "Solution population validity: " << (100.0 * num_valid / PopulationSize) << std::endl;
 #endif
 		}
 		else
@@ -377,11 +377,11 @@ public:
 //		ga.output_individuals(std::cout);
 
 		// Analyse population fitness
-		std::cout << ("Epoch ") << ga.generation << ": ";
+		os << ("Epoch ") << ga.generation << ": ";
 		//std::string fitness_output = fitness_t::analyse_population_fitness(ga.population.begin(), ga.population.end());
 		//std::cout << fitness_output << std::endl;
 
-		std::cout << analyse_population_objective_values(avg_obj_vals, PopulationSize) << std::endl;
+		os << analyse_population_objective_values(avg_obj_vals, PopulationSize) << std::endl;
 	}
 
 	processed_obj_val_t get_fittest(FANN::neural_net& nn) const

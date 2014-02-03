@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DF8182F6-5851-4435-AF7E-7C979237DE74}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ga</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\basic_rate_functors.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\collective_obj_val_ftr.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\composite_fitness_fn.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\crossover.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\direct_fitness.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\equal_procreation_selection.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\fitness.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\ga.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\genome.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\hard_constraint.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\individual.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\multiple_objective.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\mutation.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\objective_fn.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\objective_fn_data_component.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\obj_val_and_fitness_eval.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\pareto_multiple_objective.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\procreation.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\random_procreation_selection.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\ranking_fitness.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\roulette_procreation_selection.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\selection.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\shared_constraints.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\shared_objective_fn_data_components.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\single_objective.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\truncation_survival_selection.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -5,6 +5,10 @@
   <PropertyGroup>
     <IncludePath>C:\Users\Cameron\Documents\Visual Studio 2012\Projects\eigen-eigen-ffa86ffb5570;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>EIGEN_DONT_ALIGN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

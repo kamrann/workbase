@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="util">
+      <UniqueIdentifier>{3b027801-5f22-4647-819d-d2e8cdc6a20b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\gtree">
+      <UniqueIdentifier>{f8612304-1d72-46da-9d7e-5a776acd6f86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\graphics3d">
+      <UniqueIdentifier>{1358c1d3-1b2d-42dd-85ce-4500b67e6c7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\gl_helpers">
+      <UniqueIdentifier>{d241a08d-1daf-40c6-95ac-59a93f4625b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\code\common\util\dimensionality.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\meta_dependencies.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\pareto.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\pareto_ct.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\proportional_selection.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\camera.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\enum_flags.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\text_io.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\orientation.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\combinatorics.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\mpl_math.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\sysutil.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\variant_type_access.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree.hpp">
+      <Filter>util\gtree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_base.hpp">
+      <Filter>util\gtree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_base_impl.hpp">
+      <Filter>util\gtree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_copy.hpp">
+      <Filter>util\gtree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\stl_util.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\wb_math.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\wb_string.hpp">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\mesh.h">
+      <Filter>util\graphics3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\primitives.h">
+      <Filter>util\graphics3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\transform_hierarchy.h">
+      <Filter>util\graphics3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\basis_mesh.h">
+      <Filter>util\graphics3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\gl_helpers\gl_helpers.h">
+      <Filter>util\gl_helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\camera_mesh.h">
+      <Filter>util\graphics3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\cubic_spline.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\graphics3d\random.h">
+      <Filter>util\graphics3d</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

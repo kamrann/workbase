@@ -14,7 +14,7 @@
 
 
 typedef angular_full_stop< WorldDimensionality::dim2D > problem_t;
-const std::string nn_filename = "angular_full_stop_square_minimal.nn";
+const std::string nn_filename = "C:/Users/Cameron/Documents/GitHub/workbase/resource/neuroevo/nns/angular_full_stop_square_minimal.nn";
 
 
 nn_testing_app::nn_testing_app(PolycodeView *view, PolycodeView *graph_view):
@@ -26,7 +26,7 @@ nn_testing_app::nn_testing_app(PolycodeView *view, PolycodeView *graph_view):
 
 //	graph_core = new POLYCODE_CORE(graph_view, 400, 300, false, false, 0, 0, 10);//90);
 
-	CoreServices::getInstance()->getResourceManager()->addArchive("Resources/default.pak");
+	CoreServices::getInstance()->getResourceManager()->addArchive("C:/Users/Cameron/Documents/GitHub/workbase/resource/common/polycode/default.pak");
 	CoreServices::getInstance()->getResourceManager()->addDirResource("default", false);
 
 	rgen.seed(static_cast< uint32_t >(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff));
