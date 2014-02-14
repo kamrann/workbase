@@ -106,6 +106,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>wtdbod.lib;wtdbosqlite3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,6 +140,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>wtdbo.lib;wtdbosqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -160,10 +162,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\webinterface.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\database_tab.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\simulations_tab.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\system_test_tab.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\webinterfaceapp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\code\neuroevo\nn_training\sim.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\database_tab.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_period_tbl.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\generation_tbl.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genetic_language_tbl.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genome_tbl.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\problem_domain_tbl.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\system_sim_tbl.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\nac_system_coordinator.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\observer_data_models.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\ship_system_coordinator.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\sim.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\simulations_tab.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_coordinator.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_test_tab.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\webinterfaceapp.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\nac_widget.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_widget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

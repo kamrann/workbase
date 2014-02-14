@@ -68,6 +68,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\code\common\thrusters\ship_state.h" />
+    <ClInclude Include="..\..\..\code\common\thrusters\thruster.h" />
+    <ClInclude Include="..\..\..\code\common\thrusters\thruster_presets.h" />
     <ClInclude Include="..\..\..\code\common\util\camera.h" />
     <ClInclude Include="..\..\..\code\common\util\combinatorics.hpp" />
     <ClInclude Include="..\..\..\code\common\util\cubic_spline.h" />

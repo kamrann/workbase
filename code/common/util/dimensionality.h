@@ -229,6 +229,11 @@ public:
 	{
 		return transform_dir(v, -xf);
 	}
+
+	static inline orientation_t apply_orientation_delta(orientation_t const& orient, angular_direction_t const& delta)
+	{
+		return orient + delta;
+	}
 };
 
 template <>
@@ -261,6 +266,13 @@ public:
 	static inline direction_t inv_transform_dir(direction_t const& v, orientation_t const& xf)
 	{
 		return xf.inverse() * v;
+	}
+
+	static inline orientation_t apply_orientation_delta(orientation_t const& orient, angular_direction_t const& delta)
+	{
+		// Probably inefficient, see: http://stackoverflow.com/questions/8816785/looking-for-a-better-method-to-do-quaternion-differentiaton
+		double angle = delta.norm();
+		return Eigen::AngleAxis< double >(angle, delta / angle) * orient;
 	}
 };
 

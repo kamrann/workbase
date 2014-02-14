@@ -85,8 +85,8 @@ public:
 	typedef typename problem_t::agent_decision constraint_vars_t;
 	
 	enum {
-		PopulationSize = 40,
-		TrialsPerEpoch = 25,
+		PopulationSize = 5,
+		TrialsPerEpoch = 1,
 	};
 
 	boost::shared_ptr< thruster_config_t >				t_cfg;

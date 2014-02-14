@@ -33,9 +33,13 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\..\eigen.props" />
+    <Import Project="..\..\neuroevo.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\..\eigen.props" />
+    <Import Project="..\..\neuroevo.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -84,6 +88,7 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\equal_procreation_selection.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\fitness.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\ga.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\genetic_language.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\genome.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\hard_constraint.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\individual.h" />

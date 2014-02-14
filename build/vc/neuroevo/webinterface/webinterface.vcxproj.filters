@@ -13,14 +13,89 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="evo_db">
+      <UniqueIdentifier>{f45e7214-2b4e-46af-a9bd-a88c07c613d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wt_system_widgets">
+      <UniqueIdentifier>{2770755d-84b6-41bf-a38e-6945a32e96fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\webinterface.cpp">
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.cpp">
+      <Filter>evo_db</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\database_tab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\simulations_tab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\webinterfaceapp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\system_test_tab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\code\neuroevo\nn_training\sim.h">
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_period_tbl.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\generation_tbl.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genetic_language_tbl.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genome_tbl.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\problem_domain_tbl.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\system_sim_tbl.h">
+      <Filter>evo_db</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\sim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\observer_data_models.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\webinterfaceapp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\database_tab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\simulations_tab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\nac_widget.h">
+      <Filter>wt_system_widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_test_tab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\nac_system_coordinator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_coordinator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_widget.h">
+      <Filter>wt_system_widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\ship_system_coordinator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

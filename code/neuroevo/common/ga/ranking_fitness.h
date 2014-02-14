@@ -72,7 +72,7 @@ struct ranking_fitness
 		for(size_t i = 0; i < pop_size; ++i)
 		{
 			size_t const idx = obj_vals.elems[i].index;
-			size_t const inv_pos = pop_size - 1 - i;
+			double const inv_pos = pop_size - 1 - i;
 			fitnesses[idx] = fitness_t(2.0 - SP + 2.0 * (SP - 1.0) * (inv_pos / (pop_size - 1)));
 		}
 	}

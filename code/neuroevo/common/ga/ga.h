@@ -51,13 +51,15 @@ struct gen_alg
 	typedef CrossoverRateFtr					cx_rate_ftr_t;
 	typedef MutationRateFtr						mut_rate_ftr_t;
 	typedef ProcreationSelection				proc_sel_t;
+
+	typedef boost::random::mt19937				rgen_t;
 	typedef ProcreationT< 
 		proc_sel_t,
 		cx_ftr_t,
 		mut_ftr_t,
 		cx_rate_ftr_t,
 		mut_rate_ftr_t,
-		boost::random::mt19937 >	procreation_t;	// TODO: Really need to enforce the RGen type to be consistent among all template
+		rgen_t >	procreation_t;	// TODO: Really need to enforce the RGen type to be consistent among all template
 													// parameter types, but not sure how to do easily
 
 	size_t				genome_length;	// TODO: This is making assumption about genome types...
@@ -70,7 +72,7 @@ struct gen_alg
 	mut_rate_ftr_t&		mut_rate_ftr;
 
 	size_t		generation;
-//	size_t		max_generations;
+	size_t		max_generations;
 
 	boost::random::mt19937&						rgen;
 //	boost::random::uniform_real_distribution<>	rdist_pve_clamped;
@@ -97,20 +99,22 @@ struct gen_alg
 		rgen(rg)
 	{}
 
-	void init_params(size_t gn_length = 1)//, size_t max_gens = 1)
+	void init_params(size_t gn_length = 1, size_t max_gens = 1)
 	{
 		genome_length = gn_length;
-//		max_generations = max_gens;
+		max_generations = max_gens;
 	}
 
-	void init_random_population(size_t pop_size)
+	template < typename RandomGenomeFtr >
+	void init_random_population(size_t pop_size, RandomGenomeFtr const& ftr)
 	{
 		population.clear();
 		population.resize(pop_size, individual_t());
 
 		for(individual_t& idv: population)
 		{
-			idv.genome.set_random(genome_length, rgen);
+//			idv.genome.set_random(genome_length, rgen);
+			idv.genome = ftr(rgen);
 		}
 	}
 
@@ -128,14 +132,14 @@ struct gen_alg
 
 		// First, survival selection to determine which individuals will become progenitors of the next generation
 		// TODO: Number of individuals that should make it to parenthood - where and how should this be defined??
-		int const ParenthoodFraction = 3; // Half
+		int const ParenthoodFraction = 2; // Half
 		size_t const NumProgenitors = std::max< size_t >(ValidPopulationSize / ParenthoodFraction, std::min< size_t >(ValidPopulationSize, 1));
 		population_t progenitors(NumProgenitors);
 		survival_sel_t survival_sel(population.begin(), valid_end);
 		survival_sel.select_individuals(NumProgenitors, progenitors.begin());
 
 		// Next, procreation
-		procreation_t procreation(proc_sel, cx_rate_ftr, cx_ftr, mut_rate_ftr, mut_ftr, rgen);
+		procreation_t procreation(proc_sel, cx_rate_ftr, cx_ftr, mut_rate_ftr, mut_ftr, rgen, (double)generation / max_generations);
 		bool const ParentSurvival = true;	// False = comma-selection, True = plus-selection
 		population_t next_gen(ValidPopulationSize);
 		if(ParentSurvival)
@@ -151,12 +155,14 @@ struct gen_alg
 		}
 
 		// For every invalid individual, generate a random solution to replace them
+/* TODO: !!!!!!!!!!!!!!!!!!!!!! Maybe need to have genetic_mapping as template parameter.
 		for(size_t i = 0; i < population.size() - ValidPopulationSize; ++i)
 		{
 			individual_t idv;
 			idv.genome.set_random(genome_length, rgen);
 			next_gen.push_back(idv);
 		}
+		*/
 
 		population = next_gen;
 		++generation;

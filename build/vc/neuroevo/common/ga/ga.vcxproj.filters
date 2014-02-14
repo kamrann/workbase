@@ -96,5 +96,8 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\truncation_survival_selection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\genetic_language.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

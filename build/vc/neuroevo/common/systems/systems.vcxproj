@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{03CB50F6-DD56-4560-9D5A-2CE0E7DAB8F6}</ProjectGuid>
+    <RootNamespace>systems</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\..\eigen.props" />
+    <Import Project="..\..\..\fann_dbg.props" />
+    <Import Project="..\..\neuroevo.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\..\eigen.props" />
+    <Import Project="..\..\..\fann_rls.props" />
+    <Import Project="..\..\neuroevo.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\genetic_mappings\fixed_neural_net.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\nac_board_coordinates.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\nac_board_lines.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\noughts_and_crosses_system.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\maximize_valid_moves.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\shared_objective_fn_data_components.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\try_to_win.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\observers\basic_observer.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\random_player.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\scenarios\play_to_completion.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\sensible_player.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\scenarios\full_stop.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\ship_and_thrusters_system.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\system_simulation_interface.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

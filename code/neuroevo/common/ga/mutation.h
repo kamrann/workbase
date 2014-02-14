@@ -38,14 +38,7 @@ struct basic_real_mutation
 			{
 				// ...add or subtract a small value.
 				gene += rdist_clamped(rgen) * max_perturbation;
-
-#ifdef _DEBUG
-				std::cout << "m ";
-#endif
 			}
-#ifdef _DEBUG
-			else { std::cout << "x "; }
-#endif
 		}
 	}
 };

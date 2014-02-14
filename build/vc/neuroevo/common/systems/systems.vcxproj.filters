@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ship_and_thrusters">
+      <UniqueIdentifier>{d7c05113-8877-4b5f-9df6-48e40d0d462c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="noughts_and_crosses">
+      <UniqueIdentifier>{5e92dd7b-c491-475c-90bd-5ca871730f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="noughts_and_crosses\scenarios">
+      <UniqueIdentifier>{06a5f9ae-5a49-4942-8cf3-2959be0d9b84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ship_and_thrusters\scenarios">
+      <UniqueIdentifier>{718b9587-9b81-4987-a998-da5b66c33a0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="noughts_and_crosses\genetic_mappings">
+      <UniqueIdentifier>{0d90b0d4-3f2e-42f5-b379-813123638277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="noughts_and_crosses\objectives">
+      <UniqueIdentifier>{0518542f-aeb3-4138-8315-dc9bfec9cf6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="noughts_and_crosses\observers">
+      <UniqueIdentifier>{6fc20c34-4fb8-4e2e-a522-b6e2c3154a39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ship_and_thrusters\genetic_mappings">
+      <UniqueIdentifier>{54e43ece-a2b7-4999-a8a1-3e3d4b385a76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ship_and_thrusters\objectives">
+      <UniqueIdentifier>{b35199de-8a97-43d2-bc8d-a73b19b9f75a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ship_and_thrusters\observers">
+      <UniqueIdentifier>{9f1e9907-2ea4-4399-885d-a55c54ee861d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\system_simulation_interface.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\noughts_and_crosses_system.h">
+      <Filter>noughts_and_crosses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\ship_and_thrusters_system.h">
+      <Filter>ship_and_thrusters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\genetic_mappings\fixed_neural_net.h">
+      <Filter>noughts_and_crosses\genetic_mappings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\scenarios\play_to_completion.h">
+      <Filter>noughts_and_crosses\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\maximize_valid_moves.h">
+      <Filter>noughts_and_crosses\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\shared_objective_fn_data_components.h">
+      <Filter>noughts_and_crosses\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\observers\basic_observer.h">
+      <Filter>noughts_and_crosses\observers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\random_player.h">
+      <Filter>noughts_and_crosses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\try_to_win.h">
+      <Filter>noughts_and_crosses\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\nac_board_coordinates.h">
+      <Filter>noughts_and_crosses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\nac_board_lines.h">
+      <Filter>noughts_and_crosses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\sensible_player.h">
+      <Filter>noughts_and_crosses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\scenarios\full_stop.h">
+      <Filter>ship_and_thrusters\scenarios</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

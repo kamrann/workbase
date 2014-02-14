@@ -59,7 +59,8 @@ public:
 		crossover_ftr_t& _cx,
 		mutation_rate_ftr_t& _mut_rate,
 		mutation_ftr_t& _mut,
-		RGen& rg): proc_sel(_proc_sel), cx_rate_ftr(_cx_rate), cx_ftr(_cx), mut_rate_ftr(_mut_rate), mut_ftr(_mut), rgen(rg)
+		RGen& rg,
+		double _evo_stage = 0.0): proc_sel(_proc_sel), cx_rate_ftr(_cx_rate), cx_ftr(_cx), mut_rate_ftr(_mut_rate), mut_ftr(_mut), rgen(rg), evo_stage(_evo_stage)
 	{}
 
 public:
@@ -81,12 +82,8 @@ public:
 		while(num_offspring-- > 0)
 		{
 			// First determine whether or not to create the child through crossover
-			if(can_crossover && rdist_0_1(rgen) < cx_rate_ftr(0.0 /* TODO: */))
+			if(can_crossover && rdist_0_1(rgen) < cx_rate_ftr(evo_stage))
 			{
-#ifdef _DEBUG
-				std::cout << "Cx | ";
-#endif
-
 				// Select the parents for the crossover operation
 				std::vector< individual_t* > parents(num_parents_cx, nullptr);
 				proc_sel.select_parents(num_parents_cx, parents_start, parents_end, parents.begin());
@@ -105,16 +102,15 @@ public:
 			}
 
 			// Now apply mutation
-			double mutation_rate = mut_rate_ftr(0.0 /* TODO: */);
+			double mutation_rate = mut_rate_ftr(evo_stage);
 			mut_ftr(*offspring, mutation_rate);
-
-#ifdef _DEBUG
-			std::cout << std::endl;
-#endif
 
 			++offspring;
 		}
 	}
+
+private:
+	double evo_stage;
 };
 
 

@@ -13,6 +13,9 @@
     <Filter Include="util\gl_helpers">
       <UniqueIdentifier>{d241a08d-1daf-40c6-95ac-59a93f4625b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="thrusters">
+      <UniqueIdentifier>{45e3d193-e53b-4f98-bf16-2563cc790576}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\code\common\util\dimensionality.h">
@@ -98,6 +101,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\code\common\util\graphics3d\random.h">
       <Filter>util\graphics3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\thrusters\ship_state.h">
+      <Filter>thrusters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\thrusters\thruster.h">
+      <Filter>thrusters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\thrusters\thruster_presets.h">
+      <Filter>thrusters</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

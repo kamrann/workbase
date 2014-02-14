@@ -28,7 +28,7 @@ struct LinearRateFtr
 {
 	double initial_rate, final_rate;
 
-	LinearRateFtr(double _initial = DefaultInitial / 100.0, double _final = DefaultFinal): initial_rate(_initial), final_rate(_final)
+	LinearRateFtr(double _initial = DefaultInitial / 100.0, double _final = DefaultFinal / 100.0): initial_rate(_initial), final_rate(_final)
 	{}
 
 	inline double operator() (double evo_stage) const
