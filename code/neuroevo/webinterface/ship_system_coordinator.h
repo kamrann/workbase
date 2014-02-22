@@ -5,112 +5,107 @@
 
 #include "system_coordinator.h"
 #include "wt_system_widgets/ship_widget.h"
+//#include "wt_system_widgets/ship_history_widget.h"
+
+#include "rtp_interface/systems/sat/rtp_sat_system.h"
+
+// TEMP
+#include "rtp_interface/systems/sat/scenarios/full_stop/agents.h"
+//
 
 #include <Wt/WTimer>
 
+#include <chrono>
 
-template <
-	typename Scenario_
->
+
+template < WorldDimensionality dim >
 class ship_coordinator: public system_coordinator
 {
 public:
-	typedef Scenario_								scenario_t;
-	typedef typename scenario_t::system_t			system_t;
-	typedef typename system_t::solution_result		decision_t;
-
-	static WorldDimensionality const Dim = system_t::Dim;
+	typedef rtp_sat::sat_system< dim >					system_t;
+	typedef typename system_t::i_agent					agent_controller_t;
+	typedef boost::shared_ptr< agent_controller_t >		controller_ptr_t;
 
 	enum {
-		FrameDuration = 100,
+		FrameDuration = 50,
 	};
 
-	typedef typename scenario_t::state				state_t;
-	typedef typename scenario_t::agent_id_t			agent_id_t;
-	
-	typedef ship_widget< Dim >						widget_t;
-
-	class agent_controller: public agent_controller_base
-	{
-	public:
-		virtual decision_t get_decision(state_t const& st) = 0;
-	};
-
-	typedef agent_controller						agent_controller_t;
-
-	class ui_agent_controller: public agent_controller
-	{
-	public:
-		virtual bool is_synchronous() const
-		{
-			return true;
-		}
-
-		virtual decision_t get_decision(state_t const&)
-		{
-			decision_t dec;
-			// TODO: Use key state to generate thruster activations
-			return dec;
-		}
-	};
+	typedef ship_widget									widget_t;
+	//typedef ship_history_widget< Dim >				history_widget_t;
 
 public:
-	virtual Wt::WWidget* initialize()
+	ship_coordinator(i_system* sys): m_sys((rtp_sat::sat_system< dim >*)sys)
+	{}
+
+	virtual std::pair< Wt::WWidget*, Wt::WWidget* > initialize()
 	{
-		set_agent_controllers();
+		// Temp ?
+		set_agent_controllers(new rtp_sat::interactive_agent< dim >());
 
-		m_widget = new widget_t();
+		m_widget = new ship_widget();
+		m_widget->thruster_activated().connect(this, &ship_coordinator::on_widget_thruster_activated);
 
-		return m_widget;
+		// TODO: m_history_widget = new history_widget_t();
+
+		return std::pair< Wt::WWidget*, Wt::WWidget* >(m_widget, nullptr);// m_history_widget);
 	}
 
-	void set_agent_controllers(agent_controller* c = nullptr)
+	void set_agent_controllers(agent_controller_t* a)
 	{
-		scenario_t::system_agent_config sa_cfg;
-		boost::optional< scenario_t::agent_id_t > id1 = scenario_t::register_agent(sa_cfg);
+		assert(a);
+		boost::optional< agent_id_t > id1 = m_sys->register_agent(a);
 		assert(id1);
-		m_controllers[*id1] = controller_ptr_t(c != nullptr ? c : new ui_agent_controller);
+		m_controllers[*id1] = controller_ptr_t(a);
 	}
 
 	virtual void restart()
 	{
-		boost::random::mt19937 rgen_tmp;
-		scenario_t::init_state(1, m_st, rgen_tmp);
+		rgen_t rgen;
+		rgen.seed(static_cast< uint32_t >(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff));
+		
+		m_sys->generate_initial_state(rgen);
 
 		m_widget->enable_interaction(true);	// TODO:
-		update_widget();
+		// TODO: m_history_widget->reset();
+		
+		update_widgets();
+		Wt::WTimer::singleShot(FrameDuration, this, &ship_coordinator::on_update);
 	}
 
-	void update_widget()
+	void update_widgets()
 	{
-		m_widget->update_from_system_state(m_st);
-
-		Wt::WTimer::singleShot(FrameDuration, this, &ship_coordinator::on_agent_ready);
+		m_widget->update();
+		// TODO: m_history_widget->update();
 	}
 
 private:
-	void on_agent_ready()
+	// TODO: This should just be on_widget_input(...), and the widget should be generic across all systems
+	// (just define some basic input format, and the interactive agents define their own mapping)
+	void on_widget_thruster_activated(size_t idx, bool activated)
 	{
-		scenario_t::system_update_params sup;
-		for(auto const& c_elem : m_controllers)
-		{
-			controller_ptr_t controller = c_elem.second;
-			decision_t decision = controller->get_decision(m_st);
-			scenario_t::register_solution_decision(decision, sup);
-		}
+		controller_ptr_t controller = m_controllers.begin()->second;	// TODO: For now assuming only one agent
+		// TODO: This seems bit dodgy
+		// Should probably have a generic interface for interactive agents (see also above comment)
+		boost::static_pointer_cast< rtp_sat::interactive_agent< dim > >(controller)->register_input(idx, activated);
+	}
 
-		bool result = scenario_t::update(m_st, sup);
+	void on_update()
+	{
+		bool result = m_sys->update();
+
+		update_widgets();
+
 		if(result)
 		{
-			update_widget();
+			Wt::WTimer::singleShot(FrameDuration, this, &ship_coordinator::on_update);
 		}
 	}
 
 private:
-	state_t m_st;
+	system_t* m_sys;
 	widget_t* m_widget;
+	//history_widget_t* m_history_widget;
 
-	typedef boost::shared_ptr< agent_controller_t > controller_ptr_t;
 	std::map< agent_id_t, controller_ptr_t > m_controllers;
 };
 

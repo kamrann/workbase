@@ -8,9 +8,12 @@
 #include <Wt/WContainerWidget>
 #include <Wt/WComboBox>
 #include <Wt/WVBoxLayout>
+#include <Wt/WHBoxLayout>
 
 
 using namespace Wt;
+
+class i_param_widget;
 
 
 class SystemTestTab: public WContainerWidget
@@ -20,6 +23,7 @@ public:
 
 public:
 	void set_system_widget(WWidget* w);
+	void set_history_widget(WWidget* w);
 
 private:
 	void on_system_changed();
@@ -30,8 +34,10 @@ public:	// temp public
 
 private:
 	WVBoxLayout* vlayout;
-	Wt::WComboBox* system_box;
+	WHBoxLayout* hlayout;
+	i_param_widget* system_params_widget;
 	WWidget* system_widget;
+	WWidget* history_widget;
 };
 
 

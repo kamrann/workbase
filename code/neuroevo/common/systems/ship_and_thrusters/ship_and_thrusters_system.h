@@ -4,6 +4,7 @@
 #define __SHIP_AND_THRUSTERS_SYSTEM_H
 
 #include "util/dimensionality.h"
+#include "thrusters/thruster.h"
 
 
 template <
@@ -17,16 +18,18 @@ public:
 	typedef DimensionalityTraits< Dim > dim_traits_t;
 
 	enum {
-		ThrusterPower = 1000,	// in N^-3
+		ThrusterPower = 250,	// in N^-3
 	};
 
-	struct solution_result
+/*	struct solution_result
 	{
 		typename dim_traits_t::force_t		force;
 		typename dim_traits_t::torque_t		torque;
 
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	};
+	*/
+	typedef thruster_base::thruster_activation	solution_result;
 
 public:
 /*	void register_solution_result(solution_result const& res);	// TODO: Parameter identifying solution instance.

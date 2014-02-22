@@ -7,7 +7,7 @@
 #include "wt_system_widgets/nac_widget.h"
 
 //
-#include "systems/noughts_and_crosses/genetic_mappings/fixed_neural_net.h"
+#include "systems/noughts_and_crosses/genetic_mappings/fixednn_sln.h"
 //
 
 #include <Wt/WTimer>
@@ -88,8 +88,9 @@ public:
 	class nn_controller: public agent_controller
 	{
 	public:
-		typedef fixed_neural_net< system_t, typename scenario_t::solution_input > genetic_mapping_t;
-		typedef typename genetic_mapping_t::solution nn_agent_t;
+//		typedef fixed_neural_net< system_t, typename scenario_t::solution_input > genetic_mapping_t;
+//		typedef typename genetic_mapping_t::solution nn_agent_t;
+		typedef nac::default_fixednn_solution< system_t, typename scenario_t::solution_input > nn_agent_t;
 
 	public:
 		nn_controller(nn_agent_t const& a): m_agent(a)
@@ -111,14 +112,16 @@ public:
 	};
 
 public:
-	virtual Wt::WWidget* initialize()
+	virtual std::pair< Wt::WWidget*, Wt::WWidget* > initialize()
 	{
 		set_agent_controllers();
 
 		m_widget = new widget_t();
 		m_widget->move_made().connect(this, &nac_coordinator::on_widget_move_made);
 
-		return m_widget;
+		//m_history_widget = ;
+
+		return std::pair< Wt::WWidget*, Wt::WWidget* >(m_widget, nullptr);// m_history_widget);
 	}
 
 	void set_agent_controllers(agent_controller* crosses = nullptr, agent_controller* noughts = nullptr)
@@ -140,10 +143,10 @@ public:
 		//m_controllers.clear();
 		//set_agent_controllers();
 
-		update_widget(true);
+		update_widgets(true);
 	}
 
-	void update_widget(bool still_playing)
+	void update_widgets(bool still_playing)
 	{
 		boost::optional< agent_id_t > to_act = scenario_t::pending_agent(m_st);
 		if(still_playing && to_act)
@@ -192,12 +195,13 @@ private:
 		scenario_t::register_solution_decision(decision, sup);
 		bool result = scenario_t::update(m_st, sup);
 
-		update_widget(result);
+		update_widgets(result);
 	}
 
 private:
 	state_t m_st;
 	widget_t* m_widget;
+	//history_widget_t* m_history_widget;
 
 	typedef boost::shared_ptr< agent_controller_t > controller_ptr_t;
 	std::map< agent_id_t, controller_ptr_t > m_controllers;

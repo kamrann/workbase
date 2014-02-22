@@ -123,7 +123,7 @@ protected:
 	{
 		Wt::WLength dev_width = device->width();
 		Wt::WLength dev_height = device->height();
-		size_t avail_board_size = std::min(dev_width.value() - 2 * Margin, dev_height.value() - 2 * Margin);
+		size_t avail_board_size = (size_t)std::min(dev_width.value() - 2 * Margin, dev_height.value() - 2 * Margin);
 		size_t avail_squares_size = avail_board_size - (Size - 1) * LineWidth;
 		size_t square_size = avail_squares_size / Size;
 		size_t remainder = avail_squares_size % Size;
@@ -133,11 +133,11 @@ protected:
 		painter.setPen(pen);
 
 		size_t x_base = Margin + (dev_width.value() > dev_height.value() ?
-			((dev_width.value() - dev_height.value() + remainder) / 2) :
+			(size_t)((dev_width.value() - dev_height.value() + remainder) / 2) :
 			remainder / 2
 			);
 		size_t y_base = Margin + (dev_width.value() < dev_height.value() ?
-			((dev_height.value() - dev_width.value() + remainder) / 2) :
+			(size_t)((dev_height.value() - dev_width.value() + remainder) / 2) :
 			remainder / 2
 			);
 

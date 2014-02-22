@@ -5,6 +5,9 @@
 
 #include "../ship_and_thrusters_system.h"
 #include "thrusters/ship_state.h"
+// TEMP
+#include "thrusters/thruster_presets.h"
+//
 
 #include <Eigen/StdVector>
 
@@ -27,25 +30,40 @@ public:
 	/*
 	Structure for state of a single agent.
 	*/
-	typedef ship_state< Dim > agent_state;
+	struct agent_state: public ship_state< Dim >
+	{
+		// TODO: Separate core state from superfluous state - for example, thruster heat, which is used only for display purposes
+		thruster_system< Dim > thruster_sys;
+
+		agent_state(): thruster_sys(nullptr)
+		{}
+	};
 
 	/*
 	This structure represents the state of the problem domain/environment, excluding that of the contained agents.
 	*/
-	struct envt_state {};
+	struct envt_state
+	{
+		double time;
+
+		envt_state(): time(0.0)
+		{}
+	};
 
 	/*
 	This is the state known to a given agent, and represents all the information available to that agent to make decisions.
 	*/
 	struct agent_sensor_state
 	{
-		typename dim_traits_t::linear_velocity_t lin_vel;
+		typename dim_traits_t::velocity_t lin_vel;
 		typename dim_traits_t::angular_velocity_t ang_vel;
+		typename dim_traits_t::orientation_t orient;
 
 		agent_sensor_state(agent_state const& a)
 		{
 			lin_vel = a.lin_velocity;
 			ang_vel = a.ang_velocity;
+			orient = a.orientation;
 		}
 
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -66,15 +84,20 @@ public:
 
 
 	template < typename RGen >
-	static inline void init_state(size_t num_agents, state& st, RGen& rgen)
+	static inline void init_state(size_t num_agents, state& st, RGen& rgen, boost::optional< std::pair< size_t, size_t > > trial_context = boost::none)
 	{
 		st = state();
 		st.agents.resize(num_agents);	// TODO: this should be tied to register_agent()
 
 		for(size_t i = 0; i < num_agents; ++i)
 		{
-			st.agents[i].lin_velocity = random_val< typename dim_traits_t::velocity_t >(rgen);
-			st.agents[i].ang_velocity = random_val< typename dim_traits_t::angular_velocity_t >(rgen);
+			// TODO:
+			st.agents[i].thruster_cfg = boost::shared_ptr< thruster_config< Dim > >(new thruster_config< Dim >(thruster_presets::square_minimal()));
+			st.agents[i].thruster_sys.cfg = st.agents[i].thruster_cfg;
+			st.agents[i].thruster_sys.sync_to_cfg();
+
+			st.agents[i].lin_velocity = random_dir_val< typename dim_traits_t::velocity_t >(rgen) * 2.0;
+			st.agents[i].ang_velocity = random_dir_val< typename dim_traits_t::angular_velocity_t >(rgen) * 0.5;
 		}
 	}
 
@@ -101,7 +124,11 @@ public:
 
 	struct system_update_params
 	{
+		double timestep;
 		std::vector< typename system_t::solution_result > decisions;
+
+		system_update_params(): timestep(0.05)	// Default to 20 updates per second of internal simulation system time
+		{}
 	};
 
 	static void register_solution_decision(typename system_t::solution_result const& res, system_update_params& sup)
@@ -111,24 +138,45 @@ public:
 	
 	static bool update(state& st, system_update_params const& sup)
 	{
-		double const timestep = 1.0;	// TODO: ?
+		double const timestep = sup.timestep;// 1.0;	// TODO: ?
+		double const thruster_force = system_t::ThrusterPower / 1000.0;
 
 		assert(sup.decisions.size() == st.agents.size());
 
 		for(size_t i = 0; i < st.agents.size(); ++i)
 		{
-			typename system_t::solution_result const& decision = sup.decisions[i];
 			agent_state& a_state = st.agents[i];
-			
-			a_state.lin_velocity += decision.force * system_t::ThrusterPower * timestep;
-			a_state.ang_velocity += decision.torque * system_t::ThrusterPower * timestep;
+
+			typename system_t::solution_result const& decision = sup.decisions[i];
+			typename dim_traits_t::force_t force;
+			typename dim_traits_t::torque_t torque;
+			std::tie(force, torque) = a_state.thruster_cfg->calc_resultants(decision, a_state.c_of_mass);
+			force = dim_traits_t::transform_dir(force, a_state.orientation);
+			torque = dim_traits_t::transform_dir(torque, a_state.orientation);
+
+			a_state.lin_velocity += force * thruster_force * timestep;
+			a_state.ang_velocity += torque * thruster_force * timestep;
 
 			a_state.position += a_state.lin_velocity * timestep;
 			a_state.orientation = dim_traits_t::apply_orientation_delta(
 				a_state.orientation, a_state.ang_velocity * timestep);
+
+			for(size_t j = 0; j < a_state.thruster_sys.cfg->num_thrusters(); ++j)
+			{
+				if(decision[j])
+				{
+					a_state.thruster_sys[j].t.engage();
+				}
+				else
+				{
+					a_state.thruster_sys[j].t.cool_down(timestep);
+				}
+			}
 		}
 
-		return true;	// TODO:
+		st.time += timestep;
+
+		return st.time < 10.0;	// TODO:
 	}
 };
 

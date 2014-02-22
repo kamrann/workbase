@@ -3,6 +3,8 @@
 #ifndef __SYSTEM_COORDINATOR_H
 #define __SYSTEM_COORDINATOR_H
 
+#include <functional>
+
 
 namespace Wt {
 	class WWidget;
@@ -11,7 +13,7 @@ namespace Wt {
 class system_coordinator
 {
 public:
-	virtual Wt::WWidget* initialize() = 0;
+	virtual std::pair< Wt::WWidget*, Wt::WWidget* > initialize() = 0;
 	virtual void restart() = 0;
 };
 

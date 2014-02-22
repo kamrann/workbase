@@ -40,16 +40,10 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\ship_and_thrusters_system.h">
       <Filter>ship_and_thrusters</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\genetic_mappings\fixed_neural_net.h">
-      <Filter>noughts_and_crosses\genetic_mappings</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\scenarios\play_to_completion.h">
       <Filter>noughts_and_crosses\scenarios</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\maximize_valid_moves.h">
-      <Filter>noughts_and_crosses\objectives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\shared_objective_fn_data_components.h">
       <Filter>noughts_and_crosses\objectives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\observers\basic_observer.h">
@@ -71,6 +65,49 @@
       <Filter>noughts_and_crosses</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\scenarios\full_stop.h">
+      <Filter>ship_and_thrusters\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\fixed_neural_net.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\genetic_mappings\fixednn_sln.h">
+      <Filter>noughts_and_crosses\genetic_mappings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\genetic_mappings\fixednn_sln.h">
+      <Filter>ship_and_thrusters\genetic_mappings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\observers\sat_basic_observer.h">
+      <Filter>ship_and_thrusters\observers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\noughts_and_crosses\objectives\shared_objective_fn_data_components.h">
+      <Filter>noughts_and_crosses\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\sat_shared_objective_fn_data_components.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_angular_speed.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_orientation_delta.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_linear_speed.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_kinetic_energy.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_opposing_thrusters.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\scenarios\angular_full_stop.h">
+      <Filter>ship_and_thrusters\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_fuel_usage.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\objectives\minimize_ke_and_opp_thrusters.h">
+      <Filter>ship_and_thrusters\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\systems\ship_and_thrusters\scenarios\target_orientation.h">
       <Filter>ship_and_thrusters\scenarios</Filter>
     </ClInclude>
   </ItemGroup>

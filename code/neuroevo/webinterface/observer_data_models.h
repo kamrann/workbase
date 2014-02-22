@@ -4,6 +4,7 @@
 #define __OBSERVER_DATA_MODELS_H
 
 #include "systems/noughts_and_crosses/observers/basic_observer.h"
+#include "systems/ship_and_thrusters/observers/sat_basic_observer.h"
 
 #include <Wt/WStandardItemModel>
 #include <Wt/WStandardItem>
@@ -54,6 +55,29 @@ struct observer_data_model< basic_observer >
 		return model;
 	}
 };
+
+
+template <>
+struct observer_data_model< sat_basic_observer >
+{
+	static Wt::WStandardItemModel* generate(std::vector< sat_basic_observer::per_trial_data > const& data)
+	{
+		Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 1);
+		model->setHeaderData(0, std::string("todo"));
+
+		size_t row = 0;
+		for(sat_basic_observer::per_trial_data const& d : data)
+		{
+			Wt::WStandardItem* item = new Wt::WStandardItem;
+			item->setData(boost::any(std::string("")), Wt::DisplayRole);
+			model->setItem(row, 0, item);
+
+			++row;
+		}
+		return model;
+	}
+};
+
 
 
 #endif

@@ -8,6 +8,7 @@
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#include <boost/math/constants/constants.hpp>
 
 
 template < typename T >
@@ -33,14 +34,14 @@ struct num_components< Eigen::Vector3d >
 
 
 template < typename OutputIterator >
-inline size_t get_components(double x, OutputIterator out)
+inline size_t get_components(double x, OutputIterator& out)
 {
 	*out++ = x;
 	return 1;
 }
 
 template < typename OutputIterator >
-inline size_t get_components(Eigen::Vector2d const& v, OutputIterator out)
+inline size_t get_components(Eigen::Vector2d const& v, OutputIterator& out)
 {
 	*out++ = v[0];
 	*out++ = v[1];
@@ -48,7 +49,7 @@ inline size_t get_components(Eigen::Vector2d const& v, OutputIterator out)
 }
 
 template < typename OutputIterator >
-inline size_t get_components(Eigen::Vector3d const& v, OutputIterator out)
+inline size_t get_components(Eigen::Vector3d const& v, OutputIterator& out)
 {
 	*out++ = v[0];
 	*out++ = v[1];
@@ -232,7 +233,7 @@ public:
 
 	static inline orientation_t apply_orientation_delta(orientation_t const& orient, angular_direction_t const& delta)
 	{
-		return orient + delta;
+		return std::fmod(orient + delta, 2 * boost::math::double_constants::pi);
 	}
 };
 
@@ -273,8 +274,38 @@ public:
 		// Probably inefficient, see: http://stackoverflow.com/questions/8816785/looking-for-a-better-method-to-do-quaternion-differentiaton
 		double angle = delta.norm();
 		return Eigen::AngleAxis< double >(angle, delta / angle) * orient;
+		// TODO: Need to normalize a quaternion??
 	}
 };
+
+
+template < size_t Dim, typename Scalar >
+inline std::string vector_str(Eigen::Matrix< Scalar, Dim, 1 > const& vec)
+{
+	std::stringstream ss;
+	ss.precision(2);
+	std::fixed(ss);
+	ss << "[";
+	for(size_t i = 0; i < Dim; ++i)
+	{
+		if(i != 0)
+		{
+			ss << ",";
+		}
+		ss << " " << vec[i];
+	}
+	ss << " ]";
+	return ss.str();
+}
+
+inline std::string orientation_str(double angle)
+{
+	std::stringstream ss;
+	ss.precision(2);
+	std::fixed(ss);
+	ss << (360.0 * angle / (2 * boost::math::double_constants::pi)) << "\xB0";
+	return ss.str();
+}
 
 
 #endif

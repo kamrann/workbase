@@ -19,6 +19,30 @@
     <Filter Include="wt_system_widgets">
       <UniqueIdentifier>{2770755d-84b6-41bf-a38e-6945a32e96fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rtp_interface">
+      <UniqueIdentifier>{6abd3bba-87c6-4089-9d72-bdee766c4998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems">
+      <UniqueIdentifier>{759ed45f-4f91-4a65-adf0-8a47ec6c657d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\nac">
+      <UniqueIdentifier>{6ecd3eff-f7f5-4e8c-bfe4-b160c00346c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\sat">
+      <UniqueIdentifier>{ebbe9b9a-80d9-481c-9faf-5966dbcd5c56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\params">
+      <UniqueIdentifier>{0c6eb2eb-0cad-47b4-975f-0a35bb204800}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\sat\scenarios">
+      <UniqueIdentifier>{fcd840f6-a5c7-49c8-aa05-c4aa980792af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\sat\scenarios\full_stop">
+      <UniqueIdentifier>{26ce42aa-f305-40ca-8096-a19bfd5680c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\sat\scenarios\target_orientation">
+      <UniqueIdentifier>{916b6077-9907-42c0-a4d5-ee2718771034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.cpp">
@@ -38,6 +62,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\system_test_tab.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_system.cpp">
+      <Filter>rtp_interface\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_widget.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_system.cpp">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_sim.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_scenario.cpp">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\full_stop\rtp_sat_full_stop.cpp">
+      <Filter>rtp_interface\systems\sat\scenarios\full_stop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\target_orientation\rtp_sat_target_orientation.cpp">
+      <Filter>rtp_interface\systems\sat\scenarios\target_orientation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\full_stop\agents.cpp">
+      <Filter>rtp_interface\systems\sat\scenarios\full_stop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_system_drawer.cpp">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\nac\rtp_nac_scenario.cpp">
+      <Filter>rtp_interface\systems\nac</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +151,72 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\ship_system_coordinator.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_history_widget.h">
+      <Filter>wt_system_widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_sim.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_defs.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_observer.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_genome.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_system.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\integer_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\dimensionality_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_widget.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\paramlist_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\nestedparam_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_system.h">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_scenario.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_decision.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\full_stop\rtp_sat_full_stop.h">
+      <Filter>rtp_interface\systems\sat\scenarios\full_stop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_scenario.h">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\target_orientation\rtp_sat_target_orientation.h">
+      <Filter>rtp_interface\systems\sat\scenarios\target_orientation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\full_stop\agents.h">
+      <Filter>rtp_interface\systems\sat\scenarios\full_stop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_system_drawer.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_system_drawer.h">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\nac\rtp_nac_scenario.h">
+      <Filter>rtp_interface\systems\nac</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

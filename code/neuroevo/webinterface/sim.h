@@ -1,12 +1,15 @@
 // sim.h
 
-#ifndef __SHIP_SIM_H
-#define __SHIP_SIM_H
+#ifndef __NE_SIM_H
+#define __NE_SIM_H
 
+/*
 #include "systems/noughts_and_crosses/objectives/maximize_valid_moves.h"
 #include "systems/noughts_and_crosses/objectives/try_to_win.h"
 #include "systems/noughts_and_crosses/observers/basic_observer.h"
-#include "systems/noughts_and_crosses/genetic_mappings/fixed_neural_net.h"
+#include "systems/noughts_and_crosses/genetic_mappings/fixednn_sln.h"
+#include "systems/fixed_neural_net.h"
+*/
 
 #include "ga/ga.h"
 //#include "ga/genome.h"
@@ -28,6 +31,7 @@
 #include <Eigen/StdVector>
 
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/smart_ptr.hpp>
 
@@ -35,48 +39,57 @@
 
 
 template <
-	typename Scenario//,
-	//typename FitnessFn
+	typename Scenario,
+	typename GeneticMapping,
+	typename TrialData,
+	typename ResultantObjective,
+	typename CollectiveObjective,
+	typename Observer
 >
 class simulation
 {
 public:
 	typedef Scenario scenario_t;
-//	static const WorldDimensionality dim = problem_t::dim;
-//	typedef typename problem_t::dim_traits dim_traits;
-
-//	typedef thruster_config< dim > thruster_config_t;
+	typedef GeneticMapping genetic_mapping_t;
+	typedef TrialData trial_data_t;
+	typedef ResultantObjective resultant_obj_fn_t;
+	typedef CollectiveObjective collective_obj_val_fn_t;
+	typedef Observer observer_t;
 	
-	struct trial_data_t
+/*	struct trial_data_t
 	{
-		typename scenario_t::state/*agent_state	*/	initial_st;
-		typename scenario_t::state/*agent_state	*/	final_st;
+		// was agent_state
+		typename scenario_t::state	initial_st;
+		typename scenario_t::state	final_st;
 
-		//EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+		// TODO: Dependent on template params as to whether is needed...????
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	};
+	*/
 
-	typedef basic_observer											observer_t;
+	//typedef basic_observer											observer_t;
 	typedef std::vector< typename observer_t::per_trial_data >		observation_data_t;
-
-/*	typedef mpl::vector<
+/*
+	typedef mpl::vector<
 		typename problem_t::slowdown_obj_fn,
 		typename problem_t::minimize_resultant_force_obj_fn
 	> obj_fns_tl;
 	typedef pareto_multiple_objective< trial_data_t, obj_fns_tl >	resultant_obj_fn_t;
-	*/
+
 	typedef single_objective< trial_data_t,
 		try_to_win_obj_fn >
 		//max_valid_moves_obj_fn >
 																	resultant_obj_fn_t;
+*/
 
 	typedef typename resultant_obj_fn_t::obj_value_t				raw_obj_val_t;
 	// TODO: resultant should not have ofdata_t - just provides typelist of dependencies, as does observer_t
 	// then need to combine and form ofdata_t
 	typedef typename resultant_obj_fn_t::ofdata_t					ofdata_t;
 
-	typedef coll_obj_val_identity< raw_obj_val_t >					collective_obj_val_fn_t;
-
-//	typedef coll_obj_val_pareto_ranking< raw_obj_val_t >			collective_obj_val_fn_t;
+//	typedef coll_obj_val_identity< raw_obj_val_t >
+//	typedef coll_obj_val_pareto_ranking< raw_obj_val_t >
+//		collective_obj_val_fn_t;
 
 	typedef typename collective_obj_val_fn_t::processed_obj_val_t	processed_obj_val_t;
 	typedef 
@@ -85,9 +98,8 @@ public:
 																	fitness_assignment_fn_t;
 	typedef typename fitness_assignment_fn_t::fitness_t				fitness_t;
 	
-	typedef fixed_neural_net<
-		typename scenario_t::system_t,
-		typename scenario_t::solution_input >						genetic_mapping_t;
+//	typedef nac::default_fixednn_solution< typename scenario_t::system_t, typename scenario_t::solution_input > solution_t;
+//	typedef fixed_neural_net< typename scenario_t::system_t, solution_t >								genetic_mapping_t;
 	typedef typename genetic_mapping_t::genome						genome_t;
 	typedef typename genetic_mapping_t::genome_diff_t				genome_diff_t;
 
@@ -287,8 +299,9 @@ public:
 
 	void run_epoch(observation_data_t& observations, std::ostream& os)
 	{
-		rgen.seed(//static_cast< uint32_t >(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff));
-			ga_epoch_rseed + ga.generation);
+		//rgen.seed(ga_epoch_rseed + ga.generation);
+		rgen.seed(ga_epoch_rseed);
+
 		// TODO: Maybe better for these distribution objects not to persist across epochs...
 //		cx_ftr.rdist.reset();
 		mut_ftr.rdist_clamped.reset();
@@ -310,6 +323,10 @@ public:
 			++ga.generation;
 		}
 
+		// Recreate the ga rand seed so that ga code will get different random numbers in next generation
+		ga_epoch_rseed = boost::random::uniform_int_distribution< uint32_t >()(rgen);
+
+		//rgen.seed(trials_rseed + StaticTrainingSet ? 0 : ga.generation); this doesn't seem to work
 		rgen.seed(trials_rseed);
 
 		// Construct the decision making agents, then initialise their parameters by decoding the population genomes
@@ -342,11 +359,15 @@ public:
 			processed_obj_val_acc_t processed_obj_val_acc(fitnesses, population_size);
 			raw_obj_val_acc_t raw_obj_val_acc(processed_obj_val_acc, population_size);
 
+			// Initialise the system
+			scenario_t::state trial_initial_st;
+			scenario_t::init_state(1, trial_initial_st, rgen, std::pair< size_t, size_t >(iinst, trials_per_epoch));	// TODO: assuming single agent system for now
+
 			for(size_t iInd = 0; iInd < population_size; ++iInd)
 			{
-				// Initialise the system
-				scenario_t::state st;
-				scenario_t::init_state(1, st, rgen);	// TODO: assuming single agent system for now
+				// Use the same initial state for every agent's simulation on this trial
+				scenario_t::state st = trial_initial_st;
+				
 				size_t const iAgent = 0;
 
 				trial_data_t trial_data;
@@ -354,7 +375,6 @@ public:
 				ofdata_t of_data;
 
 				// Update step loop
-				//for(size_t itime = 0; itime < 100; ++itime)	// TODO: Timestep limit???
 				bool update_result = true;
 				while(update_result)
 				{
@@ -437,6 +457,14 @@ public:
 			}
 		}
 
+		bool const StaticTrainingSet = false;	// Is training data (ie. system initial state) the same for every generation?
+		// Regardless of this setting, data will be the same for all agents within a given generation.		}
+
+		// If we don't want a static training set, recreate the trials rand seed 
+		if(!StaticTrainingSet)
+		{
+			trials_rseed = boost::random::uniform_int_distribution< uint32_t >()(rgen);
+		}
 
 		// TODO: TEMP
 //		ga.sort_population_by_genome();

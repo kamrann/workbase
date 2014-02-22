@@ -32,5 +32,8 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\test_app\test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

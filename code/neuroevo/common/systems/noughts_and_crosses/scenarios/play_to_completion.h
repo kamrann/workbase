@@ -67,7 +67,7 @@ public:
 
 
 	template < typename RGen >
-	static inline void init_state(size_t num_agents, state& st, RGen& rgen)
+	static inline void init_state(size_t num_agents, state& st, RGen& rgen, boost::optional< std::pair< size_t, size_t > > trial_context = boost::none)
 	{
 		st = state();
 		st.agents.resize(num_agents);	// TODO: this should be tied to register_agent()
