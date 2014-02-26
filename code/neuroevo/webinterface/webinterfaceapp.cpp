@@ -19,6 +19,8 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 {
 	setTitle("NeuroEvo Web Interface");
 
+	styleSheet().addRule(".wb_numerical_input", "text-align: right;");
+
 	main_tabs = new WTabWidget(root());
 	main_tabs->addTab(new DatabaseTab(db_session), "Evo Database", Wt::WTabWidget::PreLoading);
 	main_tabs->addTab(new SimulationsTab(), "Simulations", Wt::WTabWidget::PreLoading);

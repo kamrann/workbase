@@ -18,15 +18,19 @@ struct min_kinetic_obj_fn: public objective_fn
 	template < typename TrialData, typename ObjFnData >
 	static inline obj_value_t evaluate(ObjFnData const& ofd, TrialData const& td)
 	{
+		// TODO:
+		double const m = 1.0;
+		double const I = 1.0;
+
 /*		double const initial_linear = magnitude(td.initial_st.agents[0].lin_velocity);
 		double const initial_angular = magnitude(td.initial_st.agents[0].ang_velocity);
-		double const initial_kinetic = initial_linear * initial_linear + initial_angular * initial_angular;
+		double const initial_kinetic = 0.5 * (m * initial_linear * initial_linear + I * initial_angular * initial_angular);
 		double const final_linear = magnitude(td.final_st.agents[0].lin_velocity);
 		double const final_angular = magnitude(td.final_st.agents[0].ang_velocity);
-		double const final_kinetic = final_linear * final_linear + final_angular * final_angular;
+		double const final_kinetic = 0.5 * (m * final_linear * final_linear + I * final_angular * final_angular);
 		return obj_value_t(-(final_kinetic - initial_kinetic));
-*/
-		double const avg_kinetic = ofd.avg_lin_speed * ofd.avg_lin_speed + ofd.avg_ang_speed * ofd.avg_ang_speed;
+*/		
+		double const avg_kinetic = 0.5 * (m * ofd.avg_lin_speed * ofd.avg_lin_speed + I * ofd.avg_ang_speed * ofd.avg_ang_speed);
 		return obj_value_t(-avg_kinetic);
 	}
 };

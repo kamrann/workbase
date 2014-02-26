@@ -21,7 +21,7 @@ void rtp_param_list_widget::add_child(std::string name, i_param_widget* c)
 	int existing_rows = children.size();
 
 	m_layout->addWidget(new Wt::WText(name), existing_rows, 0);
-	m_layout->addWidget(c->get_wt_widget(), existing_rows, 1, Wt::AlignLeft);
+	m_layout->addWidget(c->get_wt_widget(), existing_rows, 1);// , Wt::AlignLeft);
 
 	m_layout->setColumnStretch(0, 0);
 	m_layout->setColumnStretch(1, 1);

@@ -23,7 +23,7 @@ namespace rtp_sat
 		full_stop(rtp_param param);
 
 	public:
-		virtual state_t generate_initial_state(rgen_t& rgen);
+		virtual state_t generate_initial_state(rgen_t& rgen) const;
 	};
 }
 

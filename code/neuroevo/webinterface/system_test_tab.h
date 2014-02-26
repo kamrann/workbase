@@ -5,6 +5,8 @@
 
 #include "system_coordinator.h"
 
+#include "rtp_interface/rtp_param_manager.h"
+
 #include <Wt/WContainerWidget>
 #include <Wt/WComboBox>
 #include <Wt/WVBoxLayout>
@@ -36,6 +38,7 @@ private:
 	WVBoxLayout* vlayout;
 	WHBoxLayout* hlayout;
 	i_param_widget* system_params_widget;
+	rtp_param_manager param_mgr;
 	WWidget* system_widget;
 	WWidget* history_widget;
 };

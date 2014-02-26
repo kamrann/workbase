@@ -23,10 +23,10 @@ struct min_lin_speed_obj_fn: public objective_fn
 		double const SigmoidLimit = 4.0;
 
 		// TODO: .agents[0] ??? need agent index as argument?????
-		double end_speed = ofd.stopped_moving ? 0.0 : magnitude(td.final_st.agents[0].lin_velocity);
-		double accel = end_speed - magnitude(td.initial_st.agents[0].lin_velocity);
-		size_t timesteps = ofd.stopped_moving ? ofd.timesteps_to_stopped_moving : ofd.timesteps;
-		double decel_rate = -accel / (timesteps * 0.05);	// TODO: 0.1 copied from system_update_params default value
+		double end_speed = ofd.stopped_moving ? 0.0 : magnitude(td.final_st.ship.lin_velocity);
+		double accel = end_speed - magnitude(td.initial_st.ship.lin_velocity);
+		double time = ofd.stopped_moving ? ofd.time_to_stopped_moving : td.final_st.time;// ofd.timesteps;
+		double decel_rate = -accel / time;// (timesteps * 0.05);	// TODO: 0.1 copied from system_update_params default value
 
 		// NOTE: If not normalized, could potentially be +ve/-ve and any size
 		// Roulette wheel selection requires +ve values with meaningful distribution

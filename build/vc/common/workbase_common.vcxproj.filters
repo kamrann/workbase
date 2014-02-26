@@ -111,5 +111,8 @@
     <ClInclude Include="..\..\..\code\common\thrusters\thruster_presets.h">
       <Filter>thrusters</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\code\common\util\fixed_or_random.h">
+      <Filter>util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

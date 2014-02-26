@@ -160,7 +160,7 @@ public:
 				}
 				dim_traits::force_t f;
 				dim_traits::torque_t t;
-				boost::tie(f, t) = t_cfg.calc_resultants(ta, c_of_mass);
+				std::tie(f, t) = t_cfg.calc_resultants(ta, c_of_mass);
 
 				const double eps = 0.0001;
 				if(magnitude(f) < eps && magnitude(t) < eps)
@@ -206,13 +206,14 @@ class thruster_system
 public:
 	typedef thruster_config< dim > config_t;
 
+	template < typename ThrusterT >
 	struct t_data
 	{
-		thruster&								t;
+		ThrusterT&								t;
 		typename config_t::pos_t const&			pos;
 		typename config_t::lin_dir_t const&		dir;
 
-		t_data(typename config_t::t_data const& _d, thruster& _t): t(_t), pos(_d.pos), dir(_d.dir)
+		t_data(typename config_t::t_data const& _d, ThrusterT& _t): t(_t), pos(_d.pos), dir(_d.dir)
 		{}
 	};
 
@@ -239,9 +240,14 @@ public:
 		}
 	}
 
-	inline t_data operator[] (int i)
+	inline t_data< thruster > operator[] (int i)
 	{
-		return t_data((*cfg)[i], thrusters[i]);
+		return t_data< thruster >((*cfg)[i], thrusters[i]);
+	}
+
+	inline t_data< thruster const > operator[] (int i) const
+	{
+		return t_data< thruster const >((*cfg)[i], thrusters[i]);
 	}
 
 public:

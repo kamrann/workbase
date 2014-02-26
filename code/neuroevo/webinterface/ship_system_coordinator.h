@@ -23,7 +23,7 @@ class ship_coordinator: public system_coordinator
 {
 public:
 	typedef rtp_sat::sat_system< dim >					system_t;
-	typedef typename system_t::i_agent					agent_controller_t;
+	typedef i_agent										agent_controller_t;
 	typedef boost::shared_ptr< agent_controller_t >		controller_ptr_t;
 
 	enum {
@@ -40,9 +40,10 @@ public:
 	virtual std::pair< Wt::WWidget*, Wt::WWidget* > initialize()
 	{
 		// Temp ?
-		set_agent_controllers(new rtp_sat::interactive_agent< dim >());
+		//set_agent_controllers(new rtp_sat::interactive_agent< dim >());
 
 		m_widget = new ship_widget();
+		m_widget->set_drawer(m_sys->get_drawer());
 		m_widget->thruster_activated().connect(this, &ship_coordinator::on_widget_thruster_activated);
 
 		// TODO: m_history_widget = new history_widget_t();
@@ -53,6 +54,7 @@ public:
 	void set_agent_controllers(agent_controller_t* a)
 	{
 		assert(a);
+		m_sys->clear_agents();
 		boost::optional< agent_id_t > id1 = m_sys->register_agent(a);
 		assert(id1);
 		m_controllers[*id1] = controller_ptr_t(a);
@@ -63,7 +65,7 @@ public:
 		rgen_t rgen;
 		rgen.seed(static_cast< uint32_t >(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff));
 		
-		m_sys->generate_initial_state(rgen);
+		m_sys->set_state(m_sys->generate_initial_state(rgen));
 
 		m_widget->enable_interaction(true);	// TODO:
 		// TODO: m_history_widget->reset();
@@ -91,7 +93,7 @@ private:
 
 	void on_update()
 	{
-		bool result = m_sys->update();
+		bool result = m_sys->update(nullptr);
 
 		update_widgets();
 

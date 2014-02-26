@@ -28,8 +28,8 @@ SystemTestTab::SystemTestTab(WContainerWidget* parent): WContainerWidget(parent)
 	WPanel* sys_params_panel = new WPanel;
 	sys_params_panel->setTitle("System parameters");
 
-	system_param_type* spt = new system_param_type;
-	system_params_widget = spt->create_widget();
+	system_param_type* spt = new system_param_type();
+	system_params_widget = spt->create_widget(&param_mgr);
 	sys_params_panel->setCentralWidget(system_params_widget->get_wt_widget());
 
 	vlayout->addWidget(sys_params_panel);
@@ -86,10 +86,10 @@ void SystemTestTab::set_history_widget(WWidget* w)
 void SystemTestTab::on_system_changed()
 {
 	rtp_param sys_param = system_params_widget->get_param();
-	i_system* sys = i_system::create_instance(sys_param);
+	i_system* sys = std::get< 0 >(i_system::create_instance(sys_param));
 
 	// TEMP
-	if(boost::any_cast<SystemType>(boost::any_cast< std::pair< boost::any, boost::any > >(sys_param)) != ShipAndThrusters2D)
+	if(boost::any_cast<SystemType>(boost::any_cast< std::pair< boost::any, boost::any > >(sys_param).first) != ShipAndThrusters2D)
 	{
 		return;
 	}

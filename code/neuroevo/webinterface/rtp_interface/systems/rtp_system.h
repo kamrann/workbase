@@ -5,6 +5,7 @@
 
 #include "../rtp_defs.h"
 #include "../rtp_param.h"
+#include "../params/nestedparam_par.h"
 
 #include <boost/optional.hpp>
 
@@ -28,69 +29,48 @@ class system_type_param_type: public rtp_param_type
 {
 public:
 	virtual boost::any default_value() const;
-	virtual i_param_widget* create_widget() const;
+	virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
 	virtual rtp_param get_widget_param(i_param_widget const* w) const;
 };
 
-class system_param_type: public rtp_param_type
+class system_param_type: public rtp_autonestedparam_param_type
 {
 public:
-	virtual boost::any default_value() const;
-	virtual i_param_widget* create_widget() const;
-	virtual rtp_param get_widget_param(i_param_widget const* w) const;
+	system_param_type(bool evolvable = false);
+
+public:
+	virtual rtp_named_param provide_selection_param() const;
+	virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+
+private:
+	bool m_evolvable;
 };
 
 
 extern const std::array< std::string, NumSystems > SystemNames;
 
 
-//Wt::WComboBox* create_system_select_widget();
-//Wt::WWidget* create_sim_params_widget();
-
-/*
-struct rtp_named_param_list;
-
-struct rtp_system_traits_base
-{
-	static rtp_named_param_list params(SystemType sys);
-};
-
-template < int Sys = NumSystems >
-struct rtp_system_traits;
-
-template <>
-struct rtp_system_traits< NumSystems >: public rtp_system_traits_base
-{};
-
-template <>
-struct rtp_system_traits< NoughtsAndCrosses >
-{
-	static rtp_named_param_list params();
-};
-
-template <>
-struct rtp_system_traits< ShipAndThrusters2D >
-{
-	static rtp_named_param_list params();
-};
-*/
-
-
+class i_agent;
 class i_system_drawer;
+class i_observer;
+class i_genome_mapping;
+class i_agent_factory;
 
 class i_system
 {
 public:
-	static rtp_named_param_list params(SystemType sys);
-	static i_system* create_instance(rtp_param param);
+	static rtp_named_param_list params(SystemType sys, bool evolvable = false);
+	static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* > create_instance(rtp_param param, bool evolvable = false);
 
 public:
-//	virtual boost::optional< agent_id_t > register_agent() = 0;
-	virtual void generate_initial_state(rgen_t& rgen) = 0;
+	virtual boost::any generate_initial_state(rgen_t& rgen) const = 0;
+	virtual void set_state(boost::any const& st) = 0;
 
-//	virtual bool pending_decision(agent_id_t id) = 0;
-//	virtual void register_solution_decision(i_decision const& dec) = 0;
-	virtual bool update() = 0;
+	virtual void clear_agents() = 0;
+	virtual boost::optional< agent_id_t > register_agent(i_agent* a) = 0;
+
+	virtual bool update(i_observer* obs = nullptr) = 0;
+	virtual boost::any record_observations(i_observer* obs) const = 0;
 
 	virtual i_system_drawer* get_drawer() const = 0;
 };

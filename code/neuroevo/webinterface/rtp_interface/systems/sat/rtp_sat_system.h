@@ -5,6 +5,7 @@
 
 #include "../rtp_system.h"
 #include "../rtp_decision.h"
+#include "../rtp_agent.h"
 
 #include "thrusters/ship_state.h"
 #include "thrusters/thruster.h"
@@ -19,6 +20,7 @@ namespace rtp_sat {
 			public i_decision,
 			public thruster_base::thruster_activation
 		{
+		public:
 			decision(thruster_base::thruster_activation ta = thruster_base::thruster_activation()):
 				i_decision(),
 				thruster_base::thruster_activation(ta)
@@ -26,16 +28,7 @@ namespace rtp_sat {
 		};
 
 	public:
-		//virtual boost::optional< agent_id_t > register_agent();
-		//virtual bool pending_decision(agent_id_t id);
-		//virtual void register_solution_decision(i_decision const& dec);
-
-	protected:
-		//boost::optional< agent_id_t > m_agent;
-		//boost::optional< decision > m_decision;
-
-	public:
-		static i_system* create_instance(rtp_param param);
+		//static i_system* create_instance(rtp_param param);
 	};
 
 
@@ -74,24 +67,144 @@ namespace rtp_sat {
 			public agent_state	// For now, just a single agent system
 		{};
 
+		struct trial_data
+		{
+			state initial_st;
+			state final_st;
+		};
+
 		typedef boost::any scenario_data;
 
-		class i_agent
+		class i_sat_agent;
+
+		class ship_config
 		{
+		public:
+			enum Type {
+				SquareMinimal,
+				SquareComplete,
+
+				Count,
+			};
+
+			static std::string const Names[Type::Count];
+
+			class enum_param_type: public rtp_param_type
+			{
+			public:
+				virtual boost::any default_value() const;
+				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
+				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			};
+
+			class param_type: public rtp_autonestedparam_param_type
+			{
+			public:
+				virtual rtp_named_param provide_selection_param() const;
+				virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+			};
+
+			static thruster_config< dim > create_instance(rtp_param param);
+		};
+
+		class i_sat_agent: public i_agent
+		{
+		public:
+			enum Type {
+				Passive,
+				Interactive,
+
+				Count,
+			};
+
+			static std::string const Names[Type::Count];
+
+			class enum_param_type: public rtp_param_type
+			{
+			public:
+				virtual boost::any default_value() const;
+				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
+				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			};
+
+			//static rtp_named_param_list params(typename ship_config::Type cfg_type);
+			static i_sat_agent* create_instance(rtp_param param);
+
 		public:
 			virtual decision make_decision(state const& st, scenario_data sdata) = 0;
 		};
 
-	public:
-		static rtp_named_param_list params();
+		class evolvable_agent
+		{
+		public:
+			enum Type {
+				MLP,
 
-		sat_system(rtp_param param);
+				Count,
+			};
+
+			static std::string const Names[Type::Count];
+
+			class enum_param_type: public rtp_param_type
+			{
+			public:
+				virtual boost::any default_value() const;
+				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
+				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			};
+
+			class param_type: public rtp_autonestedparam_param_type
+			{
+			public:
+				virtual rtp_named_param provide_selection_param() const;
+				virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+			};
+
+			static rtp_named_param_list params();
+			static rtp_named_param_list params(Type ea_type);
+			static std::tuple< i_genome_mapping*, i_agent_factory*, i_observer* > create_instance(rtp_param param, thruster_config< dim > const& cfg);
+		};
+
+		class agent_objective
+		{
+		public:
+			enum Type {
+				MinSpeed,
+				MinAngularSpeed,
+				MinKinetic,
+//				MinFuel,
+
+				Count,
+			};
+
+			static std::string const Names[Count];
+
+			class enum_param_type: public rtp_param_type
+			{
+			public:
+				virtual boost::any default_value() const;
+				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
+				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			};
+
+			static rtp_named_param_list params();
+			static i_observer* create_instance(rtp_param param);
+		};
 
 	public:
-		boost::optional< agent_id_t > register_agent(i_agent* agent);
-		
-		virtual void generate_initial_state(rgen_t& rgen);
-		virtual bool update();
+		static rtp_named_param_list params(bool evolvable);
+		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* > create_instance(rtp_param param, bool evolvable);
+
+	private:
+		sat_system(sat_scenario< dim >* scenario, thruster_config< dim > const& t_cfg);// rtp_param param, bool evolvable);
+
+	public:
+		virtual boost::any generate_initial_state(rgen_t& rgen) const;
+		virtual void set_state(boost::any const& st);
+		virtual void clear_agents();
+		virtual boost::optional< agent_id_t > register_agent(i_agent* agent);
+		virtual bool update(i_observer* obs);
+		virtual boost::any record_observations(i_observer* obs) const;
 		virtual i_system_drawer* get_drawer() const;
 
 	protected:
@@ -102,8 +215,10 @@ namespace rtp_sat {
 
 	private:
 		sat_scenario< dim >* m_scenario;
-		boost::optional< i_agent* > m_agent;
+		thruster_config< dim > m_ship_cfg;
+		boost::optional< i_sat_agent* > m_agent;
 		state m_state;
+		trial_data m_td;
 
 	template < WorldDimensionality >
 	friend class sat_system_drawer;
@@ -111,54 +226,6 @@ namespace rtp_sat {
 
 }
 
-/*
-template < WorldDimensionality dim >
-class sat_system
-{
-public:
-	class state
-	{
-	public:
-		virtual ship_state< dim >& get_ship_state(size_t idx) = 0;
-		virtual thruster_system< dim >& get_ship_thruster_sys(size_t idx) = 0;
-		virtual double get_time() = 0;
-
-		virtual ~state() {}
-	};
-
-	template < typename Scenario >
-	class scen_state: public state
-	{
-	public:
-		typedef Scenario scenario_t;
-		typedef typename scenario_t::state state_t;
-
-	public:
-		scen_state(state_t const& _st): m_state(_st)
-		{}
-
-	public:
-		virtual ship_state< dim >&//scenario_t::Dim >&
-			get_ship_state(size_t idx)
-		{
-			return m_state.agents[idx];
-		}
-
-		virtual thruster_system< dim >& get_ship_thruster_sys(size_t idx)
-		{
-			return m_state.agents[idx].thruster_sys;
-		}
-
-		virtual double get_time()
-		{
-			return m_state.time;
-		}
-
-	private:
-		state_t m_state;
-	};
-};
-*/
 
 #endif
 

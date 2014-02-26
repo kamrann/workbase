@@ -10,26 +10,27 @@
 #include <string>
 
 
-class i_param_widget;
-
-
 typedef boost::any rtp_param;
 typedef std::vector< rtp_param > rtp_param_list;
 typedef rtp_param_list::const_iterator rtp_param_list_it;
 
 
+class i_param_widget;
+class rtp_param_manager;
+
 class rtp_param_type
 {
 public:
 	virtual boost::any default_value() const = 0;
-	virtual i_param_widget* create_widget() const = 0;
+	virtual i_param_widget* create_widget(rtp_param_manager* mgr) const = 0;
 	virtual rtp_param get_widget_param(i_param_widget const* w) const = 0;
 };
 
 
 struct rtp_named_param
 {
-	boost::shared_ptr< rtp_param_type > type;
+	//boost::shared_ptr< rtp_param_type > type;
+	rtp_param_type* type;
 	std::string name;
 
 	rtp_named_param(rtp_param_type* _type = nullptr, std::string const& _name = ""): type(_type), name(_name)

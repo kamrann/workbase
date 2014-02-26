@@ -93,6 +93,18 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\nac\rtp_nac_scenario.cpp">
       <Filter>rtp_interface\systems\nac</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_manager.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\integer_par.cpp">
+      <Filter>rtp_interface\params</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\realnum_par.cpp">
+      <Filter>rtp_interface\params</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\fixed_or_random_par.cpp">
+      <Filter>rtp_interface\params</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.h">
@@ -217,6 +229,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\nac\rtp_nac_scenario.h">
       <Filter>rtp_interface\systems\nac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_fixednn_genome_mapping.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_agent.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_observers.h">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_objectives.h">
+      <Filter>rtp_interface\systems\sat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_manager.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\realnum_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\fixed_or_random_par.h">
+      <Filter>rtp_interface\params</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

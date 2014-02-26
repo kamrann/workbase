@@ -5,6 +5,7 @@
 
 #include "../rtp_scenario.h"
 #include "../../rtp_param.h"
+#include "../../params/nestedparam_par.h"
 
 #include <array>
 
@@ -30,16 +31,15 @@ namespace rtp_nac
 		{
 		public:
 			virtual boost::any default_value() const;
-			virtual i_param_widget* create_widget() const;
+			virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
 			virtual rtp_param get_widget_param(i_param_widget const* w) const;
 		};
 
-		class param_type: public rtp_param_type
+		class param_type: public rtp_nestedparam_param_type
 		{
 		public:
-			virtual boost::any default_value() const;
-			virtual i_param_widget* create_widget() const;
-			virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			virtual rtp_named_param provide_selection_param() const;
+			virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
 		};
 
 	public:

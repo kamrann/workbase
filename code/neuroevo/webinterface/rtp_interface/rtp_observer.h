@@ -7,8 +7,9 @@
 class i_observer
 {
 public:
-	
+	virtual void reset() = 0;
 };
+
 
 
 #endif

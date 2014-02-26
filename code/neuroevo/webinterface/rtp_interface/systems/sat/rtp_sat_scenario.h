@@ -6,7 +6,9 @@
 #include "rtp_sat_system.h"
 #include "../rtp_scenario.h"
 #include "../../rtp_param.h"
+#include "../../params/nestedparam_par.h"
 
+#include "util/fixed_or_random.h"
 #include "thrusters/thruster.h"
 
 #include <array>
@@ -20,8 +22,8 @@ namespace rtp_sat
 	{
 	public:
 		enum ScenarioType {
-			AngularFullStop,
-			LinearFullStop,
+//			AngularFullStop,
+//			LinearFullStop,
 			FullStop,
 			TargetOrientation,
 
@@ -47,26 +49,30 @@ namespace rtp_sat
 		{
 		public:
 			virtual boost::any default_value() const;
-			virtual i_param_widget* create_widget() const;
+			virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
 			virtual rtp_param get_widget_param(i_param_widget const* w) const;
 		};
 
-		class param_type: public rtp_param_type
+		class param_type: public rtp_autonestedparam_param_type
 		{
 		public:
-			virtual boost::any default_value() const;
-			virtual i_param_widget* create_widget() const;
-			virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			virtual rtp_named_param provide_selection_param() const;
+			virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
 		};
 
+		static rtp_named_param_list params();
 		static rtp_named_param_list params(ScenarioType scen);
 
 		static sat_scenario* create_instance(rtp_param param);
 
 	public:
-		virtual state_t generate_initial_state(rgen_t& rgen) = 0;
+		virtual state_t generate_initial_state(rgen_t& rgen) const = 0;
 		virtual scenario_data_t get_scenario_data() const;
 		virtual bool is_complete(state_t const& st);
+
+	protected:
+		// TODO: dimensionality
+		fixed_or_random< double, boost::random::uniform_real_distribution< double >, rgen_t > m_initial_ang_vel;
 	};
 /*
 	template < WorldDimensionality dim >

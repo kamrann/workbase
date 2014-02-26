@@ -19,8 +19,22 @@ public:
 class i_genome
 {
 public:
-	virtual void to_binary(std::vector< unsigned char >& bytes) = 0;
+//	virtual void to_binary(std::vector< unsigned char >& bytes) = 0;
 //	virtual bool from_binary(std::vector< unsigned char > const& bytes) = 0;
+};
+
+class i_agent;
+
+class i_genome_mapping
+{
+public:
+	typedef double genome_diff_t;
+
+public:
+	virtual genome_diff_t genome_difference(i_genome const* ign1, i_genome const* ign2) = 0;
+	virtual size_t get_genome_length() = 0;
+	virtual i_genome* generate_random_genome(rgen_t& rgen) = 0;
+	virtual void decode_genome(i_genome const* ign, i_agent* ia) = 0;
 };
 
 

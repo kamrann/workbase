@@ -32,7 +32,7 @@ struct avg_linear_speed_ofd: public ofd_component
 	template < typename agent_decision, typename agent_state, typename envt_state, typename ofdata >
 	static inline void update(agent_decision const& dec, agent_state const& agent_st, envt_state const& envt_st, ofdata& ofd)
 	{
-		ofd.avg_lin_speed += magnitude(agent_st.lin_velocity);
+		ofd.avg_lin_speed += magnitude(agent_st.ship.lin_velocity);
 	}
 
 	template < typename ofdata >
@@ -54,7 +54,7 @@ struct avg_angular_speed_ofd: public ofd_component
 	template < typename agent_decision, typename agent_state, typename envt_state, typename ofdata >
 	static inline void update(agent_decision const& dec, agent_state const& agent_st, envt_state const& envt_st, ofdata& ofd)
 	{
-		ofd.avg_ang_speed += magnitude(agent_st.ang_velocity);
+		ofd.avg_ang_speed += magnitude(agent_st.ship.ang_velocity);
 	}
 
 	template < typename ofdata >
@@ -95,9 +95,9 @@ struct stopped_rotating_ofd: public ofd_component
 	typedef mpl::vector< timesteps_ofd > dependencies;
 
 	bool stopped_rotating;
-	size_t timesteps_to_stopped_rotating;
+	double time_to_stopped_rotating;
 
-	stopped_rotating_ofd(): stopped_rotating(false), timesteps_to_stopped_rotating(0)
+	stopped_rotating_ofd(): stopped_rotating(false), time_to_stopped_rotating(0)
 	{}
 
 	template < typename agent_decision, typename agent_state, typename envt_state, typename ofdata >
@@ -107,8 +107,8 @@ struct stopped_rotating_ofd: public ofd_component
 
 		if(!ofd.stopped_rotating)
 		{
-			ofd.stopped_rotating = magnitude(agent_st.ang_velocity) <= AcceptableSpeed;
-			ofd.timesteps_to_stopped_rotating = ofd.timesteps;
+			ofd.stopped_rotating = magnitude(agent_st.ship.ang_velocity) <= AcceptableSpeed;
+			ofd.time_to_stopped_rotating = envt_st.time;//ofd.timesteps;
 		}
 	}
 };
@@ -118,9 +118,9 @@ struct stopped_moving_linearly_ofd: public ofd_component
 	typedef mpl::vector< timesteps_ofd > dependencies;
 
 	bool stopped_moving;
-	size_t timesteps_to_stopped_moving;
+	double time_to_stopped_moving;
 
-	stopped_moving_linearly_ofd(): stopped_moving(false), timesteps_to_stopped_moving(0)
+	stopped_moving_linearly_ofd(): stopped_moving(false), time_to_stopped_moving(0)
 	{}
 
 	template < typename agent_decision, typename agent_state, typename envt_state, typename ofdata >
@@ -130,8 +130,8 @@ struct stopped_moving_linearly_ofd: public ofd_component
 
 		if(!ofd.stopped_moving)
 		{
-			ofd.stopped_moving = magnitude(agent_st.lin_velocity) <= AcceptableSpeed;
-			ofd.timesteps_to_stopped_moving = ofd.timesteps;
+			ofd.stopped_moving = magnitude(agent_st.ship.lin_velocity) <= AcceptableSpeed;
+			ofd.time_to_stopped_moving = envt_st.time;// ofd.timesteps;
 		}
 	}
 };

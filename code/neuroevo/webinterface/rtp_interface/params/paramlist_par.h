@@ -5,26 +5,24 @@
 
 #include "../rtp_param.h"
 #include "../rtp_param_widget.h"
+#include "../rtp_param_manager.h"
 
 
 class rtp_paramlist_param_type: public rtp_param_type
 {
-public:
-	rtp_paramlist_param_type(rtp_named_param_list const& params): m_params(params)
-	{}
-
 public:
 	virtual boost::any default_value() const
 	{
 		return boost::any();
 	}
 
-	virtual i_param_widget* create_widget() const
+	virtual i_param_widget* create_widget(rtp_param_manager* mgr) const
 	{
 		rtp_param_list_widget* w = new rtp_param_list_widget(this);
-		for(rtp_named_param const& p : m_params)
+		rtp_named_param_list params = provide_param_list(mgr);
+		for(rtp_named_param const& p : params)
 		{
-			w->add_child(p.name, p.type->create_widget());
+			w->add_child(p.name, p.type->create_widget(mgr));
 		}
 		return w;
 	}
@@ -39,6 +37,21 @@ public:
 			p.push_back(c->get_param());
 		}
 		return rtp_param(p);
+	}
+
+	virtual rtp_named_param_list provide_param_list(rtp_param_manager* mgr) const = 0;
+};
+
+
+class rtp_staticparamlist_param_type: public rtp_paramlist_param_type
+{
+public:
+	rtp_staticparamlist_param_type(rtp_named_param_list const& params): m_params(params)
+	{}
+
+	virtual rtp_named_param_list provide_param_list(rtp_param_manager* mgr) const
+	{
+		return m_params;
 	}
 
 private:

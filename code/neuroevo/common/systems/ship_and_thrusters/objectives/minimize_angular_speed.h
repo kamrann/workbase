@@ -23,10 +23,10 @@ struct min_ang_speed_obj_fn: public objective_fn
 		double const SigmoidLimit = 4.0;
 
 		// TODO: .agents[0] ??? need agent index as argument?????
-		double end_speed = ofd.stopped_rotating ? 0.0 : magnitude(td.final_st.agents[0].ang_velocity);
-		double accel = end_speed - magnitude(td.initial_st.agents[0].ang_velocity);
-		size_t timesteps = ofd.stopped_rotating ? ofd.timesteps_to_stopped_rotating : ofd.timesteps;
-		double decel_rate = -accel / (timesteps * 0.05);
+		double end_speed = ofd.stopped_rotating ? 0.0 : magnitude(td.final_st.ship.ang_velocity);
+		double accel = end_speed - magnitude(td.initial_st.ship.ang_velocity);
+		double time = ofd.stopped_rotating ? ofd.time_to_stopped_rotating : td.final_st.time;//ofd.timesteps;
+		double decel_rate = -accel / time;//(timesteps * 0.05);
 
 		// NOTE: If not normalized, could potentially be +ve/-ve and any size
 		// Roulette wheel selection requires +ve values with meaningful distribution

@@ -18,7 +18,7 @@ namespace rtp_nac {
 		return PlayToCompletion;
 	}
 
-	i_param_widget* nac_scenario::enum_param_type::create_widget() const
+	i_param_widget* nac_scenario::enum_param_type::create_widget(rtp_param_manager* mgr) const
 	{
 		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
 
@@ -39,6 +39,18 @@ namespace rtp_nac {
 		return rtp_param(system);
 	}
 
+	rtp_named_param nac_scenario::param_type::provide_selection_param() const
+	{
+		return rtp_named_param(new nac_scenario::enum_param_type(), "Scenario Type");
+	}
+
+	rtp_param_type* nac_scenario::param_type::provide_nested_param(rtp_param_manager* mgr) const
+	{
+		ScenarioType scenario = boost::any_cast< ScenarioType >(mgr->retrieve_param("Scenario Type"));
+		rtp_named_param_list sub_params = nac_scenario::params(scenario);
+		return new rtp_staticparamlist_param_type(sub_params);
+	}
+/*
 	boost::any nac_scenario::param_type::default_value() const
 	{
 		return boost::any();
@@ -73,7 +85,7 @@ namespace rtp_nac {
 			nested_w->get_nested_widget()->get_param()
 			);
 	}
-
+*/
 
 	rtp_named_param_list nac_scenario::params(ScenarioType scen)
 	{

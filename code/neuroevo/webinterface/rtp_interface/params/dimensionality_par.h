@@ -23,7 +23,7 @@ public:
 		return WorldDimensionality::dim2D;
 	}
 
-	i_param_widget* create_widget() const
+	i_param_widget* create_widget(rtp_param_manager* mgr) const
 	{
 		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
 		box->addItem("2D");

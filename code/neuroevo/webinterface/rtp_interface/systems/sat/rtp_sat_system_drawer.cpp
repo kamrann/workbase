@@ -4,6 +4,7 @@
 #include "rtp_sat_system.h"
 
 #include <Wt/WPainter>
+#include <Wt/WPaintDevice>
 
 
 namespace rtp_sat {
@@ -17,6 +18,8 @@ namespace rtp_sat {
 	template < WorldDimensionality dim >
 	void sat_system_drawer< dim >::draw_system(Wt::WPainter& painter)
 	{
+		size_t const Margin = 0;
+
 		Wt::WPaintDevice* device = painter.device();
 
 		Wt::WLength dev_width = device->width();
@@ -87,9 +90,9 @@ namespace rtp_sat {
 
 		double const ThrusterSize = ShipSize * 0.15;
 		std::array< Wt::WPointF, 3 > points = {
-			WPointF(0, 0),
-			WPointF(-ThrusterSize / 2, -ThrusterSize),
-			WPointF(ThrusterSize / 2, -ThrusterSize)
+			Wt::WPointF(0, 0),
+			Wt::WPointF(-ThrusterSize / 2, -ThrusterSize),
+			Wt::WPointF(ThrusterSize / 2, -ThrusterSize)
 		};
 		for(size_t i = 0; i < st.ship.thruster_cfg->num_thrusters(); ++i)
 		{
@@ -167,6 +170,8 @@ namespace rtp_sat {
 		painter.drawText(rc, Wt::AlignLeft | Wt::AlignMiddle, text.str());
 	}
 
+	template class sat_system_drawer< WorldDimensionality::dim2D >;
+	//template class sat_system_drawer< WorldDimensionality::dim3D >;
 }
 
 

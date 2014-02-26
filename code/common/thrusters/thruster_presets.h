@@ -26,7 +26,7 @@ public:
 	}
 
 	// 8 thrusters at corners of [-1, 1] square, allowing for linear thrust along 2 axis
-	static thruster_config< WorldDimensionality::dim2D > square_full()
+	static thruster_config< WorldDimensionality::dim2D > square_complete()
 	{
 		thruster_config< WorldDimensionality::dim2D > cfg;
 		cfg.thrusters.resize(8);

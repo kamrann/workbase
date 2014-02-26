@@ -13,7 +13,6 @@ namespace rtp_sat
 	{
 	public:
 		using sat_scenario< dim >::state_t;
-		using sat_scenario< dim >::scenario_data;
 
 		enum Params {
 			Target,
@@ -26,7 +25,7 @@ namespace rtp_sat
 		target_orientation(rtp_param param);
 
 	public:
-		virtual state_t generate_initial_state(rgen_t& rgen);
+		virtual state_t generate_initial_state(rgen_t& rgen) const;
 		virtual scenario_data_t get_scenario_data() const;
 
 	private:

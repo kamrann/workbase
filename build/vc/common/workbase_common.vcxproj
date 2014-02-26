@@ -76,6 +76,7 @@
     <ClInclude Include="..\..\..\code\common\util\cubic_spline.h" />
     <ClInclude Include="..\..\..\code\common\util\dimensionality.h" />
     <ClInclude Include="..\..\..\code\common\util\enum_flags.h" />
+    <ClInclude Include="..\..\..\code\common\util\fixed_or_random.h" />
     <ClInclude Include="..\..\..\code\common\util\gl_helpers\gl_helpers.h" />
     <ClInclude Include="..\..\..\code\common\util\graphics3d\basis_mesh.h" />
     <ClInclude Include="..\..\..\code\common\util\graphics3d\camera_mesh.h" />

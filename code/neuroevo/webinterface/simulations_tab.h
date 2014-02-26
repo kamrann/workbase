@@ -3,11 +3,13 @@
 #ifndef __SIMULATIONS_TAB_H
 #define __SIMULATIONS_TAB_H
 
+#include "rtp_interface/rtp_param_manager.h"
+
 // TEMP
 #include "systems/ship_and_thrusters/scenarios/angular_full_stop.h"
 #include "systems/ship_and_thrusters/scenarios/full_stop.h"
 #include "systems/ship_and_thrusters/scenarios/target_orientation.h"
-#include "system_test_tab.h"
+//#include "system_test_tab.h"
 #include "nac_system_coordinator.h"
 #include "ship_system_coordinator.h"
 #include <Wt/WTabWidget>
@@ -32,6 +34,7 @@ class WebInterfaceApplication;
 class evo_period;
 
 class i_param_widget;
+class rtp_simulation;
 
 
 class SimulationsTab: public WContainerWidget
@@ -52,10 +55,12 @@ public:
 
 private:
 	i_param_widget* system_params_widget;
-	WLineEdit* pop_size_edit;
+	i_param_widget* evo_params_widget;
+	rtp_param_manager param_mgr;
+/*	WLineEdit* pop_size_edit;
 	WLineEdit* num_epochs_edit;
 	WLineEdit* trials_per_epoch_edit;
-	WPushButton* run_sim_btn;
+*/	WPushButton* run_sim_btn;
 	WTextArea* txt_output;
 	WTableView* observations_table;
 
@@ -66,8 +71,9 @@ private:
 	void generation_cb(WStandardItemModel* obs_model, std::string txt);
 	void completion_cb(std::string txt);
 
-	template < typename Sim >
-	void run_simulation_threadmain(WebInterfaceApplication* app, sim_params params);
+//	template < typename Sim >
+//	void run_simulation_threadmain(WebInterfaceApplication* app, sim_params params);
+	void run_simulation_threadmain(WebInterfaceApplication* app, rtp_simulation* sim);
 
 public:
 	void on_run_simulation();
@@ -154,7 +160,7 @@ struct temp_ugly_hack< target_orientation< dim > >
 			);
 	}
 };
-*/
+
 
 template < typename Sim >
 void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, sim_params params)
@@ -295,7 +301,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, sim
 	
 	WServer::instance()->post(session_id, boost::bind(&SimulationsTab::completion_cb, this, out.str()));
 }
-
+*/
 
 
 #endif

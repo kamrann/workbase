@@ -1,8 +1,7 @@
 // rtp_sat_target_orientation.cpp
 
 #include "rtp_sat_target_orientation.h"
-
-#include "thrusters/thruster_presets.h"
+#include "../../../../params/integer_par.h"
 
 
 namespace rtp_sat {
@@ -26,14 +25,11 @@ namespace rtp_sat {
 	}
 
 	template < WorldDimensionality dim >
-	typename sat_system< dim >::state target_orientation< dim >::generate_initial_state(rgen_t& rgen)
+	typename sat_system< dim >::state target_orientation< dim >::generate_initial_state(rgen_t& rgen) const
 	{
 		typedef DimensionalityTraits< dim > dim_traits_t;
 
 		state_t st;
-		st.ship.thruster_cfg = boost::shared_ptr< thruster_config< dim > >(new thruster_config< dim >(thruster_presets::square_minimal()));
-		st.thrusters.cfg = st.ship.thruster_cfg;
-		st.thrusters.sync_to_cfg();
 
 		double const InitialAngularSpeed = 0.5;
 
@@ -50,6 +46,8 @@ namespace rtp_sat {
 		return scenario_data_t(m_target);
 	}
 
+	template class target_orientation< WorldDimensionality::dim2D >;
+	//template class target_orientation< WorldDimensionality::dim3D >;
 }
 
 
