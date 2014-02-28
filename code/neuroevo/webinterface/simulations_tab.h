@@ -28,13 +28,13 @@ class Wt::WLineEdit;
 class Wt::WPushButton;
 class Wt::WTextArea;
 class Wt::WTableView;
-
 class WebInterfaceApplication;
 
 class evo_period;
 
 class i_param_widget;
 class rtp_simulation;
+class properties_chart_widget;
 
 
 class SimulationsTab: public WContainerWidget
@@ -57,18 +57,16 @@ private:
 	i_param_widget* system_params_widget;
 	i_param_widget* evo_params_widget;
 	rtp_param_manager param_mgr;
-/*	WLineEdit* pop_size_edit;
-	WLineEdit* num_epochs_edit;
-	WLineEdit* trials_per_epoch_edit;
-*/	WPushButton* run_sim_btn;
+	WPushButton* run_sim_btn;
 	WTextArea* txt_output;
 	WTableView* observations_table;
+	properties_chart_widget* evo_chart;
 
 	boost::shared_ptr< boost::thread > sim_thread;
 
 private:
 	void evo_started_cb(Wt::Dbo::ptr< evo_period > ep);
-	void generation_cb(WStandardItemModel* obs_model, std::string txt);
+	void generation_cb(std::vector< boost::shared_ptr< i_property_values const > > per_gen_prop_vals, std::string txt);
 	void completion_cb(std::string txt);
 
 //	template < typename Sim >

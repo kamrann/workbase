@@ -208,6 +208,7 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_manager.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_widget.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_properties.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_sim.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\nac\rtp_nac_scenario.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_agent.h" />
@@ -232,6 +233,7 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\nac_widget.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_history_widget.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_widget.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_chart_widget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

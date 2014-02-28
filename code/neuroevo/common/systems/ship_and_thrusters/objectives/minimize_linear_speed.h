@@ -9,7 +9,7 @@
 #include "ga/objective_fn.h"
 
 
-struct min_lin_speed_obj_fn: public objective_fn
+struct reduce_lin_speed_obj_fn: public objective_fn
 {
 	typedef boost::mpl::vector< stopped_moving_linearly_ofd > dependencies;
 
@@ -19,8 +19,8 @@ struct min_lin_speed_obj_fn: public objective_fn
 	static inline obj_value_t evaluate(ObjFnData const& ofd, TrialData const& td)
 	{
 		// TODO: Should be based on num thrusters, plus thruster power, and also the size of timesteps used in the update function...
-		double const IdealDecelRate = 2 * 0.25;
-		double const SigmoidLimit = 4.0;
+//		double const IdealDecelRate = 2 * 0.25;
+//		double const SigmoidLimit = 4.0;
 
 		// TODO: .agents[0] ??? need agent index as argument?????
 		double end_speed = ofd.stopped_moving ? 0.0 : magnitude(td.final_st.ship.lin_velocity);
@@ -38,6 +38,20 @@ struct min_lin_speed_obj_fn: public objective_fn
 //		return obj_value_t(-(magnitude(td.final_st.agents[0].lin_velocity) - magnitude(td.initial_st.agents[0].lin_velocity)));
 	}
 };
+
+struct min_avg_lin_speed_obj_fn: public objective_fn
+{
+	typedef boost::mpl::vector< avg_linear_speed_ofd > dependencies;
+
+	typedef double obj_value_t;
+
+	template < typename TrialData, typename ObjFnData >
+	static inline obj_value_t evaluate(ObjFnData const& ofd, TrialData const& td)
+	{
+		return obj_value_t(-ofd.avg_lin_speed);
+	}
+};
+
 
 
 #endif

@@ -24,6 +24,9 @@ public:
 	virtual boost::any default_value() const = 0;
 	virtual i_param_widget* create_widget(rtp_param_manager* mgr) const = 0;
 	virtual rtp_param get_widget_param(i_param_widget const* w) const = 0;
+
+public:
+	virtual ~rtp_param_type() = default;
 };
 
 

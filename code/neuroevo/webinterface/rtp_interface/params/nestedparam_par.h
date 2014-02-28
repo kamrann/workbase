@@ -72,7 +72,6 @@ public:
 		i_param_widget* sel_w = sel_prm.type->create_widget(mgr);
 		mgr->register_widget(sel_prm.name, sel_w);
 		w->set_selection_widget(sel_w);
-		//w->set_nested_widget(provide_nested_param(mgr)->create_widget(mgr));
 
 		boost::function< void() > handler = [=]()
 		{

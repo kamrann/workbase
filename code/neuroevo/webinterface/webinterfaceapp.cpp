@@ -22,10 +22,10 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 	styleSheet().addRule(".wb_numerical_input", "text-align: right;");
 
 	main_tabs = new WTabWidget(root());
-	main_tabs->addTab(new DatabaseTab(db_session), "Evo Database", Wt::WTabWidget::PreLoading);
-	main_tabs->addTab(new SimulationsTab(), "Simulations", Wt::WTabWidget::PreLoading);
+	main_tabs->addTab(new DatabaseTab(db_session), "Evo Database");// , Wt::WTabWidget::PreLoading);
+	main_tabs->addTab(new SimulationsTab(), "Simulations");// , Wt::WTabWidget::PreLoading);
 	SystemTestTab* sys_tab = new SystemTestTab();
-	main_tabs->addTab(sys_tab, "System Test", Wt::WTabWidget::PreLoading);
+	main_tabs->addTab(sys_tab, "System Test");// , Wt::WTabWidget::PreLoading);
 	main_tabs->setStyleClass("tabwidget");
 
 //	noughts_and_crosses_widget< 2, 3 >* nac_w = new noughts_and_crosses_widget< 2, 3 >();

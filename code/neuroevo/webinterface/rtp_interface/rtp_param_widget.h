@@ -15,6 +15,9 @@ public:
 	virtual Wt::WWidget const* get_wt_widget() const = 0;
 	virtual rtp_param_type const* get_param_type() const = 0;
 	virtual rtp_param get_param() const = 0;
+
+public:
+	virtual ~i_param_widget() = default;
 };
 
 template < typename WtWidget >
@@ -64,6 +67,7 @@ public:
 
 public:
 	rtp_param_list_widget(rtp_paramlist_param_type const* _type);
+	virtual ~rtp_param_list_widget();
 
 public:
 	void add_child(std::string name, i_param_widget* c);

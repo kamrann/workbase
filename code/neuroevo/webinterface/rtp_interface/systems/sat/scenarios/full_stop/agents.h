@@ -60,6 +60,7 @@ namespace rtp_sat
 		enum Type {
 			AngVel,
 			VelAngle,
+			VelAnglePos,
 
 			Count,
 		};
@@ -140,6 +141,27 @@ namespace rtp_sat
 		mlp_vel_and_angle_agent(size_t num_layers, size_t num_outputs);
 		virtual std::vector< double > map_nn_inputs(state_t const& st);
 	};
+
+	template < WorldDimensionality dim >
+	class mlp_vel_angle_pos_agent: public mlp_agent< dim >
+	{
+	public:
+		typedef typename sat_system< dim >::decision decision_t;
+		typedef typename sat_system< dim >::state state_t;
+		typedef typename sat_system< dim >::scenario_data scenario_data_t;
+
+		typedef DimensionalityTraits< dim > dim_traits_t;
+		static size_t const NumNNInputs =
+			num_components< typename dim_traits_t::velocity_t >::val +
+			num_components< typename dim_traits_t::angular_velocity_t >::val +
+			num_components< typename dim_traits_t::position_t >::val +
+			num_components< typename dim_traits_t::orientation_t >::val;
+
+	public:
+		mlp_vel_angle_pos_agent(size_t num_layers, size_t num_outputs);
+		virtual std::vector< double > map_nn_inputs(state_t const& st);
+	};
+
 
 	template < WorldDimensionality dim >
 	class mlp_agent_factory: public i_agent_factory

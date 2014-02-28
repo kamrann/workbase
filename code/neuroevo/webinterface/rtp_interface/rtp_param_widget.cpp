@@ -16,6 +16,11 @@ rtp_param_list_widget::rtp_param_list_widget(rtp_paramlist_param_type const* _ty
 	setLayout(m_layout);
 }
 
+rtp_param_list_widget::~rtp_param_list_widget()
+{
+
+}
+
 void rtp_param_list_widget::add_child(std::string name, i_param_widget* c)
 {
 	int existing_rows = children.size();
@@ -57,7 +62,11 @@ rtp_nested_param_widget::rtp_nested_param_widget(rtp_param_type const* _type): b
 void rtp_nested_param_widget::set_selection_widget(i_param_widget* c)
 {
 	selection_widget = c;
-	removeWidget(widget(0));
+	Wt::WWidget* old = widget(0);
+	removeWidget(old);
+	// See below
+	delete old;
+	//
 	insertWidget(0, c->get_wt_widget());
 }
 
@@ -74,7 +83,12 @@ i_param_widget const* rtp_nested_param_widget::get_selection_widget() const
 void rtp_nested_param_widget::set_nested_widget(i_param_widget* c)
 {
 	nested_widget = c;
-	removeWidget(widget(1));
+	Wt::WWidget* old = widget(1);
+	removeWidget(old);
+	// TODO: Assuming we are given ownership of each widget pass in.
+	// Probably better to use shared_ptr to pass and store the selection and nested widgets
+	delete old;
+	//
 	insertWidget(1, c->get_wt_widget());
 }
 

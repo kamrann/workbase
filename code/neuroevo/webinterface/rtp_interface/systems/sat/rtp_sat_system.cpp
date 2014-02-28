@@ -6,6 +6,7 @@
 #include "rtp_sat_observers.h"
 #include "scenarios/full_stop/agents.h"	// TODO: shouldn't be including scenario type specific stuff in this file...
 #include "../../params/paramlist_par.h"
+#include "../../rtp_properties.h"
 
 #include "rtp_sat_objectives.h"
 #include "systems/ship_and_thrusters/objectives/minimize_linear_speed.h"
@@ -42,6 +43,20 @@ namespace rtp_sat {
 	// (So we specify agent properties (such as ship configuration), and then subsequently specify a compatible controller (with its own properties)
 
 	template < WorldDimensionality dim >
+	std::string const sat_system< dim >::StateValueNames[] = {
+		"Time",
+		"PosX",
+		"PosY",
+		// Z ?
+		"Angle",
+		"VelX",
+		"VelY",
+		"Speed",
+		"AngularSpeed",
+		"KE",
+	};
+
+	template < WorldDimensionality dim >
 	std::string const sat_system< dim >::ship_config::Names[] = {
 		"Square Minimal",
 		"Square Complete",
@@ -60,9 +75,12 @@ namespace rtp_sat {
 
 	template < WorldDimensionality dim >
 	std::string const sat_system< dim >::agent_objective::Names[] = {
-		"Minimize Speed",
-		"Minimize Angular Speed",
-		"Minimize Kinetic Energy",
+		"Reduce Speed",
+		"Minimize Avg Speed",
+		"Reduce Angular Speed",
+		"Minimize Avg Angular Speed",
+		"Reduce Kinetic Energy",
+		"Minimize Avg Kinetic Energy",
 //		"Minimize Fuel Usage",
 	};
 
@@ -295,7 +313,7 @@ namespace rtp_sat {
 	template < WorldDimensionality dim >
 	boost::any sat_system< dim >::agent_objective::enum_param_type::default_value() const
 	{
-		return MinSpeed;
+		return ReduceKinetic;
 	}
 
 	template < WorldDimensionality dim >
@@ -336,10 +354,13 @@ namespace rtp_sat {
 		Type type = boost::any_cast<Type>(param_list[0]);
 		switch(type)
 		{
-			case MinSpeed:			return new rtp_sat::wrapped_objective_fn< dim, min_lin_speed_obj_fn >();
-			case MinAngularSpeed:	return new rtp_sat::wrapped_objective_fn< dim, min_ang_speed_obj_fn >();
-			case MinKinetic:		return new rtp_sat::wrapped_objective_fn< dim, min_kinetic_obj_fn >();
-//			case MinFuel:			return new rtp_sat::wrapped_objective_fn< dim, min_fuel_obj_fn >();
+			case ReduceSpeed:			return new rtp_sat::wrapped_objective_fn< dim, reduce_lin_speed_obj_fn >();
+			case MinAvgSpeed:			return new rtp_sat::wrapped_objective_fn< dim, min_avg_lin_speed_obj_fn >();
+			case ReduceAngularSpeed:	return new rtp_sat::wrapped_objective_fn< dim, reduce_ang_speed_obj_fn >();
+			case MinAvgAngularSpeed:	return new rtp_sat::wrapped_objective_fn< dim, min_avg_ang_speed_obj_fn >();
+			case ReduceKinetic:			return new rtp_sat::wrapped_objective_fn< dim, reduce_kinetic_obj_fn >();
+			case MinAvgKinetic:			return new rtp_sat::wrapped_objective_fn< dim, min_avg_kinetic_obj_fn >();
+//			case MinFuel:				return new rtp_sat::wrapped_objective_fn< dim, min_fuel_obj_fn >();
 
 			default:
 			assert(false);
@@ -353,8 +374,7 @@ namespace rtp_sat {
 	{
 		rtp_named_param_list p;
 		//	p.push_back(rtp_named_param(new rtp_dimensionality_param_type(), "Dimensions"));
-		p.push_back(rtp_named_param(//new sat_scenario< dim >::param_type(), "Scenario"));
-			new rtp_staticparamlist_param_type(sat_scenario< dim >::params()), "Scenario"));
+		p.push_back(rtp_named_param(new rtp_staticparamlist_param_type(sat_scenario< dim >::params()), "Scenario"));
 		p.push_back(rtp_named_param(new ship_config::param_type(), "Ship Config"));
 		p.push_back(rtp_named_param(evolvable ? (rtp_param_type*)new rtp_staticparamlist_param_type(evolvable_agent::params())/*param_type()*/: (rtp_param_type*)new i_sat_agent::enum_param_type(), "Controller"));
 		return p;
@@ -504,6 +524,42 @@ namespace rtp_sat {
 	{
 		i_sat_observer< dim >* sat_obs = (i_sat_observer< dim >*)obs;
 		return sat_obs->record_observations(m_td);
+	}
+
+	template < WorldDimensionality dim >
+	void sat_system< dim >::set_state_prop(rtp_stored_property_values* pv, StateValue sv, boost::any v)
+	{
+		pv->set_value(StateValueNames[sv], v);
+	}
+
+	template < WorldDimensionality dim >
+	boost::shared_ptr< i_properties const > sat_system< dim >::get_state_properties() const
+	{
+		rtp_stored_properties* props = new rtp_stored_properties();
+		for(size_t i = 0; i < StateValue::Count; ++i)
+		{
+			props->add_property(StateValueNames[i]);
+		}
+		return boost::shared_ptr< i_properties const >(props);
+	}
+
+	template < WorldDimensionality dim >
+	boost::shared_ptr< i_property_values const > sat_system< dim >::get_state_property_values() const
+	{
+		rtp_stored_property_values* vals = new rtp_stored_property_values();
+		set_state_prop(vals, Time, m_state.time);
+		set_state_prop(vals, PosX, m_state.ship.position[0]);
+		set_state_prop(vals, PosY, m_state.ship.position[1]);
+		set_state_prop(vals, Angle, m_state.ship.orientation);
+		set_state_prop(vals, VelX, m_state.ship.lin_velocity[0]);
+		set_state_prop(vals, VelY, m_state.ship.lin_velocity[1]);
+		double speed = magnitude(m_state.ship.lin_velocity);
+		set_state_prop(vals, Speed, speed);
+		double ang_speed = m_state.ship.ang_velocity;	// TODO: For 3D should be magnitude()...
+		set_state_prop(vals, AngularSpeed, ang_speed);
+		double ke = 0.5 * (speed * speed + ang_speed * ang_speed);	// TODO: m and I
+		set_state_prop(vals, KE, ke);
+		return boost::shared_ptr< i_property_values const >(vals);
 	}
 
 	template < WorldDimensionality dim >

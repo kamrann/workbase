@@ -4,6 +4,7 @@
 #include "systems/rtp_system.h"
 #include "rtp_observer.h"
 #include "params/integer_par.h"
+#include "rtp_genome.h"
 
 #include "ga/ga.h"
 #include "ga/fitness.h"
@@ -55,7 +56,12 @@ void rtp_simulation::init()
 
 genotype_diversity_measure rtp_simulation::population_genotype_diversity() const
 {
-	return genotype_diversity_measure();
+	std::vector< i_genome const* > genomes(population_size);
+	for(size_t n = 0; n < population_size; ++n)
+	{
+		genomes[n] = population[n].gn;
+	}
+	return gn_mapping->population_diversity(genomes);
 }
 
 // TEMP

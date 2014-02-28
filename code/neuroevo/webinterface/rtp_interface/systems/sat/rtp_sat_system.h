@@ -11,6 +11,8 @@
 #include "thrusters/thruster.h"
 
 
+class rtp_stored_property_values;
+
 namespace rtp_sat {
 
 	class sat_system_base: public i_system
@@ -66,6 +68,23 @@ namespace rtp_sat {
 			public envt_state,
 			public agent_state	// For now, just a single agent system
 		{};
+
+		enum StateValue {
+			Time,
+			PosX,
+			PosY,
+			// Z ?
+			Angle,	// TODO: This is also Dimensions specific...
+			VelX,
+			VelY,
+			Speed,
+			AngularSpeed,
+			KE,
+
+			Count,
+		};
+
+		static std::string const StateValueNames[StateValue::Count];
 
 		struct trial_data
 		{
@@ -169,9 +188,12 @@ namespace rtp_sat {
 		{
 		public:
 			enum Type {
-				MinSpeed,
-				MinAngularSpeed,
-				MinKinetic,
+				ReduceSpeed,
+				MinAvgSpeed,
+				ReduceAngularSpeed,
+				MinAvgAngularSpeed,
+				ReduceKinetic,
+				MinAvgKinetic,
 //				MinFuel,
 
 				Count,
@@ -205,6 +227,8 @@ namespace rtp_sat {
 		virtual boost::optional< agent_id_t > register_agent(i_agent* agent);
 		virtual bool update(i_observer* obs);
 		virtual boost::any record_observations(i_observer* obs) const;
+		virtual boost::shared_ptr< i_properties const > get_state_properties() const;
+		virtual boost::shared_ptr< i_property_values const > get_state_property_values() const;
 		virtual i_system_drawer* get_drawer() const;
 
 	protected:
@@ -212,6 +236,8 @@ namespace rtp_sat {
 		{
 			return m_state;
 		}
+
+		static void set_state_prop(rtp_stored_property_values* pv, StateValue sv, boost::any v);
 
 	private:
 		sat_scenario< dim >* m_scenario;

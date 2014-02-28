@@ -29,9 +29,11 @@ class i_genome_mapping
 {
 public:
 	typedef double genome_diff_t;
+	typedef double diversity_t;
 
 public:
 	virtual genome_diff_t genome_difference(i_genome const* ign1, i_genome const* ign2) = 0;
+	virtual diversity_t population_diversity(std::vector< i_genome const* > const& pop_genomes) = 0;
 	virtual size_t get_genome_length() = 0;
 	virtual i_genome* generate_random_genome(rgen_t& rgen) = 0;
 	virtual void decode_genome(i_genome const* ign, i_agent* ia) = 0;

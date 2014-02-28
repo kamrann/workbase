@@ -78,6 +78,39 @@ public:
 		// on the difference measure, which seems bad.
 	}
 
+	virtual i_genome_mapping::diversity_t population_diversity(std::vector< i_genome const* > const& pop_genomes)
+	{
+		// See Google: "measure+diversity+real+valued+chromosomes" (google books result)
+
+		size_t const genome_len = get_genome_length();
+		std::vector< double > avg_gene_vals(genome_len, 0.0);
+		std::vector< double > avg_gene_squared_vals(genome_len, 0.0);
+		size_t const pop_size = pop_genomes.size();
+		for(size_t g = 0; g < genome_len; ++g)
+		{
+			double sum = 0.0;
+			double sum_of_squares = 0.0;
+			for(size_t n = 0; n < pop_size; ++n)
+			{
+				genome const& gn = *(genome const*)pop_genomes[n];
+				sum += gn[g];
+				sum_of_squares += gn[g] * gn[g];
+			}
+
+			avg_gene_vals[g] = sum / pop_size;
+			avg_gene_squared_vals[g] = sum_of_squares / pop_size;
+		}
+
+		i_genome_mapping::diversity_t diversity = 0.0;
+		for(size_t g = 0; g < genome_len; ++g)
+		{
+			diversity += avg_gene_squared_vals[g] - avg_gene_vals[g] * avg_gene_vals[g];
+		}
+
+		diversity = sqrt(diversity) / genome_len;
+		return diversity;
+	}
+
 	virtual size_t get_genome_length()
 	{
 		// TODO: Should be calcuable directly from m_layer_neuron_counts, assuming fully connected mlp

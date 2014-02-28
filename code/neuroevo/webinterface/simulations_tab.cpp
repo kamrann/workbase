@@ -2,6 +2,7 @@
 
 #include "simulations_tab.h"
 #include "webinterfaceapp.h"
+#include "wt_system_widgets/properties_chart_widget.h"
 #include "evo_db/system_sim_tbl.h"
 #include "evo_db/problem_domain_tbl.h"
 #include "evo_db/genetic_language_tbl.h"
@@ -64,32 +65,10 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 
 	system_param_type* spt = new system_param_type(true);
 	system_params_widget = spt->create_widget(&param_mgr);
-	//addWidget(system_params_widget->get_wt_widget());
 	sys_params_panel->setCentralWidget(system_params_widget->get_wt_widget());
 
 	WPanel* sim_params_panel = new WPanel(this);
 	sim_params_panel->setTitle("Simulation parameters");
-
-/*	WTable* sim_params_table = new WTable;
-
-	size_t row = 0;
-	sim_params_table->elementAt(row, 0)->addWidget(new WText("Population Size"));
-	pop_size_edit = new WLineEdit(sim_params_table->elementAt(row, 1));
-	pop_size_edit->setValidator(new Wt::WIntValidator(1, std::numeric_limits< int >::max()));
-	++row;
-
-	sim_params_table->elementAt(row, 0)->addWidget(new WText("Num Generations"));
-	num_epochs_edit = new WLineEdit(sim_params_table->elementAt(row, 1));
-	num_epochs_edit->setValidator(new Wt::WIntValidator(1, std::numeric_limits< int >::max()));
-	++row;
-
-	sim_params_table->elementAt(row, 0)->addWidget(new WText("Trials/Generation"));
-	trials_per_epoch_edit = new WLineEdit(sim_params_table->elementAt(row, 1));
-	trials_per_epoch_edit->setValidator(new Wt::WIntValidator(1, std::numeric_limits< int >::max()));
-	++row;
-
-	sim_params_panel->setCentralWidget(sim_params_table);
-	*/
 
 	rtp_named_param_list evo_param_list = rtp_simulation::evo_params();
 	rtp_param_type* evo_pt = new rtp_staticparamlist_param_type(evo_param_list);
@@ -114,11 +93,22 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	observations_table->setMaximumSize(WLength::Auto, 300);
 	observations_table->setSelectionMode(Wt::SingleSelection);
 
+	evo_chart = new properties_chart_widget();
+	rtp_stored_properties* props(new rtp_stored_properties());
+	props->add_property("Generation");
+	props->add_property("Highest Obj");
+	props->add_property("Average Obj");
+	props->add_property("Diversity");
+	evo_chart->reset(boost::shared_ptr< i_properties const >(props));
+	addWidget(evo_chart);
+
 	run_sim_btn->clicked().connect(this, &SimulationsTab::on_run_simulation);
 }
 
 void SimulationsTab::on_run_simulation()
 {
+	evo_chart->clear_content();
+
 	rtp_param sys_param = system_params_widget->get_param();
 	rtp_param evo_param = evo_params_widget->get_param();
 	rtp_simulation* sim = new rtp_simulation(sys_param, evo_param);
@@ -366,6 +356,8 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 	size_t gen_batch_index = 0;
 	size_t ind_batch_index = 0;
 
+	std::vector< boost::shared_ptr< i_property_values const > > per_generation_prop_vals(GenerationBatchSize);
+
 	// TODO: Assuming double
 //	sim_t::processed_obj_val_t highest_ov;
 //	sim_t::agent_t best;
@@ -374,21 +366,24 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 //		observations.clear();	// TODO:
 		sim->run_epoch(/*observations,*/ out);
 
+		boost::any average_obj = sim->get_average_objective();
+		boost::any highest_obj = sim->get_highest_objective();
+		genotype_diversity_measure diversity = sim->population_genotype_diversity();
+
+		rtp_stored_property_values* vals = new rtp_stored_property_values();
+		vals->set_value("Generation", boost::any(e + 1));
+		vals->set_value("Average Obj", average_obj);
+		vals->set_value("Highest Obj", highest_obj);
+		vals->set_value("Diversity", diversity);
+		per_generation_prop_vals[gen_batch_index].reset(vals);
+
 		std::stringstream ss;
 		ss.precision(2);
 		std::fixed(ss);
-		ss << "Gen " << (e + 1) << ": Average Obj. = " << boost::any_cast<double>(sim->get_average_objective());
-		ss << "; Highest = " << boost::any_cast<double>(sim->get_highest_objective()) << "." << std::endl;
+		ss << "Gen " << (e + 1) << ": Average Obj. = " << boost::any_cast<double>(average_obj);
+		ss << "; Highest = " << boost::any_cast<double>(highest_obj) << "." << std::endl;
 		out << ss.str();
 
-/*		sim_t::agent_t best_of_generation;
-		sim_t::processed_obj_val_t obj_val = sim.get_fittest(best_of_generation);
-		if(e == 0 || obj_val > highest_ov)
-		{
-			highest_ov = obj_val;
-			best = best_of_generation;
-		}
-*/
 		// Add database entries
 		gen_data[gen_batch_index].index = sim->generation;
 		gen_data[gen_batch_index].genotype_diversity = 0;// sim.population_genotype_diversity();
@@ -429,7 +424,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 
 //			WStandardItemModel* obs_model = observer_data_model< sim_t::observer_t >::generate(observations);
 
-			WServer::instance()->post(session_id, boost::bind(&SimulationsTab::generation_cb, this, nullptr/*obs_model*/, out.str()));
+			WServer::instance()->post(session_id, boost::bind(&SimulationsTab::generation_cb, this, per_generation_prop_vals, out.str()));
 
 			gen_batch_index = 0;
 			ind_batch_index = 0;
@@ -461,7 +456,8 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 
 //		WStandardItemModel* obs_model = observer_data_model< sim_t::observer_t >::generate(observations);
 
-		WServer::instance()->post(session_id, boost::bind(&SimulationsTab::generation_cb, this, nullptr/*obs_model*/, out.str()));
+		per_generation_prop_vals.resize(gen_batch_index);
+		WServer::instance()->post(session_id, boost::bind(&SimulationsTab::generation_cb, this, per_generation_prop_vals, out.str()));
 	}
 
 	{
@@ -483,13 +479,19 @@ void SimulationsTab::evo_started_cb(dbo::ptr< evo_period > ep)
 	//app->triggerUpdate();
 }
 
-void SimulationsTab::generation_cb(WStandardItemModel* obs_model, std::string txt)
+void SimulationsTab::generation_cb(std::vector< boost::shared_ptr< i_property_values const > > per_gen_prop_vals, std::string txt)
 {
-	if(obs_model)
+/*	if(obs_model)
 	{
 		observations_table->setModel(obs_model);
 	}
+*/
 	txt_output->setText(txt);
+
+	for(size_t i = 0; i < per_gen_prop_vals.size(); ++i)
+	{
+		evo_chart->append_data(per_gen_prop_vals[i]);
+	}
 
 	WebInterfaceApplication* app = (WebInterfaceApplication*)WApplication::instance();
 

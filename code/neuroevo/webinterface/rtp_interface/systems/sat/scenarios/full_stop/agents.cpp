@@ -14,6 +14,7 @@ namespace rtp_sat
 	std::string const mlp_agent< dim >::Names[] = {
 		"Angular Velocity",
 		"Velocity & Angle",
+		"Velocity & Angle & Pos",
 	};
 
 	template < WorldDimensionality dim >
@@ -153,6 +154,18 @@ namespace rtp_sat
 					new mlp_agent_factory< dim >(type, num_layers, NumNNOutputs));
 			}
 
+			case VelAnglePos:
+			{
+				size_t const NumPerHidden = (mlp_vel_angle_pos_agent< dim >::NumNNInputs + NumNNOutputs) / 2;
+				return std::pair< i_genome_mapping*, i_agent_factory* >(
+					new fixednn_genome_mapping(
+						num_layers,
+						mlp_vel_angle_pos_agent< dim >::NumNNInputs,
+						NumNNOutputs,
+						NumPerHidden),
+					new mlp_agent_factory< dim >(type, num_layers, NumNNOutputs));
+			}
+
 		default:
 			assert(false);
 			return std::pair< i_genome_mapping*, i_agent_factory* >(nullptr, nullptr);
@@ -234,6 +247,36 @@ namespace rtp_sat
 		std::vector< double >::iterator it = nni.begin();
 		get_components(st.ship.lin_velocity, it);
 		get_components(st.ship.ang_velocity, it);
+		get_components(st.ship.orientation, it);
+		assert(it == nni.end());
+		return nni;
+	}
+
+	template < WorldDimensionality dim >
+	mlp_vel_angle_pos_agent< dim >::mlp_vel_angle_pos_agent(size_t num_layers, size_t num_outputs): mlp_agent< dim >(num_layers, num_outputs)
+	{
+		size_t const NumNNHidden = (NumNNInputs + num_nn_outputs) / 2;
+
+		std::vector< unsigned int > layer_neurons(num_layers, (unsigned int)NumNNHidden);
+		layer_neurons[0] = NumNNInputs;
+		layer_neurons[num_nn_layers - 1] = num_nn_outputs;
+		nn.create_standard_array(num_nn_layers, &layer_neurons[0]);
+
+		nn.set_activation_steepness_hidden(1.0);
+		nn.set_activation_steepness_output(1.0);
+
+		nn.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC_STEPWISE);
+		nn.set_activation_function_output(FANN::THRESHOLD);
+	}
+
+	template < WorldDimensionality dim >
+	std::vector< double > mlp_vel_angle_pos_agent< dim >::map_nn_inputs(state_t const& st)
+	{
+		std::vector< double > nni(NumNNInputs);
+		std::vector< double >::iterator it = nni.begin();
+		get_components(st.ship.lin_velocity, it);
+		get_components(st.ship.ang_velocity, it);
+		get_components(st.ship.position, it);
 		get_components(st.ship.orientation, it);
 		assert(it == nni.end());
 		return nni;

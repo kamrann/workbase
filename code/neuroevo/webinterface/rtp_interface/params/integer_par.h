@@ -22,6 +22,8 @@ public:
 		m_spin_step(1)
 	{}
 
+	virtual ~rtp_integer_param_type();
+
 public:
 	inline void use_spin(bool use, int step = 1)
 	{

@@ -8,6 +8,7 @@
 #include "../params/nestedparam_par.h"
 
 #include <boost/optional.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <array>
 #include <string>
@@ -51,10 +52,12 @@ extern const std::array< std::string, NumSystems > SystemNames;
 
 
 class i_agent;
-class i_system_drawer;
 class i_observer;
 class i_genome_mapping;
 class i_agent_factory;
+class i_properties;
+class i_property_values;
+class i_system_drawer;
 
 class i_system
 {
@@ -71,6 +74,9 @@ public:
 
 	virtual bool update(i_observer* obs = nullptr) = 0;
 	virtual boost::any record_observations(i_observer* obs) const = 0;
+
+	virtual boost::shared_ptr< i_properties const > get_state_properties() const = 0;
+	virtual boost::shared_ptr< i_property_values const > get_state_property_values() const = 0;
 
 	virtual i_system_drawer* get_drawer() const = 0;
 };

@@ -251,5 +251,11 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\fixed_or_random_par.h">
       <Filter>rtp_interface\params</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_properties.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_chart_widget.h">
+      <Filter>wt_system_widgets</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,6 +8,11 @@
 //#include <Wt/WLocale>
 
 
+rtp_integer_param_type::~rtp_integer_param_type()
+{
+
+}
+
 i_param_widget* rtp_integer_param_type::create_widget(rtp_param_manager* mgr) const
 {
 	rtp_param_widget< Wt::WSpinBox >* edit = new rtp_param_widget< Wt::WSpinBox >(this);
@@ -18,12 +23,6 @@ i_param_widget* rtp_integer_param_type::create_widget(rtp_param_manager* mgr) co
 	edit->setRange(m_min, m_max);
 //	edit->setText(Wt::WString("{1}").arg(m_default));
 	edit->setValue(m_default);
-	edit->changed().connect(std::bind([edit](){
-		// Do nothing
-		std::string txt = edit->text().toUTF8();
-		int y, x = 0;
-		y = x;
-	}));
 	return edit;
 }
 

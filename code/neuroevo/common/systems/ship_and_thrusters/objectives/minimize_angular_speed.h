@@ -9,7 +9,7 @@
 #include "ga/objective_fn.h"
 
 
-struct min_ang_speed_obj_fn: public objective_fn
+struct reduce_ang_speed_obj_fn: public objective_fn
 {
 	typedef boost::mpl::vector< stopped_rotating_ofd > dependencies;
 
@@ -19,10 +19,9 @@ struct min_ang_speed_obj_fn: public objective_fn
 	static inline obj_value_t evaluate(ObjFnData const& ofd, TrialData const& td)
 	{
 		// TODO: as in above method
-		double const IdealDecelRate = 2 * 0.25;
-		double const SigmoidLimit = 4.0;
+//		double const IdealDecelRate = 2 * 0.25;
+//		double const SigmoidLimit = 4.0;
 
-		// TODO: .agents[0] ??? need agent index as argument?????
 		double end_speed = ofd.stopped_rotating ? 0.0 : magnitude(td.final_st.ship.ang_velocity);
 		double accel = end_speed - magnitude(td.initial_st.ship.ang_velocity);
 		double time = ofd.stopped_rotating ? ofd.time_to_stopped_rotating : td.final_st.time;//ofd.timesteps;

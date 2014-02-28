@@ -5,7 +5,7 @@
 
 #include "system_coordinator.h"
 #include "wt_system_widgets/ship_widget.h"
-//#include "wt_system_widgets/ship_history_widget.h"
+#include "wt_system_widgets/properties_chart_widget.h"
 
 #include "rtp_interface/systems/sat/rtp_sat_system.h"
 
@@ -30,8 +30,8 @@ public:
 		FrameDuration = 50,
 	};
 
-	typedef ship_widget									widget_t;
-	//typedef ship_history_widget< Dim >				history_widget_t;
+	typedef ship_widget							widget_t;
+	typedef properties_chart_widget				chart_widget_t;
 
 public:
 	ship_coordinator(i_system* sys): m_sys((rtp_sat::sat_system< dim >*)sys)
@@ -46,9 +46,10 @@ public:
 		m_widget->set_drawer(m_sys->get_drawer());
 		m_widget->thruster_activated().connect(this, &ship_coordinator::on_widget_thruster_activated);
 
-		// TODO: m_history_widget = new history_widget_t();
+		m_chart_widget = new chart_widget_t();
+		m_chart_widget->reset(m_sys->get_state_properties());
 
-		return std::pair< Wt::WWidget*, Wt::WWidget* >(m_widget, nullptr);// m_history_widget);
+		return std::pair< Wt::WWidget*, Wt::WWidget* >(m_widget, m_chart_widget);
 	}
 
 	void set_agent_controllers(agent_controller_t* a)
@@ -68,7 +69,7 @@ public:
 		m_sys->set_state(m_sys->generate_initial_state(rgen));
 
 		m_widget->enable_interaction(true);	// TODO:
-		// TODO: m_history_widget->reset();
+		m_chart_widget->clear_content();
 		
 		update_widgets();
 		Wt::WTimer::singleShot(FrameDuration, this, &ship_coordinator::on_update);
@@ -77,7 +78,7 @@ public:
 	void update_widgets()
 	{
 		m_widget->update();
-		// TODO: m_history_widget->update();
+		m_chart_widget->append_data(m_sys->get_state_property_values());
 	}
 
 private:
@@ -106,7 +107,7 @@ private:
 private:
 	system_t* m_sys;
 	widget_t* m_widget;
-	//history_widget_t* m_history_widget;
+	chart_widget_t* m_chart_widget;
 
 	std::map< agent_id_t, controller_ptr_t > m_controllers;
 };
