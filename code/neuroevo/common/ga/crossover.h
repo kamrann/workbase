@@ -67,16 +67,23 @@ struct basic_crossover
 		}
 		std::random_shuffle(p_order.begin(), p_order.end(), shuffle_ftr(rgen));
 
+		// TODO: Temp
+		*offspring = *parents[0];	// Hack: invoke clone to construct genome
+		//
+		genome_t& offspring_gn = rtp_cast<genome_t>(*offspring);// ->genome);
+
 		// TODO: Should this be done here, or higher up? eg. when creating next_gen in gen_alg::epoch()
-		offspring->genome.resize(genome_length);
+		offspring_gn.resize(genome_length);
 
 		// Now copy over the corresponding segment of genome from each parent to the child
 		for(size_t i = 0; i < NumParents; ++i)
 		{
+			genome_t const& parent_gn = rtp_cast<genome_t>(*parents[p_order[i]]);// ->genome);
+
 			std::copy(
-				parents[p_order[i]]->genome.begin() + cx_points[i],
-				parents[p_order[i]]->genome.begin() + cx_points[i + 1],
-				offspring->genome.begin() + cx_points[i]
+				parent_gn.begin() + cx_points[i],
+				parent_gn.begin() + cx_points[i + 1],
+				offspring_gn.begin() + cx_points[i]
 			);
 		}
 	}

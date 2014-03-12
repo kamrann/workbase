@@ -71,10 +71,12 @@ public:
 		size_t const num_parents_total = parents_end - parents_start;
 
 		// Get the number of parents needed for a single procreation
-		size_t const num_parents_cx = cx_ftr.get_num_parents();
+		size_t const num_parents_cx = 2; // TODO: rtp cx fn cannot be simple boost function if we want this reenabled...
+			// Will need to create wrapper for it with op() and also .get_num_parents()
+			//cx_ftr.get_num_parents();
 		bool const can_crossover = num_parents_total >= num_parents_cx;
 
-		typedef typename OutputIterator::value_type individual_t;
+		typedef typename OutputIterator::value_type genome_t;// individual_t;
 
 		proc_sel.preprocess_population(parents_start, parents_end);
 
@@ -85,7 +87,8 @@ public:
 			if(can_crossover && rdist_0_1(rgen) < cx_rate_ftr(evo_stage))
 			{
 				// Select the parents for the crossover operation
-				std::vector< individual_t* > parents(num_parents_cx, nullptr);
+				//std::vector< individual_t* > parents(num_parents_cx, nullptr);
+				std::vector< genome_t const* > parents(num_parents_cx, nullptr);
 				proc_sel.select_parents(num_parents_cx, parents_start, parents_end, parents.begin());
 
 				// Generate the child through crossover
@@ -94,11 +97,13 @@ public:
 			else
 			{
 				// Not using crossover, so select a single individual from the parent population
-				std::array< individual_t*, 1 > parent;
+				//std::array< individual_t*, 1 > parent;
+				std::vector< genome_t const* > parent(1, nullptr);
 				proc_sel.select_parents(1, parents_start, parents_end, parent.begin());
 
 				// And clone it
-				offspring->genome = parent[0]->genome;
+				//offspring->genome = parent[0]->genome;
+				*offspring = *parent[0];
 			}
 
 			// Now apply mutation

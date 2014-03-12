@@ -37,7 +37,7 @@ public:
 			size_t const index = current++;
 			current %= parent_pop_size;
 						
-			*dest = &pop_start[index];
+			*dest = &pop_start[index].genome;
 			++dest;
 		}
 	}

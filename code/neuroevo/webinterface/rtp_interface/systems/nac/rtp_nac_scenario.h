@@ -6,6 +6,7 @@
 #include "../rtp_scenario.h"
 #include "../../rtp_param.h"
 #include "../../params/nestedparam_par.h"
+#include "../../params/paramlist_par.h"
 
 #include <array>
 
@@ -35,11 +36,13 @@ namespace rtp_nac
 			virtual rtp_param get_widget_param(i_param_widget const* w) const;
 		};
 
-		class param_type: public rtp_nestedparam_param_type
+		class param_type: public rtp_paramlist_param_type//rtp_nestedparam_param_type
 		{
 		public:
-			virtual rtp_named_param provide_selection_param() const;
-			virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+//			virtual rtp_named_param provide_selection_param() const;
+//			virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+			virtual size_t provide_num_child_params(rtp_param_manager* mgr) const;
+			virtual rtp_named_param provide_child_param(size_t index, rtp_param_manager* mgr) const;
 		};
 
 	public:

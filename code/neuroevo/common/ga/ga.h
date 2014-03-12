@@ -24,8 +24,8 @@ template <
 //	typename FitnessType,
 	typename Individual,
 	typename SurvivalSelection,// = truncation_survival_selection< std::vector< individual< Genome, FitnessType > >::iterator,
-	typename CrossoverFtr = basic_crossover< Genome >,
-	typename MutationFtr = basic_real_mutation< Genome >,
+	typename CrossoverFtr,// = basic_crossover< Individual::genome_t >,
+	typename MutationFtr,// = basic_real_mutation< Individual::genome_t >,
 	typename CrossoverRateFtr = FixedCrossoverRate,
 	typename MutationRateFtr = FixedMutationRate,
 	typename ProcreationSelection = random_procreation_selection<>,
@@ -44,7 +44,9 @@ struct gen_alg
 //	typedef FitnessType							fitness_t;
 //	typedef individual< genome_t, fitness_t >	individual_t;
 	typedef Individual							individual_t;
+	typedef typename individual_t::genome_t		genome_t;
 	typedef std::vector< individual_t >			population_t;
+	typedef std::vector< genome_t >				genome_population_t;
 	typedef SurvivalSelection					survival_sel_t;
 	typedef CrossoverFtr						cx_ftr_t;
 	typedef MutationFtr							mut_ftr_t;
@@ -124,10 +126,11 @@ struct gen_alg
 		// Will probably want to change this??
 
 		// TODO: Currently maintain a fixed population size, but in future this should be variable
-
-		population_t::iterator valid_end = std::remove_if(
-			population.begin(), population.end(), [](individual_t const& idv) { return idv.fitness.unfit; });
-
+		population_t::iterator valid_end =
+			population.end();
+/* TODO:
+			std::remove_if(population.begin(), population.end(), [](individual_t const& idv) { return idv.fitness.unfit; });
+*/
 		size_t const ValidPopulationSize = valid_end - population.begin();//population.size();
 
 		// First, survival selection to determine which individuals will become progenitors of the next generation
@@ -141,11 +144,17 @@ struct gen_alg
 		// Next, procreation
 		procreation_t procreation(proc_sel, cx_rate_ftr, cx_ftr, mut_rate_ftr, mut_ftr, rgen, (double)generation / max_generations);
 		bool const ParentSurvival = true;	// False = comma-selection, True = plus-selection
-		population_t next_gen(ValidPopulationSize);
+		//population_t next_gen(ValidPopulationSize);
+		genome_population_t next_gen(ValidPopulationSize);
 		if(ParentSurvival)
 		{
 			// Plus-selection: Copy over progenitors, then top up population size with children
-			std::copy(progenitors.begin(), progenitors.end(), next_gen.begin());
+			std::transform(progenitors.begin(), progenitors.end(), next_gen.begin(),
+				[](individual_t const& idv)
+			{
+				return idv.genome;
+			}
+			);
 			procreation.generate_offspring(progenitors.begin(), progenitors.end(), ValidPopulationSize - NumProgenitors, next_gen.begin() + NumProgenitors);
 		}
 		else
@@ -164,7 +173,11 @@ struct gen_alg
 		}
 		*/
 
-		population = next_gen;
+		size_t pop_size = population.size();
+		for(size_t i = 0; i < pop_size; ++i)
+		{
+			population[i].genome = next_gen[i];
+		}
 		++generation;
 
 		return ValidPopulationSize;

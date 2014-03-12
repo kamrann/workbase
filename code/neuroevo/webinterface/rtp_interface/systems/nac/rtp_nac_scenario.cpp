@@ -39,7 +39,7 @@ namespace rtp_nac {
 		return rtp_param(system);
 	}
 
-	rtp_named_param nac_scenario::param_type::provide_selection_param() const
+/*	rtp_named_param nac_scenario::param_type::provide_selection_param() const
 	{
 		return rtp_named_param(new nac_scenario::enum_param_type(), "Scenario Type");
 	}
@@ -50,6 +50,18 @@ namespace rtp_nac {
 		rtp_named_param_list sub_params = nac_scenario::params(scenario);
 		return new rtp_staticparamlist_param_type(sub_params);
 	}
+	*/
+
+	size_t nac_scenario::param_type::provide_num_child_params(rtp_param_manager* mgr) const
+	{
+		return 0;
+	}
+
+	rtp_named_param nac_scenario::param_type::provide_child_param(size_t index, rtp_param_manager* mgr) const
+	{
+		return rtp_named_param();
+	}
+
 /*
 	boost::any nac_scenario::param_type::default_value() const
 	{

@@ -6,6 +6,8 @@
 #include "rtp_sat_system.h"
 #include "../rtp_scenario.h"
 #include "../../rtp_param.h"
+#include "../../params/enum_par.h"
+#include "../../params/paramlist_par.h"
 #include "../../params/nestedparam_par.h"
 
 #include "util/fixed_or_random.h"
@@ -45,22 +47,20 @@ namespace rtp_sat
 		typedef typename system_t::state state_t;
 		typedef typename system_t::scenario_data scenario_data_t;
 
-		class enum_param_type: public rtp_param_type
+		class enum_param_type: public rtp_enum_param_type
 		{
 		public:
-			virtual boost::any default_value() const;
-			virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
-			virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			enum_param_type();
 		};
 
-		class param_type: public rtp_autonestedparam_param_type
+		class param_type: public rtp_paramlist_param_type
 		{
 		public:
-			virtual rtp_named_param provide_selection_param() const;
-			virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+			virtual size_t provide_num_child_params(rtp_param_manager* mgr) const;
+			virtual rtp_named_param provide_child_param(size_t index, rtp_param_manager* mgr) const;
 		};
 
-		static rtp_named_param_list params();
+		static rtp_param_type* params();
 		static rtp_named_param_list params(ScenarioType scen);
 
 		static sat_scenario* create_instance(rtp_param param);

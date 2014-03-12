@@ -5,6 +5,7 @@
 #include "rtp_sat_system_drawer.h"
 #include "rtp_sat_observers.h"
 #include "scenarios/full_stop/agents.h"	// TODO: shouldn't be including scenario type specific stuff in this file...
+#include "../rtp_interactive_input.h"
 #include "../../params/paramlist_par.h"
 #include "../../rtp_properties.h"
 
@@ -20,24 +21,6 @@
 
 
 namespace rtp_sat {
-
-/*	i_system* sat_system_base::create_instance(rtp_param param)
-	{
-		rtp_param_list& param_list = boost::any_cast<rtp_param_list&>(param);
-		WorldDimensionality dim = boost::any_cast<WorldDimensionality>(param_list[0]);
-		switch(dim)
-		{
-		case WorldDimensionality::dim2D:
-			return new sat_system< WorldDimensionality::dim2D >(param_list[1]);
-
-		case WorldDimensionality::dim3D:
-			return new sat_system< WorldDimensionality::dim3D >(param_list[1]);
-
-		default:
-			return nullptr;
-		}
-	}
-*/
 
 	// TODO: May want to eventually separate i_agent into i_agent & i_agent_controller
 	// (So we specify agent properties (such as ship configuration), and then subsequently specify a compatible controller (with its own properties)
@@ -85,56 +68,20 @@ namespace rtp_sat {
 	};
 
 	template < WorldDimensionality dim >
-	boost::any sat_system< dim >::ship_config::enum_param_type::default_value() const
+	sat_system< dim >::ship_config::enum_param_type::enum_param_type()
 	{
-		return SquareMinimal;
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* sat_system< dim >::ship_config::enum_param_type::create_widget(rtp_param_manager* mgr) const
-	{
-		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
-
 		for(size_t i = 0; i < Type::Count; ++i)
 		{
-			box->addItem(Names[i]);
-			box->model()->setData(i, 0, (Type)i, Wt::UserRole);
+			add_item(Names[i], (Type)i);
 		}
-
-		return box;
+		set_default_index(0);
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param sat_system< dim >::ship_config::enum_param_type::get_widget_param(i_param_widget const* w) const
+	thruster_config< dim > sat_system< dim >::ship_config::create_instance(Type type, rtp_param param)
 	{
-		Wt::WComboBox const* box = (Wt::WComboBox const*)w->get_wt_widget();
-		Wt::WAbstractItemModel const* model = box->model();
-		Type cfg = boost::any_cast< Type >(model->data(box->currentIndex(), 0, Wt::UserRole));
-		return rtp_param(cfg);
-	}
-
-	template < WorldDimensionality dim >
-	rtp_named_param sat_system< dim >::ship_config::param_type::provide_selection_param() const
-	{
-		return rtp_named_param(new sat_system< dim >::ship_config::enum_param_type(), "Ship Config");
-	}
-
-	template < WorldDimensionality dim >
-	rtp_param_type* sat_system< dim >::ship_config::param_type::provide_nested_param(rtp_param_manager* mgr) const
-	{
-		Type cfg_type = boost::any_cast<Type>(mgr->retrieve_param("Ship Config"));
-		rtp_named_param_list sub_params;// = m_evolvable ? evolvable_agent::params(cfg_type) : i_sat_agent::params(cfg_type);
-		return new rtp_staticparamlist_param_type(sub_params);
-	}
-
-	template < WorldDimensionality dim >
-	thruster_config< dim > sat_system< dim >::ship_config::create_instance(rtp_param param)
-	{
-		auto param_pr = boost::any_cast<std::pair< boost::any, boost::any >>(param);
-		Type cfg_type = boost::any_cast<Type>(param_pr.first);
-
 		thruster_config< dim > cfg;
-		switch(cfg_type)
+		switch(type)
 		{
 		case SquareMinimal:
 			cfg = thruster_presets::square_minimal();
@@ -151,58 +98,36 @@ namespace rtp_sat {
 
 
 	template < WorldDimensionality dim >
-	boost::any sat_system< dim >::i_sat_agent::enum_param_type::default_value() const
+	sat_system< dim >::i_sat_agent::enum_param_type::enum_param_type()
 	{
-		return Passive;
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* sat_system< dim >::i_sat_agent::enum_param_type::create_widget(rtp_param_manager* mgr) const
-	{
-		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
-
 		for(size_t i = 0; i < Type::Count; ++i)
 		{
-			box->addItem(Names[i]);
-			box->model()->setData(i, 0, (Type)i, Wt::UserRole);
+			add_item(Names[i], (Type)i);
 		}
-
-		return box;
+		set_default_index(0);
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param sat_system< dim >::i_sat_agent::enum_param_type::get_widget_param(i_param_widget const* w) const
+	rtp_param_type* sat_system< dim >::i_sat_agent::params(typename sat_system< dim >::i_sat_agent::Type type)//typename ship_config::Type cfg_type)
 	{
-		Wt::WComboBox const* box = (Wt::WComboBox const*)w->get_wt_widget();
-		Wt::WAbstractItemModel const* model = box->model();
-		Type type = boost::any_cast< Type >(model->data(box->currentIndex(), 0, Wt::UserRole));
-		return rtp_param(type);
-	}
-/*
-	template < WorldDimensionality dim >
-	rtp_named_param_list sat_system< dim >::i_sat_agent::params(typename ship_config::Type cfg_type)
-	{
-		rtp_named_param_list p;
-
-		switch(cfg_type)
+		switch(type)
 		{
+			case i_sat_agent::Passive:
 			// TODO:
-		default:
-			{
-				p.push_back(rtp_named_param(new enum_param_type(), "Controller"));
-			}
-			break;
+			return new rtp_staticparamlist_param_type(rtp_named_param_list());
+
+			case i_sat_agent::Interactive:
+			// TODO:
+			return new rtp_staticparamlist_param_type(rtp_named_param_list());
+			
+			default:
+			return nullptr;
 		}
-		return p;
 	}
-*/
+
 	template < WorldDimensionality dim >
-	typename sat_system< dim >::i_sat_agent* sat_system< dim >::i_sat_agent::create_instance(rtp_param param)
+	typename sat_system< dim >::i_sat_agent* sat_system< dim >::i_sat_agent::create_instance(Type type, rtp_param param)
 	{
-//		auto param_pr = boost::any_cast<std::pair< rtp_param, rtp_param >>(param);
-//		Type type = boost::any_cast<Type>(param_pr.first);
-//		rtp_param_list sub = boost::any_cast<rtp_param_list>(param_pr.second);
-		Type type = boost::any_cast<Type>(param);
 		switch(type)
 		{
 		case Passive:
@@ -215,143 +140,70 @@ namespace rtp_sat {
 	}
 
 	template < WorldDimensionality dim >
-	boost::any sat_system< dim >::evolvable_agent::enum_param_type::default_value() const
+	sat_system< dim >::evolvable_agent::enum_param_type::enum_param_type()
 	{
-		return MLP;
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* sat_system< dim >::evolvable_agent::enum_param_type::create_widget(rtp_param_manager* mgr) const
-	{
-		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
-
 		for(size_t i = 0; i < Type::Count; ++i)
 		{
-			box->addItem(Names[i]);
-			box->model()->setData(i, 0, (Type)i, Wt::UserRole);
+			add_item(Names[i], (Type)i);
 		}
-
-		return box;
+		set_default_index(0);
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param sat_system< dim >::evolvable_agent::enum_param_type::get_widget_param(i_param_widget const* w) const
+	rtp_param_type* sat_system< dim >::evolvable_agent::params(Type ea_type)
 	{
-		Wt::WComboBox const* box = (Wt::WComboBox const*)w->get_wt_widget();
-		Wt::WAbstractItemModel const* model = box->model();
-		Type type = boost::any_cast< Type >(model->data(box->currentIndex(), 0, Wt::UserRole));
-		return rtp_param(type);
-	}
-
-	template < WorldDimensionality dim >
-	rtp_named_param sat_system< dim >::evolvable_agent::param_type::provide_selection_param() const
-	{
-		return rtp_named_param(new enum_param_type(), "Controller");
-	}
-
-	template < WorldDimensionality dim >
-	rtp_param_type* sat_system< dim >::evolvable_agent::param_type::provide_nested_param(rtp_param_manager* mgr) const
-	{
-		Type ea_type = boost::any_cast<Type>(mgr->retrieve_param("Controller"));
-		rtp_named_param_list sub_params = evolvable_agent::params(ea_type);
-		return new rtp_staticparamlist_param_type(sub_params);
-	}
-
-	template < WorldDimensionality dim >
-	rtp_named_param_list sat_system< dim >::evolvable_agent::params()
-	{
-		rtp_named_param_list p;
-		p.push_back(rtp_named_param(new param_type(), "Evolvable Agent?"));
-		p.push_back(rtp_named_param(new rtp_staticparamlist_param_type(agent_objective::params()), "Objective"));
-		return p;
-	}
-
-	template < WorldDimensionality dim >
-	rtp_named_param_list sat_system< dim >::evolvable_agent::params(Type ea_type)
-	{
-		rtp_named_param_list p;
-
 		switch(ea_type)
 		{
 		case MLP:
-			p.push_back(rtp_named_param(new mlp_agent< dim >::param_type()));
-			break;
+			return new mlp_agent< dim >::param_type();
 
 		default:
 			assert(false);
+			return nullptr;
 		}
-
-		return p;
 	}
 
 	template < WorldDimensionality dim >
-	std::tuple< i_genome_mapping*, i_agent_factory*, i_observer* > sat_system< dim >::evolvable_agent::create_instance(rtp_param param, thruster_config< dim > const& cfg)
+	std::tuple< i_genome_mapping*, i_agent_factory* > sat_system< dim >::evolvable_agent::create_instance(Type type, rtp_param param, thruster_config< dim > const& cfg)
 	{
-		auto param_list = boost::any_cast<rtp_param_list>(param);
-		auto param_pr = boost::any_cast<std::pair< rtp_param, rtp_param >>(param_list[0]);
+		//auto param_list = boost::any_cast<rtp_param_list>(param);
 
-		std::pair< i_genome_mapping*, i_agent_factory* > agent_spec;
-		Type type = boost::any_cast<Type>(param_pr.first);
 		switch(type)
 		{
 		case MLP:
-			agent_spec = mlp_agent< dim >::create_instance_evolvable(param_pr.second, cfg);
+			return mlp_agent< dim >::create_instance_evolvable(param/*param_list*/, cfg);
 			break;
 
 		default:
 			assert(false);
+			return std::tuple< i_genome_mapping*, i_agent_factory* >(nullptr, nullptr);
 		}
-
-		std::tuple< i_genome_mapping*, i_agent_factory*, i_observer* > result;
-		std::get< 0 >(result) = agent_spec.first;
-		std::get< 1 >(result) = agent_spec.second;
-
-		std::get< 2 >(result) = agent_objective::create_instance(param_list[1]);
-		return result;
 	}
 
 	template < WorldDimensionality dim >
-	boost::any sat_system< dim >::agent_objective::enum_param_type::default_value() const
+	sat_system< dim >::agent_objective::enum_param_type::enum_param_type()
 	{
-		return ReduceKinetic;
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* sat_system< dim >::agent_objective::enum_param_type::create_widget(rtp_param_manager* mgr) const
-	{
-		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
-
 		for(size_t i = 0; i < Type::Count; ++i)
 		{
-			box->addItem(Names[i]);
-			box->model()->setData(i, 0, (Type)i, Wt::UserRole);
+			add_item(Names[i], (Type)i);
 		}
-
-		return box;
+		set_default_index(0);
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param sat_system< dim >::agent_objective::enum_param_type::get_widget_param(i_param_widget const* w) const
+	rtp_param_type* sat_system< dim >::agent_objective::params(Type type)
 	{
-		Wt::WComboBox const* box = (Wt::WComboBox const*)w->get_wt_widget();
-		Wt::WAbstractItemModel const* model = box->model();
-		Type type = boost::any_cast< Type >(model->data(box->currentIndex(), 0, Wt::UserRole));
-		return rtp_param(type);
+		switch(type)
+		{
+			// TODO: 
+			default:
+			return new rtp_staticparamlist_param_type(rtp_named_param_list());
+		}
 	}
 
 	template < WorldDimensionality dim >
-	rtp_named_param_list sat_system< dim >::agent_objective::params()
+	i_observer* sat_system< dim >::agent_objective::create_instance(Type type, rtp_param param)
 	{
-		rtp_named_param_list p;
-		p.push_back(rtp_named_param(new enum_param_type(), "Objective?"));
-		return p;
-	}
-
-	template < WorldDimensionality dim >
-	i_observer* sat_system< dim >::agent_objective::create_instance(rtp_param param)
-	{
-		auto param_list = boost::any_cast<rtp_param_list>(param);
-		Type type = boost::any_cast<Type>(param_list[0]);
 		switch(type)
 		{
 			case ReduceSpeed:			return new rtp_sat::wrapped_objective_fn< dim, reduce_lin_speed_obj_fn >();
@@ -370,14 +222,69 @@ namespace rtp_sat {
 
 
 	template < WorldDimensionality dim >
-	rtp_named_param_list sat_system< dim >::params(bool evolvable)
+	size_t sat_system< dim >::param_type::provide_num_child_params(rtp_param_manager* mgr) const
 	{
-		rtp_named_param_list p;
+		return m_evolvable ? 6 : 4;
+	}
+
+	template < WorldDimensionality dim >
+	rtp_named_param sat_system< dim >::param_type::provide_child_param(size_t index, rtp_param_manager* mgr) const
+	{
+		switch(index)
+		{
+			case 0:
+			return rtp_named_param(sat_scenario< dim >::params());
+
+			case 1:
+			return rtp_named_param(new ship_config::enum_param_type(), "Ship Config");
+
+			case 2:
+			return m_evolvable ? rtp_named_param(new evolvable_agent::enum_param_type(), "Controller") : rtp_named_param(new i_sat_agent::enum_param_type(), "Controller");
+
+			case 3:
+			if(m_evolvable)
+			{
+				evolvable_agent::Type ea = boost::any_cast<evolvable_agent::Type>(mgr->retrieve_param("Controller"));
+				return rtp_named_param(evolvable_agent::params(ea));
+			}
+			else
+			{
+				i_sat_agent::Type a = boost::any_cast<i_sat_agent::Type>(mgr->retrieve_param("Controller"));
+				return rtp_named_param(i_sat_agent::params(a));
+			}
+
+			case 4:
+			return rtp_named_param(new agent_objective::enum_param_type(), "Objective");
+
+			case 5:
+			{
+				agent_objective::Type ao = boost::any_cast<agent_objective::Type>(mgr->retrieve_param("Objective"));
+				return rtp_named_param(agent_objective::params(ao));
+			}
+
+			default:
+			return rtp_named_param();
+		}
+	}
+
+	template < WorldDimensionality dim >
+	rtp_param_type* sat_system< dim >::params(bool evolvable)
+	{
+/*		rtp_named_param_list p;
 		//	p.push_back(rtp_named_param(new rtp_dimensionality_param_type(), "Dimensions"));
-		p.push_back(rtp_named_param(new rtp_staticparamlist_param_type(sat_scenario< dim >::params()), "Scenario"));
+
+		Try implementing:
+		sub_param_type - wraps an rtp_param_type, in create_widget indents its child, just passes child's param in get_param
+		group_param_type - wraps a child rtp_param_type within a group box/panel, as above for get_param
+
+		p.push_back(rtp_named_param(sat_scenario< dim >::params()));
 		p.push_back(rtp_named_param(new ship_config::param_type(), "Ship Config"));
-		p.push_back(rtp_named_param(evolvable ? (rtp_param_type*)new rtp_staticparamlist_param_type(evolvable_agent::params())/*param_type()*/: (rtp_param_type*)new i_sat_agent::enum_param_type(), "Controller"));
-		return p;
+		p.push_back(rtp_named_param(evolvable ? (rtp_param_type*)evolvable_agent::params() : (rtp_param_type*)new i_sat_agent::enum_param_type(), "Controller"));
+
+		return new rtp_staticparamlist_param_type(p);
+		*/
+
+		return new param_type(evolvable);
 	}
 
 	template < WorldDimensionality dim >
@@ -386,22 +293,29 @@ namespace rtp_sat {
 		std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* > result;
 
 		rtp_param_list param_list = boost::any_cast<rtp_param_list>(param);
+		
 		sat_scenario< dim >* scenario = sat_scenario< dim >::create_instance(param_list[0]);
-		thruster_config< dim > ship_cfg = ship_config::create_instance(param_list[1]);
+		
+		ship_config::Type cfg_type = boost::any_cast<ship_config::Type>(param_list[1]);
+		thruster_config< dim > ship_cfg = ship_config::create_instance(cfg_type, rtp_param());
 
 		std::get< 0 >(result) = new sat_system< dim >(scenario, ship_cfg);
 		if(evolvable)
 		{
+			evolvable_agent::Type ea_type = boost::any_cast<evolvable_agent::Type>(param_list[2]);
 			// TODO: Some easy way to access sub-tuple? (eg. result.firstN)
 			std::tie(
 				std::get< 1 >(result),
-				std::get< 2 >(result),
-				std::get< 3 >(result)
-				) = evolvable_agent::create_instance(param_list[2], ship_cfg);
+				std::get< 2 >(result)
+				) = evolvable_agent::create_instance(ea_type, param_list[3], ship_cfg);
+
+			agent_objective::Type obj_type = boost::any_cast<agent_objective::Type>(param_list[4]);
+			std::get< 3 >(result) = agent_objective::create_instance(obj_type, param_list[5]);
 		}
 		else
 		{
-			i_sat_agent* agent = i_sat_agent::create_instance(param_list[2]);
+			i_sat_agent::Type a_type = boost::any_cast<i_sat_agent::Type>(param_list[2]);
+			boost::shared_ptr< i_sat_agent > agent(i_sat_agent::create_instance(a_type, param_list[3]));
 			std::get< 0 >(result)->register_agent(agent);
 		}
 		return result;
@@ -421,7 +335,7 @@ namespace rtp_sat {
 	}
 
 	template < WorldDimensionality dim >
-	boost::optional< agent_id_t > sat_system< dim >::register_agent(i_agent* agent)
+	boost::optional< agent_id_t > sat_system< dim >::register_agent(boost::shared_ptr< i_agent > agent)
 	{
 		// For now, allowing only a single agent in the system
 		if(m_agent)
@@ -430,7 +344,7 @@ namespace rtp_sat {
 		}
 		else
 		{
-			m_agent = (i_sat_agent*)agent;
+			m_agent = boost::static_pointer_cast< i_sat_agent >(agent);
 			return boost::optional< agent_id_t >((agent_id_t)0);
 		}
 	}
@@ -458,6 +372,17 @@ namespace rtp_sat {
 		// TODO: If we want to use this method to set a general state, this shouldn't be here...
 		m_td = trial_data();
 		m_td.initial_st = m_state;
+	}
+
+	template < WorldDimensionality dim >
+	void sat_system< dim >::register_interactive_input(interactive_input const& input)
+	{
+		// TODO: Maybe store within create_instance a pointer to any interactive controller, or provide a method on i_agent
+		// along lines of is_interactive()
+		if(m_agent)
+		{
+			boost::dynamic_pointer_cast<i_interactive_agent>(*m_agent)->register_input(input);
+		}
 	}
 
 	template < WorldDimensionality dim >
@@ -520,7 +445,7 @@ namespace rtp_sat {
 	}
 
 	template < WorldDimensionality dim >
-	boost::any sat_system< dim >::record_observations(i_observer* obs) const
+	i_observer::observations_t sat_system< dim >::record_observations(i_observer* obs) const
 	{
 		i_sat_observer< dim >* sat_obs = (i_sat_observer< dim >*)obs;
 		return sat_obs->record_observations(m_td);

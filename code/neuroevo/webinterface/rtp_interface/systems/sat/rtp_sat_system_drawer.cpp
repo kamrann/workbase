@@ -18,6 +18,8 @@ namespace rtp_sat {
 	template < WorldDimensionality dim >
 	void sat_system_drawer< dim >::draw_system(Wt::WPainter& painter)
 	{
+//		boost::lock_guard< async_system_drawer > guard(*this);
+
 		size_t const Margin = 0;
 
 		Wt::WPaintDevice* device = painter.device();

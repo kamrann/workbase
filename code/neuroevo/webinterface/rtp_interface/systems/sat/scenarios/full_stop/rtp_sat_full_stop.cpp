@@ -15,7 +15,6 @@ namespace rtp_sat {
 	template < WorldDimensionality dim >
 	full_stop< dim >::full_stop(rtp_param param)
 	{
-		rtp_param_list& param_list = boost::any_cast<rtp_param_list&>(param);
 
 	}
 

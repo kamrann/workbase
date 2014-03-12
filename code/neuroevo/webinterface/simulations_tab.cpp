@@ -3,6 +3,7 @@
 #include "simulations_tab.h"
 #include "webinterfaceapp.h"
 #include "wt_system_widgets/properties_chart_widget.h"
+#include "generic_system_coordinator.h"
 #include "evo_db/system_sim_tbl.h"
 #include "evo_db/problem_domain_tbl.h"
 #include "evo_db/genetic_language_tbl.h"
@@ -15,26 +16,6 @@
 #include "rtp_interface/params/paramlist_par.h"
 #include "rtp_interface/systems/nac/rtp_nac_scenario.h"
 #include "rtp_interface/systems/sat/rtp_sat_scenario.h"
-#include "sim.h"
-
-#include "systems/noughts_and_crosses/scenarios/play_to_completion.h"
-#include "systems/noughts_and_crosses/objectives/try_to_win.h"
-#include "systems/noughts_and_crosses/observers/basic_observer.h"
-#include "systems/noughts_and_crosses/genetic_mappings/fixednn_sln.h"
-
-#include "systems/ship_and_thrusters/scenarios/angular_full_stop.h"
-#include "systems/ship_and_thrusters/scenarios/full_stop.h"
-#include "systems/ship_and_thrusters/scenarios/target_orientation.h"
-#include "systems/ship_and_thrusters/objectives/minimize_angular_speed.h"
-#include "systems/ship_and_thrusters/objectives/minimize_linear_speed.h"
-#include "systems/ship_and_thrusters/objectives/minimize_orientation_delta.h"
-#include "systems/ship_and_thrusters/objectives/minimize_kinetic_energy.h"
-#include "systems/ship_and_thrusters/objectives/minimize_opposing_thrusters.h"
-#include "systems/ship_and_thrusters/objectives/minimize_ke_and_opp_thrusters.h"
-#include "systems/ship_and_thrusters/observers/sat_basic_observer.h"
-#include "systems/ship_and_thrusters/genetic_mappings/fixednn_sln.h"
-
-#include "systems/fixed_neural_net.h"
 
 #include "observer_data_models.h"
 
@@ -49,6 +30,9 @@
 #include <Wt/WIntValidator>
 #include <Wt/WLocale>
 #include <Wt/WServer>
+// temp
+#include <Wt/WTabWidget>
+//
 
 #include <boost/random/mersenne_twister.hpp>
 
@@ -63,7 +47,7 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	WPanel* sys_params_panel = new WPanel(this);
 	sys_params_panel->setTitle("System parameters");
 
-	system_param_type* spt = new system_param_type(true);
+	rtp_param_type* spt = i_system::params(true);
 	system_params_widget = spt->create_widget(&param_mgr);
 	sys_params_panel->setCentralWidget(system_params_widget->get_wt_widget());
 
@@ -82,7 +66,7 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	addWidget(new WBreak());                       // insert a line break
 
 	txt_output = new WTextArea(this);                         // empty text
-	txt_output->resize(400, 250);
+	txt_output->resize(600, 250);
 	txt_output->setReadOnly(true);
 
 	observations_table = new WTableView(this);
@@ -321,6 +305,8 @@ void SimulationsTab::on_run_simulation()
 
 void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp_simulation* sim)
 {
+	bool const RandomlySeeded = false;
+
 	std::string session_id = app->sessionId();	// TODO: Need lock to make this call???
 	evodb_session db_s(*app->db_cp);
 
@@ -462,7 +448,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 
 	{
 		Wt::WApplication::UpdateLock lock(app->getUpdateLock());
-		typedef ship_coordinator< WorldDimensionality::dim2D > coordinator_t;
+		typedef generic_sys_coordinator coordinator_t;
 		coordinator_t* coordinator = (coordinator_t*)((SystemTestTab*)app->main_tabs->widget(2))->coordinator;
 		coordinator->set_agent_controllers(sim->get_fittest());
 		coordinator->restart();

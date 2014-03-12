@@ -3,17 +3,26 @@
 #ifndef __PARETO_H
 #define __PARETO_H
 
-#include <array>
+#include <vector>
+#include <set>
 
 
-// TODO: Think eventually we can use mpl to allow each pareto component to be of a different type
-template < size_t NumComponents, typename Comp >
+template < typename Comp >
 class pareto
 {
 private:
 	typedef Comp comp_t;
 
-	std::array< comp_t, NumComponents > components;
+	std::vector< comp_t > components;
+
+public:
+	pareto()
+	{}
+
+	inline void push_component(comp_t const& c)
+	{
+		components.push_back(c);
+	}
 
 private:
 /*	template < typename Ftr >
@@ -43,13 +52,13 @@ public:
 	inline bool dominates(pareto const& other) const
 	{
 		bool greater_component = false;
-		for(size_t i = 0; i < NumComponents; ++i)
+		for(size_t i = 0; i < components.size(); ++i)
 		{
 			if(components[i] < other.components[i])
 			{
 				return false;
 			}
-			greater_component ||= components[i] > other.components[i];
+			greater_component = greater_component || (components[i] > other.components[i]);
 		}
 		return greater_component;
 	}

@@ -3,9 +3,12 @@
 #ifndef __NE_RTP_FIXEDNN_GENOME_MAPPING_H
 #define __NE_RTP_FIXEDNN_GENOME_MAPPING_H
 
-#include "rtp_genome.h"
+#include "rtp_genome_mapping.h"
 #include "systems/rtp_agent.h"
 #include "systems/sat/scenarios/full_stop/agents.h"	// TODO: TEMP
+
+#include "ga/crossover.h"
+#include "ga/mutation.h"
 
 #include <vector>
 #include <cassert>
@@ -30,6 +33,11 @@ public:
 		public i_genome,
 		public std::vector< double >
 	{
+		virtual i_genome* clone() const
+		{
+			return new genome(*this);
+		}
+
 		inline size_t length() const
 		{
 			return size();
@@ -56,7 +64,7 @@ public:
 		//friend std::ostream& operator<< (std::ostream& out, genome const& gn);
 	};
 
-	virtual i_genome_mapping::genome_diff_t genome_difference(i_genome const* ign1, i_genome const* ign2)
+	virtual i_genome_mapping::genome_diff_t genome_difference(i_genome const* ign1, i_genome const* ign2) const
 	{
 		genome const& gn1 = *(genome const*)ign1;
 		genome const& gn2 = *(genome const*)ign2;
@@ -78,7 +86,7 @@ public:
 		// on the difference measure, which seems bad.
 	}
 
-	virtual i_genome_mapping::diversity_t population_diversity(std::vector< i_genome const* > const& pop_genomes)
+	virtual i_genome_mapping::diversity_t population_diversity(std::vector< i_genome const* > const& pop_genomes) const
 	{
 		// See Google: "measure+diversity+real+valued+chromosomes" (google books result)
 
@@ -111,7 +119,7 @@ public:
 		return diversity;
 	}
 
-	virtual size_t get_genome_length()
+	virtual size_t get_genome_length() const
 	{
 		// TODO: Should be calcuable directly from m_layer_neuron_counts, assuming fully connected mlp
 		FANN::neural_net nn_temp;
@@ -119,7 +127,7 @@ public:
 		return nn_temp.get_total_connections();
 	}
 
-	virtual i_genome* generate_random_genome(rgen_t& rgen)
+	virtual i_genome* generate_random_genome(rgen_t& rgen) const
 	{
 		genome* gn = new genome();
 		boost::random::uniform_real_distribution<> rdist(-1.0, 1.0);
@@ -137,15 +145,29 @@ public:
 	}
 
 	// TODO: Feel like would be nicer to return a newly constructed agent, but that would require some kind of agent factory, or runtime traits class.
-	virtual void decode_genome(i_genome const* ign, i_agent* ia)
+	virtual void decode_genome(i_genome const* ign, i_agent* ia) const
 	{
 		genome const* gn = (genome const*)ign;
-		rtp_sat::generic_mlp_agent* agent = dynamic_cast<rtp_sat::generic_mlp_agent*>(ia);
+		generic_mlp_controller* agent = dynamic_cast<generic_mlp_controller*>(ia);
 		//
 		size_t const NumWeights = gn->length();
 		assert(NumWeights == get_genome_length());
 		//
 		agent->set_weights(*gn);
+	}
+
+	virtual i_genome_mapping::cx_fn_t get_crossover_fn(rgen_t& rgen) const
+	{
+		return i_genome_mapping::cx_fn_t(
+			basic_crossover< genome >(get_genome_length(), rgen)
+			);
+	}
+
+	virtual i_genome_mapping::mut_fn_t get_mutation_fn(rgen_t& rgen) const
+	{
+		return i_genome_mapping::mut_fn_t(
+			basic_real_mutation< genome >(rgen)
+			);
 	}
 
 private:

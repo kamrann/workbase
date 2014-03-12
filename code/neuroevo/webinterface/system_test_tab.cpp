@@ -5,11 +5,7 @@
 #include "rtp_interface/systems/rtp_system.h"
 #include "rtp_interface/rtp_param_widget.h"
 
-#include "systems/noughts_and_crosses/scenarios/play_to_completion.h"
-#include "nac_system_coordinator.h"
-
-#include "systems/ship_and_thrusters/scenarios/full_stop.h"
-#include "ship_system_coordinator.h"
+#include "generic_system_coordinator.h"
 
 #include <Wt/WHBoxLayout>
 #include <Wt/WPushButton>
@@ -28,7 +24,7 @@ SystemTestTab::SystemTestTab(WContainerWidget* parent): WContainerWidget(parent)
 	WPanel* sys_params_panel = new WPanel;
 	sys_params_panel->setTitle("System parameters");
 
-	system_param_type* spt = new system_param_type();
+	rtp_param_type* spt = i_system::params(false);
 	system_params_widget = spt->create_widget(&param_mgr);
 	sys_params_panel->setCentralWidget(system_params_widget->get_wt_widget());
 
@@ -88,17 +84,10 @@ void SystemTestTab::on_system_changed()
 	rtp_param sys_param = system_params_widget->get_param();
 	i_system* sys = std::get< 0 >(i_system::create_instance(sys_param));
 
-	// TEMP
-	if(boost::any_cast<SystemType>(boost::any_cast< std::pair< boost::any, boost::any > >(sys_param).first) != ShipAndThrusters2D)
-	{
-		return;
-	}
-	coordinator = new ship_coordinator< WorldDimensionality::dim2D >(sys);
-	//
-
-	std::pair< WWidget*, WWidget* > w = coordinator->initialize();
-	set_system_widget(w.first);
-	set_history_widget(w.second);
+	coordinator = new generic_sys_coordinator(sys);
+	std::pair< WWidget*, WWidget* > sys_widgets = coordinator->initialize();
+	set_system_widget(sys_widgets.first);
+	set_history_widget(sys_widgets.second);
 	coordinator->restart();
 }
 

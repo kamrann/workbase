@@ -43,6 +43,21 @@
     <Filter Include="rtp_interface\systems\sat\scenarios\target_orientation">
       <UniqueIdentifier>{916b6077-9907-42c0-a4d5-ee2718771034}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rtp_interface\systems\phys">
+      <UniqueIdentifier>{d684308a-dead-482f-9d2b-bcda0c217eca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\phys\bodies">
+      <UniqueIdentifier>{0d1c5a90-0339-4035-935b-0a36e5e8fec9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\phys\scenarios">
+      <UniqueIdentifier>{a818a0df-8ce3-4f00-932a-b5498fbc5040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\phys\controllers">
+      <UniqueIdentifier>{4330ac88-b957-40ea-91de-8edfda7944f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp_interface\systems\phys\objectives">
+      <UniqueIdentifier>{c0426ff8-2ab9-412a-85b3-0d85b798e5b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.cpp">
@@ -69,26 +84,8 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_param_widget.cpp">
       <Filter>rtp_interface</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_system.cpp">
-      <Filter>rtp_interface\systems\sat</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_sim.cpp">
       <Filter>rtp_interface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_scenario.cpp">
-      <Filter>rtp_interface\systems\sat</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\full_stop\rtp_sat_full_stop.cpp">
-      <Filter>rtp_interface\systems\sat\scenarios\full_stop</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\target_orientation\rtp_sat_target_orientation.cpp">
-      <Filter>rtp_interface\systems\sat\scenarios\target_orientation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\scenarios\full_stop\agents.cpp">
-      <Filter>rtp_interface\systems\sat\scenarios\full_stop</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\sat\rtp_sat_system_drawer.cpp">
-      <Filter>rtp_interface\systems\sat</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\nac\rtp_nac_scenario.cpp">
       <Filter>rtp_interface\systems\nac</Filter>
@@ -104,6 +101,69 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\fixed_or_random_par.cpp">
       <Filter>rtp_interface\params</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\enum_par.cpp">
+      <Filter>rtp_interface\params</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_agent_body_spec.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\test_body.cpp">
+      <Filter>rtp_interface\systems\phys\bodies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_scenario.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\test_scenario.cpp">
+      <Filter>rtp_interface\systems\phys\scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_system.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_system_drawer.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\controllers\mlp.cpp">
+      <Filter>rtp_interface\systems\phys\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_mlp_controller.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\test_quadruped_body.cpp">
+      <Filter>rtp_interface\systems\phys\bodies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\test_biped_body.cpp">
+      <Filter>rtp_interface\systems\phys\bodies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_procreation_selection.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_pareto.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_pop_wide_observer.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\boolean_par.cpp">
+      <Filter>rtp_interface\params</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_single_objective.cpp">
+      <Filter>rtp_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_objectives.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_composite_observer.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_resultant_objective.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_evolvable_controller.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_controller.cpp">
+      <Filter>rtp_interface\systems\phys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,12 +216,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_coordinator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_widget.h">
-      <Filter>wt_system_widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\ship_system_coordinator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_history_widget.h">
@@ -256,6 +310,114 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_chart_widget.h">
       <Filter>wt_system_widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_indent_widget.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\enum_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_system.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_agent_body_spec.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\test_body.h">
+      <Filter>rtp_interface\systems\phys\bodies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_agent_body.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_scenario.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\test_scenario.h">
+      <Filter>rtp_interface\systems\phys\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_observers.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_objectives.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_system_drawer.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\controllers\passive.h">
+      <Filter>rtp_interface\systems\phys\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\controllers\mlp.h">
+      <Filter>rtp_interface\systems\phys\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_mlp_controller.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\system_display_widget.h">
+      <Filter>wt_system_widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\generic_system_coordinator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_system_accessor.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_interactive_agent.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\controllers\interactive.h">
+      <Filter>rtp_interface\systems\phys\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_interactive_input.h">
+      <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\test_quadruped_body.h">
+      <Filter>rtp_interface\systems\phys\bodies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\test_biped_body.h">
+      <Filter>rtp_interface\systems\phys\bodies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_genome_mapping.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_procreation_selection.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_pop_wide_observer.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_pareto.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\params\boolean_par.h">
+      <Filter>rtp_interface\params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_single_objective.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_composite_observer.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_resultant_objective.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_evolvable_controller.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_controller.h">
+      <Filter>rtp_interface\systems\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\objectives\max_final_x_objective.h">
+      <Filter>rtp_interface\systems\phys\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\objectives\shared_components.h">
+      <Filter>rtp_interface\systems\phys\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\objectives\max_average_y_objective.h">
+      <Filter>rtp_interface\systems\phys\objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\objectives\maintain_upright_stance_objective.h">
+      <Filter>rtp_interface\systems\phys\objectives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

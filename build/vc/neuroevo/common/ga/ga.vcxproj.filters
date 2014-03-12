@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="rtp_interface">
+      <UniqueIdentifier>{58028d74-dbc3-48e0-af5f-867a7219dde0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -98,6 +101,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\genetic_language.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_genome_wrap.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_individual.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_procreation_selection.h">
+      <Filter>rtp_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_fitness.h">
+      <Filter>rtp_interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

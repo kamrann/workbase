@@ -45,7 +45,7 @@ public:
 			}
 			while(selected.find(index) != selected.end());
 			
-			*dest = &pop_start[index];
+			*dest = &pop_start[index].genome;
 			++dest;
 
 			selected.insert(index);

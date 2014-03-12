@@ -71,6 +71,7 @@ public:
 
 public:
 	void add_child(std::string name, i_param_widget* c);
+	void replace_child(size_t index, std::string name, i_param_widget* c);
 	size_t num_children() const;
 	i_param_widget* get_child(size_t idx);
 	i_param_widget const* get_child(size_t idx) const;

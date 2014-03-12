@@ -18,11 +18,12 @@ namespace rtp_sat {
 	template < WorldDimensionality dim >
 	target_orientation< dim >::target_orientation(rtp_param param)
 	{
+/*	TODO:
 		rtp_param_list& param_list = boost::any_cast<rtp_param_list&>(param);
 		// TODO: Orientation type
 		int target = boost::any_cast<int>(param_list[0]);
 		m_target = (double)target;
-	}
+*/	}
 
 	template < WorldDimensionality dim >
 	typename sat_system< dim >::state target_orientation< dim >::generate_initial_state(rgen_t& rgen) const

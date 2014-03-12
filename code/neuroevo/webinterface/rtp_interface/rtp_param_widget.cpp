@@ -2,6 +2,7 @@
 
 #include "rtp_param_widget.h"
 #include "params/paramlist_par.h"
+#include "rtp_indent_widget.h"
 
 #include <Wt/WGridLayout>
 #include <Wt/WText>
@@ -25,13 +26,67 @@ void rtp_param_list_widget::add_child(std::string name, i_param_widget* c)
 {
 	int existing_rows = children.size();
 
-	m_layout->addWidget(new Wt::WText(name), existing_rows, 0);
-	m_layout->addWidget(c->get_wt_widget(), existing_rows, 1);// , Wt::AlignLeft);
+	if(name.empty())
+	{
+		rtp_indent_widget* iw = new rtp_indent_widget();
+		iw->set_child(c);
+		m_layout->addWidget(iw, existing_rows, 0, 1, 2);// , Wt::AlignLeft);
+	}
+	else
+	{
+		m_layout->addWidget(new Wt::WText(name), existing_rows, 0);// , 1, 2);
+		m_layout->addWidget(c->get_wt_widget(), existing_rows, 1, 1, 1, Wt::AlignLeft);
+	}
 
 	m_layout->setColumnStretch(0, 0);
 	m_layout->setColumnStretch(1, 1);
 	
 	children.push_back(c);
+}
+
+void rtp_param_list_widget::replace_child(size_t index, std::string name, i_param_widget* c)//, rtp_param_manager* mgr)
+{
+	// TODO: This seems like assumptions we probably shouldn't be making about the layout...
+	size_t const col_count = 2;
+	size_t left_index = index * col_count;
+	size_t right_index = left_index + 1;
+
+	Wt::WLayoutItem* item = m_layout->itemAt(right_index);
+	if(item != nullptr)
+	{
+		// Existing entry at this location is labelled
+		Wt::WWidget* label = m_layout->itemAt(left_index)->widget();
+		m_layout->removeWidget(label);
+		delete label;
+
+		Wt::WWidget* old = item->widget();
+		m_layout->removeWidget(old);
+		delete old;
+	}
+	else
+	{
+		// Unlabelled
+		Wt::WWidget* old = m_layout->itemAt(left_index)->widget();
+		m_layout->removeWidget(old);
+		delete old;
+	}
+
+	//m_layout->removeWidget(children[index]->get_wt_widget());
+	
+	if(name.empty())
+	{
+		rtp_indent_widget* iw = new rtp_indent_widget();
+		iw->set_child(c);
+		m_layout->addWidget(iw, index, 0, 1, 2);// , Wt::AlignLeft);
+	}
+	else
+	{
+		Wt::WText* label = new Wt::WText(name);
+		m_layout->addWidget(label, index, 0);
+		m_layout->addWidget(c->get_wt_widget(), index, 1, 1, 1, Wt::AlignLeft);
+	}
+	
+	children[index] = c;
 }
 
 size_t rtp_param_list_widget::num_children() const

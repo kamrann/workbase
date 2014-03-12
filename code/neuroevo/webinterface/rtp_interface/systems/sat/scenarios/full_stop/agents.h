@@ -4,9 +4,9 @@
 #define __NE_RTP_SAT_FULL_STOP_AGENTS_H
 
 #include "../../rtp_sat_system.h"
-
-#include <doublefann.h>
-#include <fann_cpp.h>
+#include "../../../rtp_interactive_agent.h"
+#include "../../../../params/enum_par.h"
+#include "../../../../rtp_mlp_controller.h"
 
 
 namespace rtp_sat
@@ -24,7 +24,9 @@ namespace rtp_sat
 	};
 
 	template < WorldDimensionality dim >
-	class interactive_agent: public sat_system< dim >::i_sat_agent
+	class interactive_agent:
+		public sat_system< dim >::i_sat_agent,
+		public i_interactive_agent
 	{
 	public:
 		typedef typename sat_system< dim >::decision decision_t;
@@ -35,26 +37,17 @@ namespace rtp_sat
 		virtual decision_t make_decision(state_t const& st, scenario_data_t sdata);
 
 		interactive_agent();
-		void register_input(size_t idx, bool activate);
+		virtual void register_input(interactive_input const& input);
 
 	protected:
-		std::vector< bool > input;
+		std::vector< bool > inputs;
 	};
 
-	// TODO: Move out of SAT
-	class generic_mlp_agent
-	{
-	public:
-		void set_weights(std::vector< double > const& weights);
-
-	protected:
-		FANN::neural_net nn;
-	};
 
 	template < WorldDimensionality dim >
 	class mlp_agent:
 		public sat_system< dim >::i_sat_agent,
-		public generic_mlp_agent
+		public generic_mlp_controller
 	{
 	public:
 		enum Type {
@@ -67,23 +60,21 @@ namespace rtp_sat
 
 		static std::string const Names[Count];
 
-		class enum_param_type: public rtp_param_type
+		class enum_param_type: public rtp_enum_param_type
 		{
 		public:
-			virtual boost::any default_value() const;
-			virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
-			virtual rtp_param get_widget_param(i_param_widget const* w) const;
+			enum_param_type();
 		};
 
-		class param_type: public rtp_autonestedparam_param_type
+		class param_type: public rtp_paramlist_param_type
 		{
 		public:
-			virtual rtp_named_param provide_selection_param() const;
-			virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
+			virtual size_t provide_num_child_params(rtp_param_manager* mgr) const;
+			virtual rtp_named_param provide_child_param(size_t index, rtp_param_manager* mgr) const;
 		};
 
 		//static rtp_named_param_list params(Type mlp_type);
-		static std::pair< i_genome_mapping*, i_agent_factory* > create_instance_evolvable(rtp_param param, thruster_config< dim > const& cfg);
+		static std::tuple< i_genome_mapping*, i_agent_factory* > create_instance_evolvable(rtp_param param, thruster_config< dim > const& cfg);
 
 	public:
 		typedef typename sat_system< dim >::decision decision_t;

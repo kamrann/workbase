@@ -15,6 +15,8 @@ class system_coordinator
 public:
 	virtual std::pair< Wt::WWidget*, Wt::WWidget* > initialize() = 0;
 	virtual void restart() = 0;
+
+	virtual ~system_coordinator() = default;
 };
 
 

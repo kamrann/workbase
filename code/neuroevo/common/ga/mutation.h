@@ -28,11 +28,13 @@ struct basic_real_mutation
 		rgen(rg)
 	{}
 
-	template < typename Individual >
-	inline void operator() (Individual& child, double rate)
+	template < typename Genome >
+	inline void operator() (Genome& child, double rate)
 	{
+		genome_t& child_gn = rtp_cast<genome_t>(child);
+
 		// For each gene, dependent upon mutation rate...
-		for(auto& gene: child.genome)
+		for(auto& gene: child_gn)
 		{
 			if(rdist_01(rgen) < rate)
 			{

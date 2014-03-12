@@ -6,6 +6,7 @@
 #include "../rtp_system.h"
 #include "../rtp_decision.h"
 #include "../rtp_agent.h"
+#include "../../params/paramlist_par.h"
 
 #include "thrusters/ship_state.h"
 #include "thrusters/thruster.h"
@@ -108,22 +109,13 @@ namespace rtp_sat {
 
 			static std::string const Names[Type::Count];
 
-			class enum_param_type: public rtp_param_type
+			class enum_param_type: public rtp_enum_param_type
 			{
 			public:
-				virtual boost::any default_value() const;
-				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
-				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+				enum_param_type();
 			};
 
-			class param_type: public rtp_autonestedparam_param_type
-			{
-			public:
-				virtual rtp_named_param provide_selection_param() const;
-				virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
-			};
-
-			static thruster_config< dim > create_instance(rtp_param param);
+			static thruster_config< dim > create_instance(Type type, rtp_param param);
 		};
 
 		class i_sat_agent: public i_agent
@@ -138,16 +130,14 @@ namespace rtp_sat {
 
 			static std::string const Names[Type::Count];
 
-			class enum_param_type: public rtp_param_type
+			class enum_param_type: public rtp_enum_param_type
 			{
 			public:
-				virtual boost::any default_value() const;
-				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
-				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+				enum_param_type();
 			};
 
-			//static rtp_named_param_list params(typename ship_config::Type cfg_type);
-			static i_sat_agent* create_instance(rtp_param param);
+			static rtp_param_type* params(Type type);
+			static i_sat_agent* create_instance(Type type, rtp_param param);
 
 		public:
 			virtual decision make_decision(state const& st, scenario_data sdata) = 0;
@@ -164,24 +154,14 @@ namespace rtp_sat {
 
 			static std::string const Names[Type::Count];
 
-			class enum_param_type: public rtp_param_type
+			class enum_param_type: public rtp_enum_param_type
 			{
 			public:
-				virtual boost::any default_value() const;
-				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
-				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+				enum_param_type();
 			};
 
-			class param_type: public rtp_autonestedparam_param_type
-			{
-			public:
-				virtual rtp_named_param provide_selection_param() const;
-				virtual rtp_param_type* provide_nested_param(rtp_param_manager* mgr) const;
-			};
-
-			static rtp_named_param_list params();
-			static rtp_named_param_list params(Type ea_type);
-			static std::tuple< i_genome_mapping*, i_agent_factory*, i_observer* > create_instance(rtp_param param, thruster_config< dim > const& cfg);
+			static rtp_param_type* params(Type ea_type);
+			static std::tuple< i_genome_mapping*, i_agent_factory* > create_instance(Type type, rtp_param param, thruster_config< dim > const& cfg);
 		};
 
 		class agent_objective
@@ -201,20 +181,32 @@ namespace rtp_sat {
 
 			static std::string const Names[Count];
 
-			class enum_param_type: public rtp_param_type
+			class enum_param_type: public rtp_enum_param_type
 			{
 			public:
-				virtual boost::any default_value() const;
-				virtual i_param_widget* create_widget(rtp_param_manager* mgr) const;
-				virtual rtp_param get_widget_param(i_param_widget const* w) const;
+				enum_param_type();
 			};
 
-			static rtp_named_param_list params();
-			static i_observer* create_instance(rtp_param param);
+			static rtp_param_type* params(Type type);
+			static i_observer* create_instance(Type type, rtp_param param);
+		};
+
+		class param_type: public rtp_paramlist_param_type
+		{
+		public:
+			param_type(bool evolvable = false): m_evolvable(evolvable)
+			{}
+
+		public:
+			virtual size_t provide_num_child_params(rtp_param_manager* mgr) const;
+			virtual rtp_named_param provide_child_param(size_t index, rtp_param_manager* mgr) const;
+
+		private:
+			bool m_evolvable;
 		};
 
 	public:
-		static rtp_named_param_list params(bool evolvable);
+		static rtp_param_type* params(bool evolvable);
 		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* > create_instance(rtp_param param, bool evolvable);
 
 	private:
@@ -224,9 +216,10 @@ namespace rtp_sat {
 		virtual boost::any generate_initial_state(rgen_t& rgen) const;
 		virtual void set_state(boost::any const& st);
 		virtual void clear_agents();
-		virtual boost::optional< agent_id_t > register_agent(i_agent* agent);
+		virtual boost::optional< agent_id_t > register_agent(boost::shared_ptr< i_agent > agent);
+		virtual void register_interactive_input(interactive_input const& input);
 		virtual bool update(i_observer* obs);
-		virtual boost::any record_observations(i_observer* obs) const;
+		virtual i_observer::observations_t record_observations(i_observer* obs) const;
 		virtual boost::shared_ptr< i_properties const > get_state_properties() const;
 		virtual boost::shared_ptr< i_property_values const > get_state_property_values() const;
 		virtual i_system_drawer* get_drawer() const;
@@ -242,7 +235,7 @@ namespace rtp_sat {
 	private:
 		sat_scenario< dim >* m_scenario;
 		thruster_config< dim > m_ship_cfg;
-		boost::optional< i_sat_agent* > m_agent;
+		boost::optional< boost::shared_ptr< i_sat_agent > > m_agent;
 		state m_state;
 		trial_data m_td;
 

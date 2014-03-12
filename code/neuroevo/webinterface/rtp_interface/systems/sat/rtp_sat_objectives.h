@@ -13,14 +13,14 @@ namespace rtp_sat
 {
 	// TODO: May not need to distinguish objective from observer
 	template < WorldDimensionality dim >
-	class objective_fn: public i_sat_observer< dim >
+	class sat_objective_fn: public i_sat_observer< dim >
 	{};
 
 	template <
 		WorldDimensionality dim,
 		typename ObjFn
 	>
-	class wrapped_objective_fn: public objective_fn< dim >
+	class wrapped_objective_fn: public sat_objective_fn< dim >
 	{
 	public:
 		typedef ObjFn obj_fn_t;

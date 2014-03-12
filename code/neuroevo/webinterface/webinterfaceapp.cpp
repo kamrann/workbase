@@ -18,6 +18,7 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 	db_session(db)
 {
 	setTitle("NeuroEvo Web Interface");
+	setCssTheme("polished");
 
 	styleSheet().addRule(".wb_numerical_input", "text-align: right;");
 

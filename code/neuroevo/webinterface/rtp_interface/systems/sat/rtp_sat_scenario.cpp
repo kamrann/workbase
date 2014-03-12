@@ -21,95 +21,38 @@ namespace rtp_sat {
 	};
 
 	template < WorldDimensionality dim >
-	boost::any sat_scenario< dim >::enum_param_type::default_value() const
+	sat_scenario< dim >::enum_param_type::enum_param_type()
 	{
-		return FullStop;
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* sat_scenario< dim >::enum_param_type::create_widget(rtp_param_manager* mgr) const
-	{
-		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
-
 		for(size_t i = 0; i < NumScenarios; ++i)
 		{
-			box->addItem(ScenarioNames[i]);
-			box->model()->setData(i, 0, (ScenarioType)i, Wt::UserRole);
+			add_item(ScenarioNames[i], (ScenarioType)i);
 		}
-
-		return box;
+		set_default_index(0);
 	}
 
+	
 	template < WorldDimensionality dim >
-	rtp_param sat_scenario< dim >::enum_param_type::get_widget_param(i_param_widget const* w) const
+	size_t sat_scenario< dim >::param_type::provide_num_child_params(rtp_param_manager* mgr) const
 	{
-		Wt::WComboBox const* box = (Wt::WComboBox const*)w->get_wt_widget();
-		Wt::WAbstractItemModel const* model = box->model();
-		ScenarioType system = boost::any_cast< ScenarioType >(model->data(box->currentIndex(), 0, Wt::UserRole));
-		return rtp_param(system);
+		return 0;
 	}
 
 	template < WorldDimensionality dim >
-	rtp_named_param sat_scenario< dim >::param_type::provide_selection_param() const
+	rtp_named_param sat_scenario< dim >::param_type::provide_child_param(size_t index, rtp_param_manager* mgr) const
 	{
-		return rtp_named_param(new sat_scenario< dim >::enum_param_type(), "Scenario Type");
+		// TODO:
+		return rtp_named_param();
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param_type* sat_scenario< dim >::param_type::provide_nested_param(rtp_param_manager* mgr) const
-	{
-		ScenarioType scenario = boost::any_cast< ScenarioType >(mgr->retrieve_param("Scenario Type"));
-		rtp_named_param_list sub_params = sat_scenario< dim >::params(scenario);
-		return new rtp_staticparamlist_param_type(sub_params);
-	}
-
-/*
-	template < WorldDimensionality dim >
-	boost::any sat_scenario< dim >::param_type::default_value() const
-	{
-		return boost::any();
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* sat_scenario< dim >::param_type::create_widget() const
-	{
-		rtp_nested_param_widget* cont = new rtp_nested_param_widget(this);
-		sat_scenario< dim >::enum_param_type* stpt = new sat_scenario< dim >::enum_param_type;
-		cont->set_selection_widget(stpt->create_widget());
-
-		Wt::WComboBox* box = (Wt::WComboBox*)cont->get_selection_widget()->get_wt_widget();
-		box->changed().connect(std::bind([=]()
-		{
-			Wt::WAbstractItemModel* model = box->model();
-			int idx = box->currentIndex();
-			ScenarioType scenario = boost::any_cast< ScenarioType >(model->data(idx, 0, Wt::UserRole));
-			rtp_named_param_list sub_params = sat_scenario< dim >::params(scenario);
-			rtp_paramlist_param_type* paramlist_prm = new rtp_paramlist_param_type(sub_params);
-			cont->set_nested_widget(paramlist_prm->create_widget());
-		}));
-		box->changed().emit();
-
-		return cont;
-	}
-
-	template < WorldDimensionality dim >
-	rtp_param sat_scenario< dim >::param_type::get_widget_param(i_param_widget const* w) const
-	{
-		rtp_nested_param_widget const* nested_w = (rtp_nested_param_widget const*)w;
-		return std::make_pair(
-			nested_w->get_selection_widget()->get_param(),
-			nested_w->get_nested_widget()->get_param()
-			);
-	}
-*/
-
-	template < WorldDimensionality dim >
-	rtp_named_param_list sat_scenario< dim >::params()
+	//rtp_named_param_list
+	rtp_param_type* sat_scenario< dim >::params()
 	{
 		rtp_named_param_list p;
-		p.push_back(rtp_named_param(new sat_scenario< dim >::param_type(), "Scenario"));
+		p.push_back(rtp_named_param(new sat_scenario< dim >::enum_param_type(), "Scenario"));
+		//p.push_back(rtp_named_param(new sat_scenario< dim >::param_type()));
 		p.push_back(rtp_named_param(new rtp_fixed_or_random_param_type(0.0, -1.0, 1.0), "Initial Ang Vel"));
-		return p;
+		return new rtp_staticparamlist_param_type(p);
 	}
 
 	template < WorldDimensionality dim >
@@ -117,11 +60,7 @@ namespace rtp_sat {
 	{
 		switch(scen)
 		{
-/*		case AngularFullStop:
-			return angular_full_stop< dim >::params();
-		case LinearFullStop:
-			return linear_full_stop< dim >::params();
-*/		case FullStop:
+		case FullStop:
 			return full_stop< dim >::params();
 		case TargetOrientation:
 			return target_orientation< dim >::params();
@@ -135,22 +74,19 @@ namespace rtp_sat {
 	sat_scenario< dim >* sat_scenario< dim >::create_instance(rtp_param param)
 	{
 		auto param_list = boost::any_cast<rtp_param_list>(param);
-		auto param_pr = boost::any_cast<std::pair< rtp_param, rtp_param >>(param_list[0]);
-		ScenarioType scenario_type = boost::any_cast<ScenarioType>(param_pr.first);
+		ScenarioType scenario_type = boost::any_cast<ScenarioType>(param_list[0]);
 		sat_scenario< dim >* scenario = nullptr;
 		switch(scenario_type)
 		{
-/*		case AngularFullStop:
-			return new angular_full_stop< dim >(param_pr.second);
-		case LinearFullStop:
-			return new linear_full_stop< dim >(param_pr.second);
-*/		case FullStop:
-			scenario = new full_stop< dim >(param_pr.second);
+			case FullStop:
+			scenario = new full_stop< dim >(rtp_param());
 			break;
-		case TargetOrientation:
-			scenario = new target_orientation< dim >(param_pr.second);
+		
+			case TargetOrientation:
+			scenario = new target_orientation< dim >(rtp_param());
 			break;
-		default:
+		
+			default:
 			assert(false);
 		}
 

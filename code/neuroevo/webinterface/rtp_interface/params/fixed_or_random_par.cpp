@@ -7,6 +7,7 @@
 
 #include <Wt/WComboBox>
 #include <Wt/WText>
+#include <Wt/WHBoxLayout>
 
 #include <boost/random/uniform_real_distribution.hpp>
 
@@ -14,20 +15,33 @@
 i_param_widget* rtp_fixed_or_random_param_type::create_widget(rtp_param_manager* mgr) const
 {
 	rtp_param_widget< Wt::WContainerWidget >* widget = new rtp_param_widget< Wt::WContainerWidget >(this);
-	Wt::WComboBox* box = new Wt::WComboBox(widget);
+	Wt::WHBoxLayout* layout = new Wt::WHBoxLayout();
+	layout->setContentsMargins(0, 0, 0, 0);
+	widget->setLayout(layout);
+
+	Wt::WComboBox* box = new Wt::WComboBox();
 	box->addItem("Fixed");
 	box->addItem("Random");
+//	box->setMinimumSize(75, Wt::WLength::Auto);
+	layout->addWidget(box);
 
 	rtp_realnum_param_type* fixed_pt = new rtp_realnum_param_type(m_default, m_min, m_max);
 	//fixed_pt->use_spin(true, )
 	i_param_widget* fixed = fixed_pt->create_widget(mgr);
-	widget->addWidget(fixed->get_wt_widget());
-	widget->addWidget(new Wt::WText("["));
+//	fixed->get_wt_widget()->setMinimumSize(75, Wt::WLength::Auto);
+	layout->addWidget(fixed->get_wt_widget());
+	Wt::WText* txt = new Wt::WText("[");
+//	txt->setMinimumSize(15, Wt::WLength::Auto);
+	layout->addWidget(txt);
 	i_param_widget* rand_min = (new rtp_realnum_param_type(m_default_min, m_min, m_max))->create_widget(mgr);
-	widget->addWidget(rand_min->get_wt_widget());
+//	rand_min->get_wt_widget()->setMinimumSize(75, Wt::WLength::Auto);
+	layout->addWidget(rand_min->get_wt_widget());
 	i_param_widget* rand_max = (new rtp_realnum_param_type(m_default_max, m_min, m_max))->create_widget(mgr);
-	widget->addWidget(rand_max->get_wt_widget());
-	widget->addWidget(new Wt::WText(")"));
+//	rand_max->get_wt_widget()->setMinimumSize(75, Wt::WLength::Auto);
+	layout->addWidget(rand_max->get_wt_widget());
+	txt = new Wt::WText(")");
+//	txt->setMinimumSize(15, Wt::WLength::Auto);
+	layout->addWidget(txt);
 
 	box->changed().connect(std::bind([=](){
 		int index = box->currentIndex();

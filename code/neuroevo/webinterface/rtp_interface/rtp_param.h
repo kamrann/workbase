@@ -13,6 +13,7 @@
 typedef boost::any rtp_param;
 typedef std::vector< rtp_param > rtp_param_list;
 typedef rtp_param_list::const_iterator rtp_param_list_it;
+typedef std::pair< rtp_param, rtp_param > rtp_param_pair;
 
 
 class i_param_widget;

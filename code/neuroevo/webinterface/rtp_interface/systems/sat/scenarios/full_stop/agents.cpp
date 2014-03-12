@@ -1,6 +1,7 @@
 // agents.cpp
 
 #include "agents.h"
+#include "../../../rtp_interactive_input.h"
 #include "../../../../params/paramlist_par.h"
 #include "../../../../params/integer_par.h"
 #include "../../../../rtp_fixednn_genome_mapping.h"
@@ -27,7 +28,7 @@ namespace rtp_sat
 	}
 
 	template < WorldDimensionality dim >
-	interactive_agent< dim >::interactive_agent(): input(10)	// TODO: input size
+	interactive_agent< dim >::interactive_agent(): inputs(10)	// TODO: input size
 	{}
 
 	template < WorldDimensionality dim >
@@ -38,100 +39,70 @@ namespace rtp_sat
 		dec.resize(num_thrusters);
 		for(size_t i = 0; i < num_thrusters; ++i)
 		{
-			dec[i] = input[i];
+			dec[i] = inputs[i];
 		}
 		return dec;
 	}
 
 	template < WorldDimensionality dim >
-	void interactive_agent< dim >::register_input(size_t idx, bool activate)
+	void interactive_agent< dim >::register_input(interactive_input const& input)
 	{
-		// TODO: This is not ideal
-		if(idx >= input.size())
+		if(input.key_index >= inputs.size())
 		{
-			input.resize(idx + 1);
+			inputs.resize(input.key_index + 1);
 		}
 
-		input[idx] = activate;
+		inputs[input.key_index] = input.down;
 	}
 
-	void generic_mlp_agent::set_weights(std::vector< double > const& weights)
-	{
-		size_t const NumWeights = weights.size();
-		assert(NumWeights == nn.get_total_connections());
-
-		std::vector< FANN::connection > conns(NumWeights);
-		nn.get_connection_array(&conns[0]);
-		for(size_t c = 0; c < NumWeights; ++c)
-		{
-			conns[c].weight = weights[c];
-		}
-		nn.set_weight_array(&conns[0], NumWeights);
-	}
-
-
+	
 	template < WorldDimensionality dim >
-	boost::any mlp_agent< dim >::enum_param_type::default_value() const
+	mlp_agent< dim >::enum_param_type::enum_param_type()
 	{
-		return AngVel;
-	}
-
-	template < WorldDimensionality dim >
-	i_param_widget* mlp_agent< dim >::enum_param_type::create_widget(rtp_param_manager* mgr) const
-	{
-		rtp_param_widget< Wt::WComboBox >* box = new rtp_param_widget< Wt::WComboBox >(this);
-
 		for(size_t i = 0; i < Type::Count; ++i)
 		{
-			box->addItem(Names[i]);
-			box->model()->setData(i, 0, (Type)i, Wt::UserRole);
+			add_item(Names[i], (Type)i);
 		}
-
-		return box;
+		set_default_index(0);
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param mlp_agent< dim >::enum_param_type::get_widget_param(i_param_widget const* w) const
+	size_t mlp_agent< dim >::param_type::provide_num_child_params(rtp_param_manager* mgr) const
 	{
-		Wt::WComboBox const* box = (Wt::WComboBox const*)w->get_wt_widget();
-		Wt::WAbstractItemModel const* model = box->model();
-		Type type = boost::any_cast< Type >(model->data(box->currentIndex(), 0, Wt::UserRole));
-		return rtp_param(type);
+		return 2;
 	}
 
 	template < WorldDimensionality dim >
-	rtp_named_param mlp_agent< dim >::param_type::provide_selection_param() const
+	rtp_named_param mlp_agent< dim >::param_type::provide_child_param(size_t index, rtp_param_manager* mgr) const
 	{
-		return rtp_named_param(new enum_param_type(), "MLP Type");
+		switch(index)
+		{
+			case 0:
+			return rtp_named_param(new enum_param_type(), "Inputs");
+
+			case 1:
+			return rtp_named_param(new rtp_integer_param_type(3, 2, 5), "Num Layers");
+
+			default:
+			return rtp_named_param();
+		}
 	}
 
 	template < WorldDimensionality dim >
-	rtp_param_type* mlp_agent< dim >::param_type::provide_nested_param(rtp_param_manager* mgr) const
-	{
-		Type type = boost::any_cast<Type>(mgr->retrieve_param("MLP Type"));
-		rtp_named_param_list sub_params;// = evolvable_agent::params(type);
-		sub_params.push_back(rtp_named_param(new rtp_integer_param_type(3, 2, 5), "Num Layers"));
-		return new rtp_staticparamlist_param_type(sub_params);
-	}
-
-	template < WorldDimensionality dim >
-	std::pair< i_genome_mapping*, i_agent_factory* > mlp_agent< dim >::create_instance_evolvable(rtp_param param, thruster_config< dim > const& cfg)
+	std::tuple< i_genome_mapping*, i_agent_factory* > mlp_agent< dim >::create_instance_evolvable(rtp_param param, thruster_config< dim > const& cfg)
 	{
 		size_t const NumNNOutputs = cfg.num_thrusters();
 
 		auto param_list = boost::any_cast< rtp_param_list >(param);
-		auto param_pr = boost::any_cast<std::pair< rtp_param, rtp_param >>(param_list[0]);
-		Type type = boost::any_cast<Type>(param_pr.first);
-
-		auto param_list_2 = boost::any_cast<rtp_param_list>(param_pr.second);
-		int num_layers = boost::any_cast<int>(param_list_2[0]);
+		Type type = boost::any_cast<Type>(param_list[0]);
+		int num_layers = boost::any_cast<int>(param_list[1]);
 
 		switch(type)
 		{
 			case AngVel:
 			{
 				size_t const NumPerHidden = (mlp_ang_vel_agent< dim >::NumNNInputs + NumNNOutputs) / 2;
-				return std::pair< i_genome_mapping*, i_agent_factory* >(
+				return std::tuple< i_genome_mapping*, i_agent_factory* >(
 					new fixednn_genome_mapping(
 					//mlp_ang_vel_agent< dim >::NumNNLayers,
 					num_layers,
@@ -144,7 +115,7 @@ namespace rtp_sat
 			case VelAngle:
 			{
 				size_t const NumPerHidden = (mlp_vel_and_angle_agent< dim >::NumNNInputs + NumNNOutputs) / 2;
-				return std::pair< i_genome_mapping*, i_agent_factory* >(
+				return std::tuple< i_genome_mapping*, i_agent_factory* >(
 					new fixednn_genome_mapping(
 						//mlp_vel_and_angle_agent< dim >::NumNNLayers,
 						num_layers,
@@ -157,7 +128,7 @@ namespace rtp_sat
 			case VelAnglePos:
 			{
 				size_t const NumPerHidden = (mlp_vel_angle_pos_agent< dim >::NumNNInputs + NumNNOutputs) / 2;
-				return std::pair< i_genome_mapping*, i_agent_factory* >(
+				return std::tuple< i_genome_mapping*, i_agent_factory* >(
 					new fixednn_genome_mapping(
 						num_layers,
 						mlp_vel_angle_pos_agent< dim >::NumNNInputs,
@@ -168,7 +139,7 @@ namespace rtp_sat
 
 		default:
 			assert(false);
-			return std::pair< i_genome_mapping*, i_agent_factory* >(nullptr, nullptr);
+			return std::tuple< i_genome_mapping*, i_agent_factory* >(nullptr, nullptr);
 		}
 	}
 

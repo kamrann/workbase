@@ -102,6 +102,10 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\random_procreation_selection.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\ranking_fitness.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\roulette_procreation_selection.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_fitness.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_genome_wrap.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_individual.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\rtp_interface\rtp_procreation_selection.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\selection.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\shared_constraints.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\ga\shared_objective_fn_data_components.h" />

@@ -4,16 +4,7 @@
 #define __SIMULATIONS_TAB_H
 
 #include "rtp_interface/rtp_param_manager.h"
-
-// TEMP
-#include "systems/ship_and_thrusters/scenarios/angular_full_stop.h"
-#include "systems/ship_and_thrusters/scenarios/full_stop.h"
-#include "systems/ship_and_thrusters/scenarios/target_orientation.h"
-//#include "system_test_tab.h"
-#include "nac_system_coordinator.h"
-#include "ship_system_coordinator.h"
-#include <Wt/WTabWidget>
-//
+#include "rtp_interface/rtp_properties.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/Dbo/ptr>
