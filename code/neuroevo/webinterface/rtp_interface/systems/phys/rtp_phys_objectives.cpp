@@ -4,7 +4,10 @@
 
 #include "objectives/max_final_x_objective.h"
 #include "objectives/max_average_y_objective.h"
+#include "objectives/min_final_linear_speed_objective.h"
 #include "objectives/maintain_upright_stance_objective.h"
+#include "objectives/min_average_ke_objective.h"
+#include "objectives/maintain_altitude_objective.h"
 
 #include "../../params/boolean_par.h"
 
@@ -14,7 +17,10 @@ namespace rtp_phys
 	std::string const agent_objective::Names[] = {
 		"Max Final X",
 		"Max Average Y",
-		"Maintain Upright Stance",
+		"Min Final Linear Speed",
+//		"Maintain Upright Stance",
+		"Min Average KE",
+		"Maintain Altitude",
 	};
 
 	agent_objective::enum_param_type::enum_param_type()
@@ -52,7 +58,10 @@ namespace rtp_phys
 		{
 			case MaxFinalX:				return new rtp_phys::wrapped_objective_fn< max_final_x_obj_fn >();
 			case MaxAverageY:			return new rtp_phys::wrapped_objective_fn< max_average_y_obj_fn >();
-			case MaintainUprightStance:	return new rtp_phys::wrapped_objective_fn< maintain_upright_stance_obj_fn >();
+			case MinFinalLinearSpeed:	return new rtp_phys::wrapped_objective_fn< min_final_linear_speed_obj_fn >();
+//			case MaintainUprightStance:	return new rtp_phys::wrapped_objective_fn< maintain_upright_stance_obj_fn >();
+			case MinAverageKE:			return new rtp_phys::wrapped_objective_fn< min_average_ke_obj_fn >();
+			case MaintainAltitude:		return new rtp_phys::wrapped_objective_fn< maintain_altitude_obj_fn >();
 
 			default:
 			assert(false);

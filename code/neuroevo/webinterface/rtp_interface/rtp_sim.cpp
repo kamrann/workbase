@@ -188,12 +188,14 @@ void rtp_simulation::run_epoch(/*observation_data_t& observations,*/ std::ostrea
 		gn_mapping->decode_genome(population[idv].gn.get(), population[idv].idv.get());
 	}
 
-	fitness_acc_t avg_fitnesses(population_size);
+/*	fitness_acc_t avg_fitnesses(population_size);
 	processed_obj_val_acc_t avg_obj_vals(avg_fitnesses, population_size);
 	for(size_t idv = 0; idv < population_size; ++idv)
 	{
 		avg_obj_vals[idv] = processed_obj_val_t(0.0);
 	}
+*/
+	i_population_wide_observer::eval_data_t obj_val_eval_data = resultant_obj->initialize(population_size);
 
 	for(size_t trial = 0; trial < trials_per_generation; ++trial)
 	{
@@ -224,25 +226,33 @@ void rtp_simulation::run_epoch(/*observation_data_t& observations,*/ std::ostrea
 
 		// Invoke the collective objective value processing
 		//collective_obj_val_fn_t() (raw_obj_val_acc, population_size, processed_obj_val_acc);
-		std::vector< boost::any > resultant_vals = resultant_obj->evaluate(observations);
+		resultant_obj->register_datapoint(observations, obj_val_eval_data);
 
-		for(size_t idv = 0; idv < population_size; ++idv)
+/*		for(size_t idv = 0; idv < population_size; ++idv)
 		{
 			//avg_obj_vals[idv] += processed_obj_val_acc[idv];
 			avg_obj_vals[idv] += boost::any_cast<double>(resultant_vals[idv]);
 		}
-	}
+*/	}
 
-	for(size_t idv = 0; idv < population_size; ++idv)
+/*	for(size_t idv = 0; idv < population_size; ++idv)
 	{
 		avg_obj_vals[idv] = avg_obj_vals[idv] / (double)trials_per_generation;
 	}
+*/
+	boost::optional< std::string > analysis = "";
+	std::vector< boost::any > resultant_vals = resultant_obj->evaluate(obj_val_eval_data, analysis);
+
+	fitness_acc_t avg_fitnesses(population_size);
+	processed_obj_val_acc_t avg_obj_vals(avg_fitnesses, population_size);
 
 	// TODO: temp resolution to issue below, but ideally don't want to require this copying
 	std::vector< processed_obj_val_t > unordered_obj_vals(population_size);
 	for(size_t idv = 0; idv < population_size; ++idv)
 	{
-		unordered_obj_vals[idv] = avg_obj_vals[idv];
+		avg_obj_vals[idv] = 
+			unordered_obj_vals[idv] = boost::any_cast<double>(resultant_vals[idv]);
+			//avg_obj_vals[idv];
 	}
 	//
 
@@ -266,6 +276,8 @@ void rtp_simulation::run_epoch(/*observation_data_t& observations,*/ std::ostrea
 	}
 
 	++generation;
+
+	os << "Gen " << generation << ": " << *analysis;
 }
 	
 i_genome* rtp_simulation::get_individual_genome(size_t idx)

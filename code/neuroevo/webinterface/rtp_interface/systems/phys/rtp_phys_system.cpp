@@ -1,6 +1,7 @@
 // rtp_phys_system.cpp
 
 #include "rtp_phys_system.h"
+#include "rtp_phys_systemstatevalues.h"
 #include "rtp_phys_scenario.h"
 #include "rtp_phys_system_drawer.h"
 #include "rtp_phys_observers.h"
@@ -22,46 +23,74 @@
 
 #include <Wt/WComboBox>
 
-#include <Box2D/Box2D.h>
-
 
 namespace rtp_phys {
 
 	// TODO: May want to eventually separate i_agent into i_agent & i_agent_controller
 	// (So we specify agent properties (such as ship configuration), and then subsequently specify a compatible controller (with its own properties)
 
-	std::string const phys_system::StateValueNames[] = {
+	std::string const StateValueNames[] = {
 		"Time",
 		"Agent Position X",
 		"Agent Position Y",
-		"Agent Angle",
+		"Agent Vel X",
+		"Agent Vel Y",
+		"Agent Speed",
+//		"Agent Angle",
+		"Agent Kinetic Energy",
 	};
 
+	void set_state_prop(rtp_stored_property_values* pv, StateValue sv, boost::any v)
+	{
+		pv->set_value(StateValueNames[sv], v);
+	}
+
+
+	enum {
+		_Scenario = 0,
+		_BodyType,
+		_BodyParams,
+		_ControllerType,
+		_ControllerParams,
+
+		_NonEvolvableParamCount,
+
+		_ObjectiveType = _NonEvolvableParamCount,
+		_ObjectiveParams,
+
+		_EvolvableParamCount,
+	};
 
 	phys_system::param_type::param_type(bool evolvable): m_evolvable(evolvable)
 	{
-		add_dependency("Objective Type", 5);
+		add_dependency("Objective Type", _ObjectiveParams);
 	}
 
 	size_t phys_system::param_type::provide_num_child_params(rtp_param_manager* mgr) const
 	{
-		return m_evolvable ? 6 : 4;
+		return m_evolvable ? _EvolvableParamCount : _NonEvolvableParamCount;
 	}
 
 	rtp_named_param phys_system::param_type::provide_child_param(size_t index, rtp_param_manager* mgr) const
 	{
 		switch(index)
 		{
-			case 0:
+			case _Scenario:
 			return rtp_named_param(phys_scenario::params());
 
-			case 1:
+			case _BodyType:
 			return rtp_named_param(new agent_body_spec::enum_param_type(), "Spec");
 
-			case 2:
+			case _BodyParams:
+			{
+				agent_body_spec::Type t = boost::any_cast<agent_body_spec::Type>(mgr->retrieve_param("Spec"));
+				return rtp_named_param(agent_body_spec::params(t));
+			}
+
+			case _ControllerType:
 			return m_evolvable ? rtp_named_param(new evolvable_controller::enum_param_type(), "Controller") : rtp_named_param(new i_phys_controller::enum_param_type(), "Controller");
 
-			case 3:
+			case _ControllerParams:
 			if(m_evolvable)
 			{
 				evolvable_controller::Type ea = boost::any_cast<evolvable_controller::Type>(mgr->retrieve_param("Controller"));
@@ -73,10 +102,10 @@ namespace rtp_phys {
 				return rtp_named_param(i_phys_controller::params(a));
 			}
 
-			case 4:
+			case _ObjectiveType:
 			return rtp_named_param(new i_population_wide_observer::enum_param_type(), "Objective Type");
 
-			case 5:
+			case _ObjectiveParams:
 			{
 				i_population_wide_observer::Type t = boost::any_cast<i_population_wide_observer::Type>(mgr->retrieve_param("Objective Type"));
 				switch(t)
@@ -93,12 +122,6 @@ namespace rtp_phys {
 				}
 			}
 
-/*			case 5:
-			{
-				agent_objective::Type ao = boost::any_cast<agent_objective::Type>(mgr->retrieve_param("Objective"));
-				return rtp_named_param(agent_objective::params(ao));
-			}
-*/
 			default:
 			return rtp_named_param();
 		}
@@ -115,31 +138,31 @@ namespace rtp_phys {
 
 		rtp_param_list param_list = boost::any_cast<rtp_param_list>(param);
 
-		phys_scenario* scenario = phys_scenario::create_instance(param_list[0]);
+		phys_scenario* scenario = phys_scenario::create_instance(param_list[_Scenario]);
 		
-		agent_body_spec* spec = agent_body_spec::create_instance(param_list[1]);
+		auto bdy_type = boost::any_cast<agent_body_spec::Type>(param_list[_BodyType]);
+		agent_body_spec* spec = agent_body_spec::create_instance(bdy_type, param_list[_BodyParams]);
 
 		std::get< 0 >(result) = new phys_system(scenario, spec);
 		if(evolvable)
 		{
-			evolvable_controller::Type ea_type = boost::any_cast<evolvable_controller::Type>(param_list[2]);
+			evolvable_controller::Type ea_type = boost::any_cast<evolvable_controller::Type>(param_list[_ControllerType]);
 			// TODO: Some easy way to access sub-tuple? (eg. result.firstN)
 			std::tie(
 				std::get< 1 >(result),
 				std::get< 2 >(result)
-				) = evolvable_controller::create_instance(ea_type, param_list[3]);
+				) = evolvable_controller::create_instance(ea_type, param_list[_ControllerParams]);
 
 			std::set< agent_objective::Type > required_observations;
-			i_population_wide_observer::Type pwot = boost::any_cast<i_population_wide_observer::Type>(param_list[4]);
-			std::get< 4 >(result) = resultant_objective::create_instance(pwot, param_list[5], required_observations);
+			i_population_wide_observer::Type pwot = boost::any_cast<i_population_wide_observer::Type>(param_list[_ObjectiveType]);
+			std::get< 4 >(result) = resultant_objective::create_instance(pwot, param_list[_ObjectiveParams], required_observations);
 
-//			agent_objective::Type obj_type = boost::any_cast<agent_objective::Type>(param_list[4]);
 			std::get< 3 >(result) = composite_observer::create_instance(required_observations);
 		}
 		else
 		{
-			i_phys_controller::Type a_type = boost::any_cast<i_phys_controller::Type>(param_list[2]);
-			boost::shared_ptr< i_phys_controller > agent(i_phys_controller::create_instance(a_type, param_list[3]));
+			i_phys_controller::Type a_type = boost::any_cast<i_phys_controller::Type>(param_list[_ControllerType]);
+			boost::shared_ptr< i_phys_controller > agent(i_phys_controller::create_instance(a_type, param_list[_ControllerParams]));
 			std::get< 0 >(result)->register_agent(agent);
 		}
 		return result;
@@ -173,47 +196,49 @@ namespace rtp_phys {
 
 	boost::any phys_system::generate_initial_state(rgen_t& rgen) const
 	{
-		// TODO: Currently working on assumption that this does not depend on which agents are registered, so that can be called
-		// once before start of trial, and used for any subsequently registered agent
+		// TODO: Currently working on assumption that this does not depend on which controllers are registered, so that can be called
+		// once before start of trial, and used for any subsequently registered controller
 
-		// TODO: Bit dodgy, but since can't easily serialize and currently no randomness in initialization anyway,
-		// easier to just recreate initial state within below method.
+		serializable_initial_state init_st;
+
+		init_st.scenario = m_scenario->generate_initial_state(rgen);
+
+		init_st.body_pos.x = m_body_spec->m_initial_pos_x.get(rgen);
+		init_st.body_pos.y = m_body_spec->m_initial_pos_y.get(rgen);
+		init_st.body_angle = m_body_spec->m_initial_orientation.get(rgen) * b2_pi / 180;
+		float motion_angle = m_body_spec->m_initial_linear_dir.get(rgen) * b2_pi / 180;
+		float lin_speed = m_body_spec->m_initial_linear_speed.get(rgen);
+		init_st.body_lin_vel.Set(
+			-std::sin(motion_angle) * lin_speed,
+			std::cos(motion_angle) * lin_speed
+			);
+		init_st.body_ang_vel = m_body_spec->m_initial_ang_vel.get(rgen) * b2_pi / 180;
 		
-		return boost::any();
+		return boost::any(init_st);
 	}
 
 	void phys_system::set_state(boost::any const& st)
 	{
-		//m_state = boost::any_cast<state const&>(st);
+		serializable_initial_state const& init_st = boost::any_cast<serializable_initial_state const&>(st);
 
 		m_state = state();
-		m_state.world.reset(new b2World(b2Vec2(0.0f, -9.81f)));
+		m_state.world.reset(new b2World(b2Vec2(0.0f, 0.0f)));
 
-		{
-			b2BodyDef bd;
-			b2Body* ground = m_state.world->CreateBody(&bd);
-
-			b2EdgeShape shape;
-			shape.Set(b2Vec2(-100.0f, 0.0f), b2Vec2(100.0f, 0.0f));
-
-			b2FixtureDef fd;
-			fd.shape = &shape;
-			fd.friction = 0.5f;
-
-			ground->CreateFixture(&fd);
-		}
-
-		// TODO: scenario method should be: initialize_state(st&);
-		//= m_scenario->generate_initial_state(rgen);
+		m_scenario->load_initial_state(init_st.scenario, m_state);
 
 		m_state.body.reset(m_body_spec->create_body(m_state.world.get()));
 
+		m_state.body->rotate(init_st.body_angle);
+		m_state.body->translate(init_st.body_pos);
+		m_state.body->set_linear_velocity(init_st.body_lin_vel);
+		m_state.body->set_angular_velocity(init_st.body_ang_vel);
+
 		// TODO: For now, step forwards a couple of seconds so that sim starts with bodies already at equilibrium
-		for(size_t i = 0; i < 100; ++i)
+/*		for(size_t i = 0; i < 100; ++i)
 		{
 			m_state.world->Step(1.0f / 50, 8, 3);
 		}
-
+*/
 		// TODO: If we want to use this method to set a general state, this shouldn't be here...
 		m_td = trial_data();
 		m_td.initial_st = m_state;
@@ -270,11 +295,6 @@ namespace rtp_phys {
 		return phys_obs->record_observations(m_td);
 	}
 
-	void phys_system::set_state_prop(rtp_stored_property_values* pv, StateValue sv, boost::any v)
-	{
-		pv->set_value(StateValueNames[sv], v);
-	}
-
 	boost::shared_ptr< i_properties const > phys_system::get_state_properties() const
 	{
 		rtp_stored_properties* props = new rtp_stored_properties();
@@ -292,7 +312,12 @@ namespace rtp_phys {
 		b2Vec2 pos = m_state.body->get_position();
 		set_state_prop(vals, AgentPosX, pos.x);
 		set_state_prop(vals, AgentPosY, pos.y);
-		set_state_prop(vals, AgentAngle, m_state.body->get_orientation());
+		b2Vec2 vel = m_state.body->get_linear_velocity();
+		set_state_prop(vals, AgentVelX, vel.x);
+		set_state_prop(vals, AgentVelY, vel.y);
+		set_state_prop(vals, AgentSpeed, vel.Length());
+//		set_state_prop(vals, AgentAngle, m_state.body->get_orientation());
+		set_state_prop(vals, AgentKE, m_state.body->get_kinetic_energy());
 		return boost::shared_ptr< i_property_values const >(vals);
 	}
 

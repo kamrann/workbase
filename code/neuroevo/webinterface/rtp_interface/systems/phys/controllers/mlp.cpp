@@ -4,6 +4,7 @@
 #include "../bodies/test_body.h"
 #include "../bodies/test_quadruped_body.h"
 #include "../bodies/test_biped_body.h"
+#include "../bodies/basic_spaceship.h"
 #include "../../../params/paramlist_par.h"
 #include "../../../params/integer_par.h"
 #include "../../../rtp_fixednn_genome_mapping.h"
@@ -19,6 +20,7 @@ namespace rtp_phys
 		"Test Controller",
 		"Test Quadruped",
 		"Test Biped",
+		"Spaceship",
 	};
 
 	
@@ -94,6 +96,19 @@ namespace rtp_phys
 					new fixednn_genome_mapping(
 					num_layers,
 					mlp_test_biped_controller::NumNNInputs,
+					NumNNOutputs,
+					NumPerHidden),
+					new mlp_controller_factory(type, num_layers, NumPerHidden, NumNNOutputs));
+			}
+
+			case Spaceship:
+			{
+				size_t const NumNNOutputs = 4;	// TODO:
+				size_t const NumPerHidden = (mlp_all_inputs_spaceship_controller::NumNNInputs + NumNNOutputs + 1) / 2;
+				return std::pair< i_genome_mapping*, i_agent_factory* >(
+					new fixednn_genome_mapping(
+					num_layers,
+					mlp_all_inputs_spaceship_controller::NumNNInputs,
 					NumNNOutputs,
 					NumPerHidden),
 					new mlp_controller_factory(type, num_layers, NumPerHidden, NumNNOutputs));
@@ -271,6 +286,84 @@ namespace rtp_phys
 		bp->lower2->ApplyTorque(nn_outputs[4] * MaxKneeTorque, true);
 	}
 
+
+	mlp_spaceship_controller::mlp_spaceship_controller(size_t num_layers, size_t per_hidden, size_t num_outputs): mlp_controller(num_layers, per_hidden, num_outputs)
+	{
+		
+	}
+
+	void mlp_spaceship_controller::create_nn(size_t num_inputs)
+	{
+		std::vector< unsigned int > layer_neurons(num_nn_layers, num_per_hidden);
+		layer_neurons[0] = num_inputs;
+		layer_neurons[num_nn_layers - 1] = num_nn_outputs;
+		nn.create_standard_array(num_nn_layers, &layer_neurons[0]);
+
+		nn.set_activation_steepness_hidden(1.0);
+		nn.set_activation_steepness_output(1.0);
+
+		nn.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC_STEPWISE);
+		nn.set_activation_function_output(FANN::THRESHOLD);
+	}
+
+	void mlp_spaceship_controller::update(phys_system::state& st, phys_system::scenario_data sdata)
+	{
+		std::vector< double > nn_inputs = map_nn_inputs(st);
+		double* nn_outputs = nn.run((double*)&nn_inputs[0]);
+		thruster_base::thruster_activation ta(num_nn_outputs, false);
+		std::transform(nn_outputs, nn_outputs + num_nn_outputs, ta.begin(), [](double d_act) {
+			return d_act > 0.0;
+		});
+
+		basic_spaceship* ss = static_cast< basic_spaceship* >(st.body.get());
+		float const ThrusterForce = 100.0f;	// TODO: Property of the ship/thrusters
+
+		for(size_t i = 0; i < ss->m_t_cfg->num_thrusters(); ++i)
+		{
+			if(ta[i])
+			{
+				b2Vec2 pos = ss->m_half_width * b2Vec2((*ss->m_t_cfg)[i].pos[0], (*ss->m_t_cfg)[i].pos[1]);
+				b2Vec2 dir((*ss->m_t_cfg)[i].dir[0], (*ss->m_t_cfg)[i].dir[1]);
+				ss->apply_force_local(ThrusterForce * dir, pos);
+
+				ss->m_t_system[i].t.engage();
+			}
+			else
+			{
+				ss->m_t_system[i].t.cool_down(1.0f / 60.0f);	// TODO: Hard copied from phys_system::update()
+			}
+		}
+	}
+
+	size_t const mlp_all_inputs_spaceship_controller::NumNNInputs = 6;
+
+	mlp_all_inputs_spaceship_controller::mlp_all_inputs_spaceship_controller(size_t num_layers, size_t per_hidden, size_t num_outputs):
+		mlp_spaceship_controller(num_layers, per_hidden, num_outputs)
+	{
+		create_nn(NumNNInputs);
+	}
+
+	std::vector< double > mlp_all_inputs_spaceship_controller::map_nn_inputs(state_t const& st)
+	{
+		std::vector< double > nni(NumNNInputs);
+		std::vector< double >::iterator it = nni.begin();
+		basic_spaceship* ss = static_cast< basic_spaceship* >(st.body.get());
+		b2Vec2 const linvel = ss->get_linear_velocity();
+		// TODO: Temp map linear velocity vector into local coordinates, so orientation is not needed
+		//linvel = ss->m_body->GetLocalVector(linvel);
+		*it++ = linvel.x;
+		*it++ = linvel.y;
+		*it++ = ss->get_angular_velocity();
+		b2Vec2 const pos = ss->get_position();
+		*it++ = pos.x;
+		*it++ = pos.y;
+		// TODO: Could it be better for NN to input orientation as 2 inputs, absolute val (0-Pi), plus a sign input (-1,1)?
+		// Feel as though it may be hard for it to deal with an input that can flip at a boundary from +Pi to -Pi.
+		*it++ = ss->get_orientation();
+		assert(it == nni.end());
+		return nni;
+	}
+
 	
 	mlp_controller_factory::mlp_controller_factory(mlp_controller::Type type, size_t num_layers, size_t num_per_hidden, size_t num_outputs):
 		m_num_nn_layers(num_layers),
@@ -292,6 +385,9 @@ namespace rtp_phys
 
 			case mlp_controller::TestBiped:
 			return new mlp_test_biped_controller(m_num_nn_layers, m_num_per_hidden, m_num_nn_outputs);
+
+			case mlp_controller::Spaceship:
+			return new mlp_all_inputs_spaceship_controller(m_num_nn_layers, m_num_per_hidden, m_num_nn_outputs);
 
 			default:
 			assert(false);

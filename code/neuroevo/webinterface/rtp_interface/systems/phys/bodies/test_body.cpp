@@ -1,16 +1,25 @@
 // test_body.cpp
 
 #include "test_body.h"
+#include "../../../params/paramlist_par.h"
 
 #include "Box2D/Box2D.h"
 
 
 namespace rtp_phys {
 
+	rtp_param_type* test_body::spec::params()
+	{
+		rtp_named_param_list p = agent_body_spec::base_params();
+		// Add more here
+		return new rtp_staticparamlist_param_type(p);
+	}
+
 	test_body::spec* test_body::spec::create_instance(rtp_param param)
 	{
-		// TODO: Params
-		return new spec();
+		spec* s = new spec();
+		agent_body_spec::create_base_instance(param, s);
+		return s;
 	}
 
 	agent_body* test_body::spec::create_body(b2World* world)
@@ -74,18 +83,12 @@ namespace rtp_phys {
 		jd.collideConnected = false;
 
 		joint = (b2RevoluteJoint*)world->CreateJoint(&jd);
+
+		m_bodies.push_back(rear);
+		m_bodies.push_back(fore);
 	}
 
-	b2Vec2 test_body::get_position()
-	{
-		return fore->GetWorldCenter();
-	}
-
-	float test_body::get_orientation()
-	{
-		return fore->GetTransform().q.GetAngle();
-	}
-
+/*
 	void test_body::draw(Wt::WPainter& painter)
 	{
 		painter.save();
@@ -114,6 +117,7 @@ namespace rtp_phys {
 		painter.drawRect(rc_fore);
 		painter.restore();
 	}
+*/
 }
 
 

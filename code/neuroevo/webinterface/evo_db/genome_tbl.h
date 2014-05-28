@@ -3,6 +3,8 @@
 #ifndef __GADB_GENOME_H
 #define __GADB_GENOME_H
 
+#include "table_traits.h"
+
 #include <Wt/Dbo/Types>
 
 
@@ -23,7 +25,7 @@ public:
 		dbo::field(a, gen_obj_rank, "rank");
 		dbo::field(a, encoding, "encoding");
 
-		dbo::belongsTo(a, generation, "geno_gen");
+		dbo::belongsTo(a, generation, "genome__generation", dbo::NotNull | dbo::OnDeleteCascade);
 	}
 };
 

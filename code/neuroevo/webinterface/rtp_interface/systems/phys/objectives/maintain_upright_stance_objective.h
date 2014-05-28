@@ -11,7 +11,7 @@
 
 namespace rtp_phys {
 
-	struct maintain_upright_stance_obj_fn: public objective_fn
+/*	struct maintain_upright_stance_obj_fn: public objective_fn
 	{
 		typedef boost::mpl::vector< avg_tilt_ofd > dependencies;
 
@@ -23,7 +23,7 @@ namespace rtp_phys {
 			return obj_value_t(boost::math::double_constants::pi - ofd.avg_tilt);
 		}
 	};
-
+*/
 }
 
 

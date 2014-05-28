@@ -1,15 +1,20 @@
 // rtp_phys_scenario.cpp
 
 #include "rtp_phys_scenario.h"
-#include "scenarios/test_scenario.h"
+#include "scenarios/ground_based.h"
+#include "scenarios/space_based.h"
+#include "../../params/realnum_par.h"
 
 #include <Wt/WComboBox>
+
+#include <boost/math/constants/constants.hpp>
 
 
 namespace rtp_phys {
 
 	const std::string phys_scenario_base::Names[] = {
-		"Test Scenario",
+		"Ground Based",
+		"Space Based",
 	};
 
 	phys_scenario::enum_param_type::enum_param_type()
@@ -37,10 +42,16 @@ namespace rtp_phys {
 	{
 		rtp_named_param_list p;
 		p.push_back(rtp_named_param(new phys_scenario::enum_param_type(), "Scenario"));
-//		p.push_back(rtp_named_param(new rtp_fixed_or_random_param_type(0.0, -1.0, 1.0), "Initial Ang Vel"));
+		p.push_back(rtp_named_param(
+			new rtp_realnum_param_type(
+				10.0,
+				0.0,
+				1000.0
+			),
+			"Duration"));
 		return new rtp_staticparamlist_param_type(p);
 	}
-
+/*
 	rtp_named_param_list phys_scenario::params(Type scen)
 	{
 		switch(scen)
@@ -53,24 +64,29 @@ namespace rtp_phys {
 			return rtp_named_param_list();
 		}
 	}
-
+*/
 	phys_scenario* phys_scenario::create_instance(rtp_param param)
 	{
 		auto param_list = boost::any_cast<rtp_param_list>(param);
+
 		Type scenario_type = boost::any_cast<Type>(param_list[0]);
 		phys_scenario* scenario = nullptr;
 		switch(scenario_type)
 		{
-			case TestScenario:
-			scenario = new test_scenario(rtp_param());
+			case GroundBased:
+			scenario = new ground_based_scenario(rtp_param());
 			break;
 	
+			case SpaceBased:
+			scenario = new space_based_scenario(rtp_param());
+			break;
+
 			default:
 			assert(false);
 		}
 
-		//auto init_angvel = boost::any_cast<fixed_or_random< double, boost::random::uniform_real_distribution< double >, rgen_t >>(param_list[1]);
-		//scenario->m_initial_ang_vel = init_angvel;
+		scenario->m_duration = boost::any_cast<double>(param_list[1]);
+		
 		return scenario;
 	}
 
@@ -81,7 +97,7 @@ namespace rtp_phys {
 
 	bool phys_scenario::is_complete(state_t const& st)
 	{
-		return st.time >= 10.0;	// TODO:
+		return st.time >= m_duration;
 	}
 }
 

@@ -45,6 +45,31 @@ namespace rtp_phys {
 		}
 	};
 
+	template < int Reference >	// TODO: If want to keep this as templated, replace int with ratio to allow non-integer values
+	struct avg_y_delta_ofd: public ofd_component
+	{
+		typedef mpl::vector< timesteps_ofd > dependencies;
+
+		float avg_y_delta;
+
+		avg_y_delta_ofd(): avg_y_delta(0.0f)
+		{}
+
+		template < typename agent_decision, typename agent_state, typename envt_state, typename ofdata >
+		static inline void update(agent_decision const& dec, agent_state const& agent_st, envt_state const& envt_st, ofdata& ofd)
+		{
+			float y = agent_st.body->get_position().y;
+			ofd.avg_y_delta += std::abs(y - Reference);
+		}
+
+		template < typename ofdata >
+		static inline void finalise(ofdata& ofd)
+		{
+			ofd.avg_y_delta /= ofd.timesteps;
+		}
+	};
+
+/*
 	struct avg_tilt_ofd: public ofd_component
 	{
 		typedef mpl::vector< timesteps_ofd > dependencies;
@@ -65,6 +90,28 @@ namespace rtp_phys {
 		static inline void finalise(ofdata& ofd)
 		{
 			ofd.avg_tilt /= ofd.timesteps;
+		}
+	};
+*/
+	struct avg_ke_ofd: public ofd_component
+	{
+		typedef mpl::vector< timesteps_ofd > dependencies;
+
+		float avg_ke;
+
+		avg_ke_ofd(): avg_ke(0.0f)
+		{}
+
+		template < typename agent_decision, typename agent_state, typename envt_state, typename ofdata >
+		static inline void update(agent_decision const& dec, agent_state const& agent_st, envt_state const& envt_st, ofdata& ofd)
+		{
+			ofd.avg_ke += agent_st.body->get_kinetic_energy();
+		}
+
+		template < typename ofdata >
+		static inline void finalise(ofdata& ofd)
+		{
+			ofd.avg_ke /= ofd.timesteps;
 		}
 	};
 

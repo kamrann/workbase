@@ -20,8 +20,10 @@ namespace rtp_phys
 			TestType,
 			TestQuadruped,
 			TestBiped,
+			Spaceship,
 
 			Count,
+			None = Count,
 		};
 
 		static std::string const Names[Count];
@@ -109,6 +111,31 @@ namespace rtp_phys
 		virtual std::vector< double > map_nn_inputs(state_t const& st);
 
 		virtual void update(phys_system::state& st, phys_system::scenario_data sdata);
+	};
+
+	class mlp_spaceship_controller: public mlp_controller
+	{
+	public:
+		typedef phys_system::state state_t;
+		typedef phys_system::scenario_data scenario_data_t;
+
+	public:
+		mlp_spaceship_controller(size_t num_layers, size_t per_hidden, size_t num_outputs);
+
+		void create_nn(size_t num_inputs);
+		
+		virtual void update(phys_system::state& st, phys_system::scenario_data sdata);
+	};
+
+	class mlp_all_inputs_spaceship_controller: public mlp_spaceship_controller
+	{
+	public:
+		static size_t const NumNNInputs;
+
+		mlp_all_inputs_spaceship_controller(size_t num_layers, size_t per_hidden, size_t num_outputs);
+
+	public:
+		virtual std::vector< double > map_nn_inputs(state_t const& st);
 	};
 
 

@@ -30,6 +30,7 @@ enum SystemType {
 	Physics2D,
 
 	NumSystems,
+	None = NumSystems,
 };
 
 class system_type_param_type: public rtp_enum_param_type

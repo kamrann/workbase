@@ -1,13 +1,7 @@
 // database_tab.cpp
 
 #include "database_tab.h"
-#include "evo_db/evodb_session.h"
-#include "evo_db/system_sim_tbl.h"
-#include "evo_db/problem_domain_tbl.h"
-#include "evo_db/genetic_language_tbl.h"
-#include "evo_db/evo_period_tbl.h"
-#include "evo_db/generation_tbl.h"
-#include "evo_db/genome_tbl.h"
+#include "evo_db/evo_db.h"
 
 #include <Wt/WTableView>
 #include <Wt/WPanel>
@@ -22,8 +16,8 @@ DatabaseTab::DatabaseTab(evodb_session& dbs, WContainerWidget* parent):
 	WContainerWidget(parent),
 	db_session(dbs)
 {
-	dbo::Query< dbo::ptr< evo_period > > period_query = db_session.find< evo_period >();
-	dbo::QueryModel< dbo::ptr< evo_period > >* period_q_model = new dbo::QueryModel< dbo::ptr< evo_period > >(this);
+	dbo::Query< dbo::ptr< evo_run > > period_query = db_session.find< evo_run >();
+	dbo::QueryModel< dbo::ptr< evo_run > >* period_q_model = new dbo::QueryModel< dbo::ptr< evo_run > >(this);
 	period_q_model->setQuery(period_query);
 	{
 		auto const& fields = period_q_model->fields();
@@ -36,7 +30,7 @@ DatabaseTab::DatabaseTab(evodb_session& dbs, WContainerWidget* parent):
 		}
 	}
 
-	dbo::Query< dbo::ptr< generation > > generation_query = db_session.find< generation >().where("gen_period_id = ?").bind("0");
+	dbo::Query< dbo::ptr< generation > > generation_query = db_session.find< generation >().where("generation__evo_run_id = ?").bind("0");
 	dbo::QueryModel< dbo::ptr< generation > >* generation_q_model = new dbo::QueryModel< dbo::ptr< generation > >(this);
 	generation_q_model->setQuery(generation_query);
 	{
@@ -50,7 +44,7 @@ DatabaseTab::DatabaseTab(evodb_session& dbs, WContainerWidget* parent):
 		}
 	}
 
-	dbo::Query< dbo::ptr< genome > > individual_query = db_session.find< genome >().where("geno_gen_id = ?").bind("0");
+	dbo::Query< dbo::ptr< genome > > individual_query = db_session.find< genome >().where("genome__generation_id = ?").bind("0");
 	dbo::QueryModel< dbo::ptr< genome > >* individual_q_model = new dbo::QueryModel< dbo::ptr< genome > >(this);
 	individual_q_model->setQuery(individual_query);
 	{
@@ -65,7 +59,7 @@ DatabaseTab::DatabaseTab(evodb_session& dbs, WContainerWidget* parent):
 	}
 
 	WPanel* panel = new WPanel(this);
-	panel->setTitle("Evolution Periods");
+	panel->setTitle("Evolution Runs");
 
 	period_table = new WTableView();
 	period_table->setMargin(10, Top | Bottom);
@@ -124,11 +118,11 @@ DatabaseTab::DatabaseTab(evodb_session& dbs, WContainerWidget* parent):
 
 void DatabaseTab::on_period_sel_changed()
 {
-	dbo::Query< dbo::ptr< generation > > generation_query = db_session.find< generation >().where("gen_period_id = ?");
+	dbo::Query< dbo::ptr< generation > > generation_query = db_session.find< generation >().where("generation__evo_run_id = ?");
 	auto sel = period_table->selectedIndexes();
 	if(!sel.empty())
 	{
-		dbo::QueryModel< dbo::ptr< evo_period > >* period_mod = (dbo::QueryModel< dbo::ptr< evo_period > >*)period_table->model();
+		dbo::QueryModel< dbo::ptr< evo_run > >* period_mod = (dbo::QueryModel< dbo::ptr< evo_run > >*)period_table->model();
 		std::stringstream ss;
 		ss << period_mod->resultRow(sel.begin()->row()).id();
 		generation_query.bind(ss.str());
@@ -140,7 +134,7 @@ void DatabaseTab::on_period_sel_changed()
 
 void DatabaseTab::on_generation_sel_changed()
 {
-	dbo::Query< dbo::ptr< genome > > individual_query = db_session.find< genome >().where("geno_gen_id = ?");
+	dbo::Query< dbo::ptr< genome > > individual_query = db_session.find< genome >().where("genome__generation_id = ?");
 	auto sel = generation_table->selectedIndexes();
 	if(!sel.empty())
 	{
@@ -160,7 +154,7 @@ void DatabaseTab::on_individual_dbl_clicked()
 	auto sel = period_table->selectedIndexes();
 	if(!sel.empty())
 	{
-		dbo::QueryModel< dbo::ptr< evo_period > >* period_mod = (dbo::QueryModel< dbo::ptr< evo_period > >*)period_table->model();
+		dbo::QueryModel< dbo::ptr< evo_run > >* period_mod = (dbo::QueryModel< dbo::ptr< evo_run > >*)period_table->model();
 		std::stringstream ss;
 		ss << period_mod->resultRow(sel.begin()->row()).id();
 		generation_query.bind(ss.str());
@@ -171,9 +165,9 @@ void DatabaseTab::on_individual_dbl_clicked()
 	*/
 }
 
-void DatabaseTab::on_new_evo_period(dbo::ptr< evo_period > ep)
+void DatabaseTab::on_new_evo_period(dbo::ptr< evo_run > ep)
 {
-	dbo::QueryModel< dbo::ptr< evo_period > >* period_mod = (dbo::QueryModel< dbo::ptr< evo_period > >*)period_table->model();
+	dbo::QueryModel< dbo::ptr< evo_run > >* period_mod = (dbo::QueryModel< dbo::ptr< evo_run > >*)period_table->model();
 	period_mod->reload();
 	WApplication::instance()->triggerUpdate();
 }

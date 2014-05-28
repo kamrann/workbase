@@ -2,6 +2,7 @@
 
 #include "rtp_phys_system_drawer.h"
 #include "rtp_phys_system.h"
+#include "rtp_phys_scenario.h"
 #include "rtp_phys_agent_body.h"
 
 #include <Wt/WPainter>
@@ -35,21 +36,59 @@ namespace rtp_phys {
 
 		painter.save();
 
+		Wt::WPen pen(Wt::GlobalColor::lightGray);
+		painter.setPen(pen);
+
 		double const scale = avail_size / 25.0;
+
+		size_t const GridDim = 5;
+		double const GridSquareSize = avail_size / GridDim;
+
+		b2Vec2 grid_ref_pos = st.body->get_position();
+
+		double x_off = std::fmod(-grid_ref_pos.x * scale, GridSquareSize);
+		if(x_off < 0.0)
+		{
+			x_off += GridSquareSize;
+		}
+		double y_off = std::fmod(-grid_ref_pos.y * -scale, GridSquareSize);
+		if(y_off < 0.0)
+		{
+			y_off += GridSquareSize;
+		}
+
+		for(size_t i = 0; i < dev_width.toPixels() / GridSquareSize; ++i)
+		{
+			painter.drawLine(
+				x_off + i * GridSquareSize,
+				0.0,
+				x_off + i * GridSquareSize,
+				dev_height.toPixels()
+				);
+		}
+
+		for(size_t i = 0; i < dev_height.toPixels() / GridSquareSize; ++i)
+		{
+			painter.drawLine(
+				0.0,
+				y_off + i * GridSquareSize,
+				dev_width.toPixels(),
+				y_off + i * GridSquareSize
+				);
+		}
 
 		painter.translate(dev_width.toPixels() / 2, dev_height.toPixels() / 2);
 		painter.scale(scale, -scale);
 		painter.translate(-st.body->get_position().x, -st.body->get_position().y);
 
-		Wt::WPen pen = Wt::WPen(Wt::GlobalColor::black);
+		pen = Wt::WPen(Wt::GlobalColor::black);
 		painter.setPen(pen);
 		Wt::WBrush br(Wt::GlobalColor::white);
 		painter.setBrush(br);
 
 		painter.save();
 
-		// TODO: Not hard coded in
-		painter.drawLine(-100.0f, 0.0f, 100.0f, 0.0f);
+		m_sys.m_scenario->draw_fixed_objects(painter);
 
 		st.body->draw(painter);
 

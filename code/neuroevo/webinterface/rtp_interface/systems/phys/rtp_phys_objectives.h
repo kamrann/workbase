@@ -17,7 +17,10 @@ namespace rtp_phys
 		enum Type {
 			MaxFinalX,
 			MaxAverageY,
-			MaintainUprightStance,
+			MinFinalLinearSpeed,
+//			MaintainUprightStance,
+			MinAverageKE,
+			MaintainAltitude,
 
 			Count,
 		};

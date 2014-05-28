@@ -1,11 +1,13 @@
 
+#include "params.h"
+
 #include <Wt/WApplication>
 #include <Wt/WPushButton>
 #include <Wt/WContainerWidget>
-#include <Wt/WTabWidget>
-#include <Wt/WSpinBox>
-#include <Wt/WTextArea>
-#include <Wt/WGridLayout>
+#include <Wt/WTime>
+
+#include <Wt/Dbo/Dbo>
+#include <Wt/Dbo/backend/Sqlite3>
 
 #include <string>
 #include <sstream>
@@ -13,80 +15,62 @@
 
 using namespace Wt;
 using namespace std;
+namespace dbo = Wt::Dbo;
 
 
-class SyncIssueApp: public WApplication
+dbo::backend::Sqlite3 the_db("test.db");
+
+
+class TestApp: public WApplication
 {
 public:
-	SyncIssueApp(const WEnvironment& env): WApplication(env)
+	TestApp(const WEnvironment& env): WApplication(env)
 	{
-		WTabWidget* tab_widget = new WTabWidget(root());
+		Wt::WWidget* w = db_hierarchy_level< Animal >::create_widget(m_mgr);
+		root()->addWidget(w);
 
-		// NOTE: If this tab is added last, the issue goes away.
-		tab_widget->addTab(new WContainerWidget, "Empty Tab");
+		Wt::WPushButton* btn = new Wt::WPushButton("Add");
+		btn->clicked().connect(this, &TestApp::on_add);
+		root()->addWidget(btn);
 
-		WContainerWidget* issue_tab = new WContainerWidget();
+		session.setConnection(the_db);
+		db_hierarchy_level< Animal >::map_database_table(session);
+		db_hierarchy_level< House >::map_database_table(session);
+		db_hierarchy_level< Dog >::map_database_table(session);
+		db_hierarchy_level< Cat >::map_database_table(session);
+		db_hierarchy_level< DomesticCat >::map_database_table(session);
+		db_hierarchy_level< Tiger >::map_database_table(session);
 
-		// Just for feedback purposes
-		WTextArea* output = new WTextArea();
-		output->setInline(false);
-		output->setReadOnly(true);
-		output->resize(400, 300);
-		output->setText("First, check that the spin box is working as expected. Then click the button.\n");
+		try
+		{
+			dbo::Transaction t(session);
+			session.createTables();
+			t.commit();
 
-		// Spin box which will lose sync
-		WSpinBox* edit = new WSpinBox();
-		issue_tab->addWidget(edit);
-
-		// Handler for spin box change event
-		edit->changed().connect(std::bind([=](){
-
-			// Get the spin box value and output it to the text area
-			std::string text = edit->text().toUTF8();
-			std::stringstream output_text;
-			output_text << output->text().toUTF8() << "Spin changed (" << text << ")." << std::endl;
-			output->setText(output_text.str());
-		}));
-
-		// Button to trigger the issue
-		WPushButton* btn = new WPushButton("Click Me");
-		issue_tab->addWidget(btn);
-
-		// Add an empty container with a layout, which will be removed and deleted when the button is clicked
-		WContainerWidget* cont = new WContainerWidget();
-		// Without adding this layout, there is no issue!
-		cont->setLayout(new WGridLayout());
-		issue_tab->addWidget(cont);
-
-		// Handler for the button. This is what causes the problem (but is only seen after switching tabs).
-		btn->clicked().connect([=](WMouseEvent e){
-
-			std::stringstream output_text;
-			output_text << output->text().toUTF8() << "Button clicked, replacing empty container." << std::endl;
-			output_text << "Switch to the empty tab and back, then modify the spin box." << std::endl;
-			output->setText(output_text.str());
-
-			// Get the empty container with layout that we added above
-			WWidget* cont = issue_tab->widget(2);
-			// Remove and delete it
-			issue_tab->removeWidget(cont);
-			delete cont;
-
-			btn->disable();
-		});
-
-		// Add the output text area at the bottom
-		issue_tab->addWidget(output);
-
-		// NOTE: Without PreLoading, there is no issue.
-		tab_widget->addTab(issue_tab, "Issue Tab", WTabWidget::PreLoading);
+			std::cerr << "Created database" << std::endl;
+		}
+		catch(std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+			std::cerr << "Using existing database";
+		}
 	}
+
+	void on_add()
+	{
+		dbo::Transaction t(session);
+		db_hierarchy_level< Animal >::add_record_from_input(session, m_mgr);
+		t.commit();
+	}
+
+	prm::param_mgr m_mgr;
+	dbo::Session session;
 };
 
 
 WApplication* createApplication(const WEnvironment& env)
 {
-	return new SyncIssueApp(env);
+	return new TestApp(env);
 }
 
 int main(int argc, char* argv[])

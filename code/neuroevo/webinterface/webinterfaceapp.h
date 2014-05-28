@@ -3,7 +3,7 @@
 #ifndef __WEB_INTERFACE_APP_H
 #define __WEB_INTERFACE_APP_H
 
-#include "evo_db/evodb_session.h"
+#include "evo_db/evo_db.h"
 
 #include <Wt/WApplication>
 

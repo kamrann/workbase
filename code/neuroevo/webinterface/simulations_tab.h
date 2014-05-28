@@ -3,7 +3,8 @@
 #ifndef __SIMULATIONS_TAB_H
 #define __SIMULATIONS_TAB_H
 
-#include "rtp_interface/rtp_param_manager.h"
+//#include "rtp_interface/rtp_param_manager.h"
+#include "wt_param_widgets/param_manager.h"
 #include "rtp_interface/rtp_properties.h"
 
 #include <Wt/WContainerWidget>
@@ -21,7 +22,7 @@ class Wt::WTextArea;
 class Wt::WTableView;
 class WebInterfaceApplication;
 
-class evo_period;
+class evo_run;
 
 class i_param_widget;
 class rtp_simulation;
@@ -45,9 +46,13 @@ public:
 	SimulationsTab(WContainerWidget* parent = nullptr);
 
 private:
-	i_param_widget* system_params_widget;
+/*	i_param_widget* system_params_widget;
 	i_param_widget* evo_params_widget;
 	rtp_param_manager param_mgr;
+*/
+	prm::param_mgr param_mgr;
+	Wt::WWidget* params_wgt;
+
 	WPushButton* run_sim_btn;
 	WTextArea* txt_output;
 	WTableView* observations_table;
@@ -56,7 +61,7 @@ private:
 	boost::shared_ptr< boost::thread > sim_thread;
 
 private:
-	void evo_started_cb(Wt::Dbo::ptr< evo_period > ep);
+	void evo_started_cb(Wt::Dbo::ptr< evo_run > ep);
 	void generation_cb(std::vector< boost::shared_ptr< i_property_values const > > per_gen_prop_vals, std::string txt);
 	void completion_cb(std::string txt);
 

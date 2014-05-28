@@ -16,6 +16,9 @@
     <Filter Include="thrusters">
       <UniqueIdentifier>{45e3d193-e53b-4f98-bf16-2563cc790576}</UniqueIdentifier>
     </Filter>
+    <Filter Include="params">
+      <UniqueIdentifier>{74d297aa-57ae-4a61-8412-bb51e5509c6a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\code\common\util\dimensionality.h">
@@ -113,6 +116,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\code\common\util\fixed_or_random.h">
       <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\params\param.h">
+      <Filter>params</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\code\common\params\param_constraints.h">
+      <Filter>params</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

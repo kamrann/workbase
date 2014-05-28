@@ -18,7 +18,7 @@ namespace rtp_sat
 
 	public:
 		virtual void update(/*decision,*/ state_t const& st) = 0;
-		virtual boost::any record_observations(trial_data_t const& td) = 0;
+		virtual i_observer::observations_t record_observations(trial_data_t const& td) = 0;
 	};
 }
 

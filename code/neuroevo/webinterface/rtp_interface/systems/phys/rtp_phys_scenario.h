@@ -9,8 +9,14 @@
 #include "../../params/enum_par.h"
 #include "../../params/paramlist_par.h"
 
+#include <boost/random/uniform_real_distribution.hpp>
+
 
 struct rtp_named_param_list;
+
+namespace Wt {
+	class WPainter;
+}
 
 namespace rtp_phys
 {
@@ -18,7 +24,8 @@ namespace rtp_phys
 	{
 	public:
 		enum Type {
-			TestScenario,
+			GroundBased,
+			SpaceBased,
 
 			Count,
 		};
@@ -47,18 +54,23 @@ namespace rtp_phys
 		};
 
 		static rtp_param_type* params();
-		static rtp_named_param_list params(Type scen);
+//		static rtp_named_param_list params(Type scen);
 
 		static phys_scenario* create_instance(rtp_param param);
 
 	public:
-		virtual state_t generate_initial_state(rgen_t& rgen) const = 0;
+		virtual boost::any generate_initial_state(rgen_t& rgen) const = 0;
+		virtual void load_initial_state(boost::any const& data, phys_system::state& st) const = 0;
 		virtual scenario_data_t get_scenario_data() const;
 		virtual bool is_complete(state_t const& st);
 
-	protected:
-		// TODO: dimensionality
-//		fixed_or_random< double, boost::random::uniform_real_distribution< double >, rgen_t > m_initial_ang_vel;
+		// TODO: Ideally we want a scenario/system to have a collection of i_world_object interface pointers,
+		// which can draw themselves.
+		virtual void draw_fixed_objects(Wt::WPainter& painter) const {}
+		//
+
+	public:
+		int m_duration;
 	};
 
 }

@@ -21,6 +21,7 @@ namespace rtp_phys
 			MLP,
 
 			Count,
+			None = Count,
 		};
 
 		static std::string const Names[Type::Count];

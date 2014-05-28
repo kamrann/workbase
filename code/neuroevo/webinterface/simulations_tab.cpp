@@ -4,11 +4,7 @@
 #include "webinterfaceapp.h"
 #include "wt_system_widgets/properties_chart_widget.h"
 #include "generic_system_coordinator.h"
-#include "evo_db/system_sim_tbl.h"
-#include "evo_db/problem_domain_tbl.h"
-#include "evo_db/genetic_language_tbl.h"
-#include "evo_db/evo_period_tbl.h"
-#include "evo_db/generation_tbl.h"
+#include "evo_db/evo_db.h"
 
 #include "rtp_interface/rtp_sim.h"
 #include "rtp_interface/systems/rtp_system.h"
@@ -16,6 +12,15 @@
 #include "rtp_interface/params/paramlist_par.h"
 #include "rtp_interface/systems/nac/rtp_nac_scenario.h"
 #include "rtp_interface/systems/sat/rtp_sat_scenario.h"
+
+#include "evorun_params.h"
+#include "system_params.h"
+#include "phys_system_params.h"
+#include "phys_agent_params.h"
+#include "phys_spaceship_params.h"
+#include "phys_controller_params.h"
+#include "phys_mlp_controller_params.h"
+#include "genalg_params.h"
 
 #include "observer_data_models.h"
 
@@ -44,7 +49,7 @@ std::set< thruster_base::thruster_activation > opposing_thruster_activation_ofd:
 SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	WContainerWidget(parent)
 {
-	WPanel* sys_params_panel = new WPanel(this);
+/*	WPanel* sys_params_panel = new WPanel(this);
 	sys_params_panel->setTitle("System parameters");
 
 	rtp_param_type* spt = i_system::params(true);
@@ -58,6 +63,10 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	rtp_param_type* evo_pt = new rtp_staticparamlist_param_type(evo_param_list);
 	evo_params_widget = evo_pt->create_widget(&param_mgr);
 	sim_params_panel->setCentralWidget(evo_params_widget->get_wt_widget());
+*/
+
+	params_wgt = db_hierarchy_level< evorun_params_defn >::create_widget(param_mgr);
+	addWidget(params_wgt);
 
 	run_sim_btn = new WPushButton("Run Simulation", this);              // create a button
 	run_sim_btn->setFocus();
@@ -92,7 +101,7 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 void SimulationsTab::on_run_simulation()
 {
 	evo_chart->clear_content();
-
+	/*
 	rtp_param sys_param = system_params_widget->get_param();
 	rtp_param evo_param = evo_params_widget->get_param();
 	rtp_simulation* sim = new rtp_simulation(sys_param, evo_param);
@@ -102,7 +111,7 @@ void SimulationsTab::on_run_simulation()
 	boost::function< void() > thread_func = boost::bind< void >(boost::mem_fn(&SimulationsTab::run_simulation_threadmain), this, app, sim);
 	sim_thread.swap(boost::shared_ptr< boost::thread >(new boost::thread(thread_func)));
 	run_sim_btn->setEnabled(false);
-
+	*/
 #if 0
 	rtp_param sys_param = system_params_widget->get_param();
 
@@ -316,12 +325,14 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 
 	out << ("Initialising...") << std::endl;
 
-	// Add database entry to evo_period table
-	dbo::Transaction t(db_s);
-	dbo::ptr< evo_period > ep = db_s.add(new evo_period);
-	ep.modify()->initial_pop_size = sim->population_size;//params.pop_size;
+	// Add database entry to evo_run table
+	// Temp
+	dbo::ptr< evo_run > ep;
+/*	dbo::Transaction t(db_s);
+	dbo::ptr< evo_run > ep = db_s.add(new evo_run);
+//	ep.modify()->initial_pop_size = sim->population_size;//params.pop_size;
 	t.commit();
-
+*/
 	WServer::instance()->post(session_id, boost::bind(&SimulationsTab::evo_started_cb, this, ep));
 
 	sim->init();
@@ -363,17 +374,17 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 		vals->set_value("Diversity", diversity);
 		per_generation_prop_vals[gen_batch_index].reset(vals);
 
-		std::stringstream ss;
+/*		std::stringstream ss;
 		ss.precision(2);
 		std::fixed(ss);
 		ss << "Gen " << (e + 1) << ": Average Obj. = " << boost::any_cast<double>(average_obj);
 		ss << "; Highest = " << boost::any_cast<double>(highest_obj) << "." << std::endl;
 		out << ss.str();
-
+*/
 		// Add database entries
 		gen_data[gen_batch_index].index = sim->generation;
 		gen_data[gen_batch_index].genotype_diversity = 0;// sim.population_genotype_diversity();
-		gen_data[gen_batch_index].period = ep;
+		gen_data[gen_batch_index].run = ep;
 		++gen_batch_index;
 
 //		std::sort(sim.ga.population.begin(), sim.ga.population.end());
@@ -391,7 +402,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 			std::cout << "Batching new generation records..." << std::endl;
 #endif
 
-			dbo::Transaction t(db_s);
+/*			dbo::Transaction t(db_s);
 			for(size_t i = 0; i < GenerationBatchSize; ++i)
 			{
 				dbo::ptr< generation > gen_ptr = db_s.add(new generation(gen_data[i]));
@@ -403,7 +414,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 				}
 			}
 			t.commit();
-
+*/
 #ifndef _DEBUG
 			std::cout << "...committed." << std::endl;
 #endif
@@ -423,7 +434,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 		std::cout << "Batching new generation records..." << std::endl;
 #endif
 
-		dbo::Transaction t(db_s);
+/*		dbo::Transaction t(db_s);
 		for(size_t i = 0; i < gen_batch_index; ++i)
 		{
 			dbo::ptr< generation > gen_ptr = db_s.add(new generation(gen_data[i]));
@@ -435,7 +446,7 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 			}
 		}
 		t.commit();
-
+*/
 #ifndef _DEBUG
 		std::cout << "...committed." << std::endl;
 #endif
@@ -457,12 +468,11 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app, rtp
 	WServer::instance()->post(session_id, boost::bind(&SimulationsTab::completion_cb, this, out.str()));
 }
 
-void SimulationsTab::evo_started_cb(dbo::ptr< evo_period > ep)
+void SimulationsTab::evo_started_cb(dbo::ptr< evo_run > ep)
 {
 	WebInterfaceApplication* app = (WebInterfaceApplication*)WApplication::instance();
 
-	app->db_session.new_evo_period_signal().emit(ep);
-	//app->triggerUpdate();
+// TODO: enable		app->db_session.new_evo_period_signal().emit(ep);
 }
 
 void SimulationsTab::generation_cb(std::vector< boost::shared_ptr< i_property_values const > > per_gen_prop_vals, std::string txt)
@@ -481,7 +491,7 @@ void SimulationsTab::generation_cb(std::vector< boost::shared_ptr< i_property_va
 
 	WebInterfaceApplication* app = (WebInterfaceApplication*)WApplication::instance();
 
-	app->db_session.new_generations_signal().emit();
+// TODO: enable		app->db_session.new_generations_signal().emit();
 
 	app->triggerUpdate();
 }

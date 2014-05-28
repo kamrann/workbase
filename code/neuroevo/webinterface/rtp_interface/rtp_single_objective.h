@@ -18,7 +18,8 @@ public:
 public:
 	virtual eval_data_t initialize(size_t pop_size) const;
 	virtual void register_datapoint(population_observations_t const& observations, eval_data_t& edata) const;
-	virtual std::vector< boost::any > evaluate(eval_data_t const& edata) const;
+	virtual std::vector< boost::any > evaluate(eval_data_t const& edata, boost::optional< std::string >& analysis) const;
+//	virtual std::string get_analysis(eval_data_t const& edata) const;
 
 protected:
 	std::string m_obj_id;

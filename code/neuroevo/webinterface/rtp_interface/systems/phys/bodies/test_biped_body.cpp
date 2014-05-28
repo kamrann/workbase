@@ -1,16 +1,25 @@
 // test_biped_body.cpp
 
 #include "test_biped_body.h"
+#include "../../../params/paramlist_par.h"
 
 #include "Box2D/Box2D.h"
 
 
 namespace rtp_phys {
 
+	rtp_param_type* test_biped_body::spec::params()
+	{
+		rtp_named_param_list p = agent_body_spec::base_params();
+		// Add more here
+		return new rtp_staticparamlist_param_type(p);
+	}
+
 	test_biped_body::spec* test_biped_body::spec::create_instance(rtp_param param)
 	{
-		// TODO: Params
-		return new spec();
+		spec* s = new spec();
+		agent_body_spec::create_base_instance(param, s);
+		return s;
 	}
 
 	agent_body* test_biped_body::spec::create_body(b2World* world)
@@ -122,18 +131,15 @@ namespace rtp_phys {
 
 		jd.Initialize(upper2, lower2, b2Vec2(0.0f, initial_y - m_torso_len / 2 - m_pelvis_height / 2 - m_upper_len));
 		knee2 = (b2RevoluteJoint*)world->CreateJoint(&jd);
-	}
 
-	b2Vec2 test_biped_body::get_position()
-	{
-		return torso->GetWorldCenter();
+		m_bodies.push_back(torso);
+		m_bodies.push_back(pelvis);
+		m_bodies.push_back(upper1);
+		m_bodies.push_back(upper2);
+		m_bodies.push_back(lower1);
+		m_bodies.push_back(lower2);
 	}
-
-	float test_biped_body::get_orientation()
-	{
-		return torso->GetTransform().q.GetAngle();
-	}
-
+/*
 	void test_biped_body::draw(Wt::WPainter& painter)
 	{
 		Wt::WRectF rc_torso(
@@ -204,6 +210,7 @@ namespace rtp_phys {
 		painter.drawEllipse(rc_foot);
 		painter.restore();
 	}
+*/
 }
 
 

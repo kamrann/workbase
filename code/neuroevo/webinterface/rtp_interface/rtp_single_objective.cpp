@@ -2,6 +2,8 @@
 
 #include "rtp_single_objective.h"
 
+#include <sstream>
+
 
 rtp_single_objective::rtp_single_objective(std::string const& obj_id): m_obj_id(obj_id)
 {
@@ -10,7 +12,7 @@ rtp_single_objective::rtp_single_objective(std::string const& obj_id): m_obj_id(
 
 i_population_wide_observer::eval_data_t rtp_single_objective::initialize(size_t pop_size) const
 {
-	return eval_data_t(eval_data(pop_size);
+	return eval_data_t(eval_data(pop_size));
 }
 
 void rtp_single_objective::register_datapoint(population_observations_t const& observations, eval_data_t& edata) const
@@ -24,7 +26,7 @@ void rtp_single_objective::register_datapoint(population_observations_t const& o
 	++ed.num_datapoints;
 }
 
-std::vector< boost::any > rtp_single_objective::evaluate(eval_data_t const& edata) const
+std::vector< boost::any > rtp_single_objective::evaluate(eval_data_t const& edata, boost::optional< std::string >& analysis) const
 {
 	eval_data const& ed = boost::any_cast<eval_data const&>(edata);
 	size_t const pop_size = ed.sums.size();
@@ -34,8 +36,43 @@ std::vector< boost::any > rtp_single_objective::evaluate(eval_data_t const& edat
 	{
 		results[i] = ed.sums[i] / ed.num_datapoints;
 	}
+
+	if(analysis)
+	{
+		double sum = 0.0;
+		boost::optional< double > high;
+		for(size_t i = 0; i < pop_size; ++i)
+		{
+			double val = boost::any_cast<double>(results[i]);
+			sum += val;
+			if(!high || val > *high)
+			{
+				high = val;
+			}
+		}
+
+		std::stringstream ss;
+		std::fixed(ss);
+		ss.precision(2);
+		ss << "Average [" << (sum / pop_size) << "]";
+		ss << "; ";
+		ss << "Highest [" << *high << "]";
+		ss << std::endl;
+		analysis = ss.str();
+	}
+
 	return results;
 }
-
+/*
+std::string rtp_single_objective::get_analysis(eval_data_t const& edata) const
+{
+	std::stringstream ss;
+	std::fixed(ss);
+	ss.precision(2);
+	ss << "Average [";
+	ss << 
+	return ss.str();
+}
+*/
 
 

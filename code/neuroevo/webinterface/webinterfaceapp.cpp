@@ -1,7 +1,7 @@
 // webinterfaceapp.cpp
 
 #include "webinterfaceapp.h"
-#include "database_tab.h"
+//#include "database_tab.h"
 #include "simulations_tab.h"
 #include "system_test_tab.h"
 
@@ -23,7 +23,7 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 	styleSheet().addRule(".wb_numerical_input", "text-align: right;");
 
 	main_tabs = new WTabWidget(root());
-	main_tabs->addTab(new DatabaseTab(db_session), "Evo Database");// , Wt::WTabWidget::PreLoading);
+//	main_tabs->addTab(new DatabaseTab(db_session), "Evo Database");// , Wt::WTabWidget::PreLoading);
 	main_tabs->addTab(new SimulationsTab(), "Simulations");// , Wt::WTabWidget::PreLoading);
 	SystemTestTab* sys_tab = new SystemTestTab();
 	main_tabs->addTab(sys_tab, "System Test");// , Wt::WTabWidget::PreLoading);

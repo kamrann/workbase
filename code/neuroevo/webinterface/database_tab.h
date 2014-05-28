@@ -12,7 +12,7 @@ namespace dbo = Wt::Dbo;
 class Wt::WTableView;
 
 class evodb_session;
-class evo_period;
+class evo_run;
 class generation;
 
 class DatabaseTab: public WContainerWidget
@@ -31,7 +31,8 @@ public:
 	void on_period_sel_changed();
 	void on_generation_sel_changed();
 	void on_individual_dbl_clicked();
-	void on_new_evo_period(dbo::ptr< evo_period > ep);
+	void on_new_evo_period(dbo::ptr<  > ep);
+		//dbo::ptr< evo_run > ep);
 	void on_new_generations();
 };
 

@@ -9,12 +9,13 @@
 #include "../../rtp_pop_wide_observer.h"
 #include "../../params/paramlist_par.h"
 
+#include <Box2D/Box2D.h>
+
 #include <boost/shared_ptr.hpp>
+#include <boost/any.hpp>
 
 #include <set>
 
-
-class rtp_stored_property_values;
 
 class b2World;
 
@@ -58,16 +59,21 @@ namespace rtp_phys {
 			public agent_state	// For now, just a single agent system
 		{};
 
-		enum StateValue {
-			Time,
-			AgentPosX,
-			AgentPosY,
-			AgentAngle,
+		struct serializable_initial_state
+		{
+			b2Vec2 body_pos;
+			float body_angle;
+			b2Vec2 body_lin_vel;
+			float body_ang_vel;
+			boost::any scenario;
 
-			Count,
+			serializable_initial_state():
+				body_pos(0.0f, 0.0f),
+				body_angle(0.0f),
+				body_lin_vel(0.0f, 0.0f),
+				body_ang_vel(0.0f)
+			{}
 		};
-
-		static std::string const StateValueNames[StateValue::Count];
 
 		struct trial_data
 		{
@@ -117,8 +123,6 @@ namespace rtp_phys {
 		{
 			return m_state;
 		}
-
-		static void set_state_prop(rtp_stored_property_values* pv, StateValue sv, boost::any v);
 
 	private:
 		phys_scenario* m_scenario;

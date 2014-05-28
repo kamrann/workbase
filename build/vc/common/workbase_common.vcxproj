@@ -34,12 +34,14 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="..\eigen.props" />
     <Import Project="..\gles_angle.props" />
+    <Import Project="..\Wt_dbg.props" />
     <Import Project="..\workbase.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="..\eigen.props" />
     <Import Project="..\gles_angle.props" />
+    <Import Project="..\Wt_rls.props" />
     <Import Project="..\workbase.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -68,6 +70,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\code\common\params\param.h" />
+    <ClInclude Include="..\..\..\code\common\params\param_constraints.h" />
     <ClInclude Include="..\..\..\code\common\thrusters\ship_state.h" />
     <ClInclude Include="..\..\..\code\common\thrusters\thruster.h" />
     <ClInclude Include="..\..\..\code\common\thrusters\thruster_presets.h" />

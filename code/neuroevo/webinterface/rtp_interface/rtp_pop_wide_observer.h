@@ -7,6 +7,7 @@
 #include "params/enum_par.h"
 
 #include <boost/any.hpp>
+#include <boost/optional.hpp>
 
 #include <vector>
 
@@ -38,7 +39,8 @@ public:
 public:
 	virtual eval_data_t initialize(size_t pop_size) const = 0;
 	virtual void register_datapoint(population_observations_t const& observations, eval_data_t& edata) const = 0;
-	virtual std::vector< boost::any > evaluate(eval_data_t const& edata) const = 0;
+	virtual std::vector< boost::any > evaluate(eval_data_t const& edata, boost::optional< std::string >& analysis) const = 0;
+//	virtual std::string get_analysis(eval_data_t const& edata) const = 0;
 };
 
 

@@ -4,20 +4,20 @@
 #define __RTP_PHYS_TEST_BODY_H
 
 #include "../rtp_phys_agent_body_spec.h"
-#include "../rtp_phys_agent_body.h"
+#include "composite_rigid_body.h"
 
 
-class b2Body;
 class b2RevoluteJoint;
 
 namespace rtp_phys {
 
-	class test_body: public agent_body
+	class test_body: public composite_rigid_body
 	{
 	public:
 		class spec: public agent_body_spec
 		{
 		public:
+			static rtp_param_type* params();
 			static spec* create_instance(rtp_param param);
 
 		public:
@@ -32,10 +32,6 @@ namespace rtp_phys {
 
 	public:
 		test_body(spec const& spc, b2World* world);
-
-		virtual b2Vec2 get_position();
-		virtual float get_orientation();
-		virtual void draw(Wt::WPainter& painter);
 
 	public:
 		float m_rear_len;

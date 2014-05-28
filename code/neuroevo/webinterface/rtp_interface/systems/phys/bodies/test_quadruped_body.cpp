@@ -1,16 +1,25 @@
 // test_quadruped_body.cpp
 
 #include "test_quadruped_body.h"
+#include "../../../params/paramlist_par.h"
 
 #include "Box2D/Box2D.h"
 
 
 namespace rtp_phys {
 
+	rtp_param_type* test_quadruped_body::spec::params()
+	{
+		rtp_named_param_list p = agent_body_spec::base_params();
+		// Add more here
+		return new rtp_staticparamlist_param_type(p);
+	}
+
 	test_quadruped_body::spec* test_quadruped_body::spec::create_instance(rtp_param param)
 	{
-		// TODO: Params
-		return new spec();
+		spec* s = new spec();
+		agent_body_spec::create_base_instance(param, s);
+		return s;
 	}
 
 	agent_body* test_quadruped_body::spec::create_body(b2World* world)
@@ -115,18 +124,18 @@ namespace rtp_phys {
 
 		jd.Initialize(fore_upper2, fore_lower2, b2Vec2(m_torso_len / 2, initial_y - m_torso_width / 2 - m_upper_len));
 		fore_knee2 = (b2RevoluteJoint*)world->CreateJoint(&jd);
-	}
 
-	b2Vec2 test_quadruped_body::get_position()
-	{
-		return torso->GetWorldCenter();
+		m_bodies.push_back(torso);
+		m_bodies.push_back(rear_upper1);
+		m_bodies.push_back(rear_upper2);
+		m_bodies.push_back(rear_lower1);
+		m_bodies.push_back(rear_lower2);
+		m_bodies.push_back(fore_upper1);
+		m_bodies.push_back(fore_upper2);
+		m_bodies.push_back(fore_lower1);
+		m_bodies.push_back(fore_lower2);
 	}
-
-	float test_quadruped_body::get_orientation()
-	{
-		return torso->GetTransform().q.GetAngle();
-	}
-
+/*
 	void test_quadruped_body::draw(Wt::WPainter& painter)
 	{
 		Wt::WRectF rc_torso(
@@ -201,6 +210,7 @@ namespace rtp_phys {
 		painter.drawRect(rc_lower);
 		painter.restore();
 	}
+*/
 }
 
 

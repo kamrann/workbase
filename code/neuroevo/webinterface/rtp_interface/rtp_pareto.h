@@ -5,6 +5,8 @@
 
 #include "rtp_pop_wide_observer.h"
 
+#include "util/pareto.h"
+
 #include <string>
 #include <vector>
 
@@ -17,15 +19,15 @@ public:
 public:
 	virtual eval_data_t initialize(size_t pop_size) const;
 	virtual void register_datapoint(population_observations_t const& observations, eval_data_t& edata) const;
-	virtual std::vector< boost::any > evaluate(eval_data_t const& edata) const;
+	virtual std::vector< boost::any > evaluate(eval_data_t const& edata, boost::optional< std::string >& analysis) const;
+//	virtual std::string get_analysis(eval_data_t const& edata) const;
 
 protected:
 	std::vector< std::string > m_components;
 
-	struct eval_data
-	{
-
-	};
+//	typedef std::vector< double > obj_components;
+	typedef std::vector< pareto< double > > idv_datapoints;
+	typedef std::vector< idv_datapoints > eval_data;
 };
 
 

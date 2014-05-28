@@ -6,24 +6,30 @@
 #include "../../params/enum_par.h"
 
 //
-#include <Wt/WPainter>
+namespace Wt {
+	class WPainter;
+}
 //
 
-#include <Box2D/Box2D.h>
-
-#include <string>
-
+struct b2Vec2;
 
 namespace rtp_phys {
 
 	class agent_body
 	{
 	public:
-		virtual b2Vec2 get_position() = 0;
-		virtual float get_orientation() = 0;
+		virtual void translate(b2Vec2 const& vec) = 0;
+		virtual void rotate(float angle) = 0;
+		virtual void set_linear_velocity(b2Vec2 const& vel) = 0;
+		virtual void set_angular_velocity(float vel) = 0;
+
+		virtual b2Vec2 get_position() const = 0;
+		virtual b2Vec2 get_linear_velocity() const = 0;
+		//virtual float get_angular_velocity() const = 0;
+		virtual float get_kinetic_energy() const = 0;
 
 		// Temp, don't really want WPainter in the interface
-		virtual void draw(Wt::WPainter& painter) = 0;
+		virtual void draw(Wt::WPainter& painter) const = 0;
 	};
 
 }

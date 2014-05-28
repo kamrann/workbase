@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ga", "common\ga\ga.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "systems", "common\systems\systems.vcxproj", "{03CB50F6-DD56-4560-9D5A-2CE0E7DAB8F6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wt_param_widgets", "..\common\wt_param_widgets\wt_param_widgets.vcxproj", "{51B32241-2A77-4223-9D29-87CF3EE53997}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -119,6 +121,16 @@ Global
 		{03CB50F6-DD56-4560-9D5A-2CE0E7DAB8F6}.Release|Win32.ActiveCfg = Release|Win32
 		{03CB50F6-DD56-4560-9D5A-2CE0E7DAB8F6}.Release|Win32.Build.0 = Release|Win32
 		{03CB50F6-DD56-4560-9D5A-2CE0E7DAB8F6}.Release|x64.ActiveCfg = Release|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Debug|Win32.ActiveCfg = Debug|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Debug|Win32.Build.0 = Debug|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Debug|x64.ActiveCfg = Debug|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|Win32.ActiveCfg = Release|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|Win32.Build.0 = Release|Win32
+		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
