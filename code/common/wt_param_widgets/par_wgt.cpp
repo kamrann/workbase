@@ -9,6 +9,8 @@
 #include "enum_par_wgt.h"
 #include "vector_par_wgt.h"
 
+#include "container_par_wgt.h"
+
 #include <Wt/WText>
 #include <Wt/WContainerWidget>
 #include <Wt/WFormWidget>
@@ -53,6 +55,10 @@ namespace prm
 
 			case ParamType::Vector2:
 			pw = new vector_par_wgt();
+			break;
+
+			case ParamType::List:
+			pw = new container_par_wgt();
 			break;
 		}
 

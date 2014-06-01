@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\container_par_wgt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\boolean_par_wgt.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\container_par_wgt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

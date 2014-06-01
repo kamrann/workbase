@@ -21,9 +21,6 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\test_app\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\test_app\animal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\stdafx.h">
@@ -39,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\house.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\test_app\yaml_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

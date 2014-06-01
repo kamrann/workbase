@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\boolean_par_wgt.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\container_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\enum_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\integer_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\param_manager.cpp" />
@@ -93,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\boolean_par_wgt.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\container_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\enum_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\integer_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\param_manager.h" />
