@@ -10,13 +10,13 @@ namespace YAML {
 class yaml_spec_A
 {
 public:
-	YAML::Node get_param_schema();
+	YAML::Node get_param_schema(YAML::Node const& param_vals);
 };
 
 class yaml_spec_B
 {
 public:
-	YAML::Node get_param_schema();
+	YAML::Node get_param_schema(YAML::Node const& param_vals);
 };
 
 

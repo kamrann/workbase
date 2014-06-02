@@ -2,6 +2,7 @@
 
 #include "basic_spaceship.h"
 #include "../../../params/paramlist_par.h"
+#include "wt_param_widgets/pw_yaml.h"
 
 #include "thrusters/thruster_presets.h"
 
@@ -17,6 +18,15 @@ namespace rtp_phys {
 		rtp_named_param_list p = agent_body_spec::base_params();
 		// Add more here
 		return new rtp_staticparamlist_param_type(p);
+	}
+
+	YAML::Node basic_spaceship::spec::get_schema(YAML::Node const& param_vals)
+	{
+		prm::schema_builder sb;
+
+		sb.add_integer("Placeholder", 0);
+
+		return sb.get_schema();
 	}
 
 	basic_spaceship::spec* basic_spaceship::spec::create_instance(rtp_param param)

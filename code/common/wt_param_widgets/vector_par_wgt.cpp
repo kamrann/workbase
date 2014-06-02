@@ -13,12 +13,15 @@ namespace prm
 	class vector_par_wgt::impl: public Wt::WContainerWidget
 	{
 	public:
-		impl(vector2_par_constraints const& c)
+		impl(YAML::Node const& script)
 		{
 			m_x_box = new Wt::WDoubleSpinBox(this);
-			//m_x_box->setMinimum(c.min);
-			//m_x_box->setMaximum(c.max);
 			m_y_box = new Wt::WDoubleSpinBox(this);
+
+			if(auto def = script["default"])
+			{
+				set(def.as< vec2 >());
+			}
 		}
 
 		vec2 get_value() const
@@ -37,9 +40,9 @@ namespace prm
 		Wt::WDoubleSpinBox* m_y_box;
 	};
 
-	Wt::WWidget* vector_par_wgt::create_impl(pw_options const& opt)
+	Wt::WWidget* vector_par_wgt::create_impl(YAML::Node const& script)
 	{
-		m_impl = new impl(boost::get< vector2_par_constraints >(opt));
+		m_impl = new impl(script);
 		return m_impl;
 	}
 

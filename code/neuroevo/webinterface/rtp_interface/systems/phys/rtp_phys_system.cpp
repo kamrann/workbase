@@ -132,6 +132,23 @@ namespace rtp_phys {
 		return new param_type(evolvable);
 	}
 
+	YAML::Node phys_system::get_schema(YAML::Node const& param_vals, bool evolvable)
+	{
+		prm::schema_builder sb;
+
+		sb.add_nested_schema(
+			"Scenario",
+			phys_scenario::get_schema(param_vals["Scenario"])
+			);
+
+		sb.add_nested_schema(
+			"Spec",
+			agent_body_spec::get_schema(param_vals["Spec"])
+			);
+
+		return sb.get_schema();
+	}
+
 	std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > phys_system::create_instance(rtp_param param, bool evolvable)
 	{
 		std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > result;
@@ -166,6 +183,11 @@ namespace rtp_phys {
 			std::get< 0 >(result)->register_agent(agent);
 		}
 		return result;
+	}
+
+	std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > phys_system::create_instance(YAML::Node const& param, bool evolvable)
+	{
+		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >();
 	}
 
 

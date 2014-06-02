@@ -17,6 +17,45 @@ namespace rtp_phys {
 		"Space Based",
 	};
 
+}
+
+namespace YAML {
+	template <>
+	struct convert< rtp_phys::phys_scenario_base::Type >
+	{
+		static Node encode(rtp_phys::phys_scenario_base::Type const& rhs)
+		{
+			return Node(rtp_phys::phys_scenario_base::Names[rhs]);
+		}
+
+		static bool decode(Node const& node, rtp_phys::phys_scenario_base::Type& rhs)
+		{
+			if(!node.IsScalar())
+			{
+				return false;
+			}
+
+			auto it = mapping_.find(node.Scalar());
+			if(it == mapping_.end())
+			{
+				return false;
+			}
+
+			rhs = it->second;
+			return true;
+		}
+
+		static std::map< std::string, rtp_phys::phys_scenario_base::Type > const mapping_;
+	};
+
+	std::map< std::string, rtp_phys::phys_scenario_base::Type > const convert< rtp_phys::phys_scenario_base::Type >::mapping_ = {
+		{ "Ground Based", rtp_phys::phys_scenario_base::Type::GroundBased },
+		{ "Space Based", rtp_phys::phys_scenario_base::Type::SpaceBased },
+	};
+}
+
+namespace rtp_phys {
+
 	phys_scenario::enum_param_type::enum_param_type()
 	{
 		for(size_t i = 0; i < Type::Count; ++i)
@@ -65,6 +104,26 @@ namespace rtp_phys {
 		}
 	}
 */
+
+	YAML::Node phys_scenario::get_schema(YAML::Node const& param_vals)
+	{
+		prm::schema_builder sb;
+
+		sb.add_enum_selection(
+			"World Type",
+			{ begin(Names), end(Names) }
+			);
+
+		sb.add_real(
+			"Duration",
+			10.0,
+			0.0,
+			1000.0
+			);
+
+		return sb.get_schema();
+	}
+
 	phys_scenario* phys_scenario::create_instance(rtp_param param)
 	{
 		auto param_list = boost::any_cast<rtp_param_list>(param);
@@ -87,6 +146,29 @@ namespace rtp_phys {
 
 		scenario->m_duration = boost::any_cast<double>(param_list[1]);
 		
+		return scenario;
+	}
+
+	phys_scenario* phys_scenario::create_instance(YAML::Node const& param)
+	{
+		Type scenario_type = param["World Type"].as< Type >();
+		phys_scenario* scenario = nullptr;
+		switch(scenario_type)
+		{
+			case GroundBased:
+			scenario = new ground_based_scenario(rtp_param());
+			break;
+
+			case SpaceBased:
+			scenario = new space_based_scenario(rtp_param());
+			break;
+
+			default:
+			assert(false);
+		}
+
+		scenario->m_duration = param["Duration"].as< double >();
+
 		return scenario;
 	}
 

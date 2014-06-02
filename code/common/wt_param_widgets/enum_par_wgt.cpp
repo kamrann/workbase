@@ -12,21 +12,22 @@ namespace prm
 	class enum_par_wgt::impl: public Wt::WComboBox
 	{
 	public:
-		impl(enum_par_constraints const& c)
+		impl(YAML::Node const& script)
 		{
 			size_t idx = 0;
-			for(auto const& v : c.vals)
+			for(auto const& v : script["constraints"]["values"])
 			{
-				addItem(v.name);
-				model()->setData(idx, 0, v.val, Wt::UserRole);
+				// TODO: Separate label and value strings
+				addItem(v.as< std::string >());
+				model()->setData(idx, 0, v.as< std::string >(), Wt::UserRole);
 				++idx;
 			}
 		}
 	};
 
-	Wt::WWidget* enum_par_wgt::create_impl(pw_options const& opt)
+	Wt::WWidget* enum_par_wgt::create_impl(YAML::Node const& script)
 	{
-		m_impl = new impl(boost::get< enum_par_constraints >(opt));
+		m_impl = new impl(script);
 		return m_impl;
 	}
 

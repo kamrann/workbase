@@ -12,16 +12,31 @@ namespace prm
 	class realnum_par_wgt::impl: public Wt::WDoubleSpinBox
 	{
 	public:
-		impl(realnum_par_constraints const& c)
+		impl(YAML::Node const& script)
 		{
-			setMinimum(c.min);
-			setMaximum(c.max);
+			setMinimum(-std::numeric_limits< double >::max());
+			setMaximum(std::numeric_limits< double >::max());
+			if(auto c = script["constraints"])
+			{
+				if(auto min = c["min"])
+				{
+					setMinimum(min.as< double >());
+				}
+				if(auto max = c["max"])
+				{
+					setMaximum(max.as< double >());
+				}
+			}
+			if(auto def = script["default"])
+			{
+				setValue(def.as< double >());
+			}
 		}
 	};
 
-	Wt::WWidget* realnum_par_wgt::create_impl(pw_options const& opt)
+	Wt::WWidget* realnum_par_wgt::create_impl(YAML::Node const& script)
 	{
-		m_impl = new impl(boost::get< realnum_par_constraints >(opt));
+		m_impl = new impl(script);
 		return m_impl;
 	}
 

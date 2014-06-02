@@ -55,6 +55,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="..\..\eigen.props" />
+    <Import Project="..\..\yaml_cpp_dbg.props" />
     <Import Project="..\..\box2d_dbg.props" />
     <Import Project="..\..\Wt_dbg.props" />
     <Import Project="..\..\fann_dbg.props" />
@@ -70,6 +71,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="..\..\eigen.props" />
+    <Import Project="..\..\yaml_cpp_rls.props" />
     <Import Project="..\..\box2d_rls.props" />
     <Import Project="..\..\Wt_rls.props" />
     <Import Project="..\..\fann_rls.props" />

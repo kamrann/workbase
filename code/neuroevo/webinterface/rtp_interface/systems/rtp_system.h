@@ -12,6 +12,8 @@
 #include "../rtp_observer.h"
 //
 
+#include "wt_param_widgets/par_wgt.h"
+
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -31,6 +33,7 @@ enum SystemType {
 
 	NumSystems,
 	None = NumSystems,
+	Default = Physics2D,
 };
 
 class system_type_param_type: public rtp_enum_param_type
@@ -72,6 +75,9 @@ public:
 	static rtp_param_type* params(bool evolvable = false);
 	static rtp_param_type* params(SystemType sys, bool evolvable = false);
 	static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(rtp_param param, bool evolvable = false);
+
+	static YAML::Node get_schema(YAML::Node const& param_vals, bool evolvable);
+	static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(YAML::Node const& param, bool evolvable = false);
 
 public:
 	virtual boost::any generate_initial_state(rgen_t& rgen) const = 0;

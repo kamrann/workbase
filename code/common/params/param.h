@@ -25,6 +25,9 @@ namespace prm
 		Enumeration,
 		Vector2,
 //		Vector3,
+		
+		_LeafTypeEnd,
+		__Composite = _LeafTypeEnd - 1,
 
 		// Composite
 		List,	// A list of params
@@ -32,6 +35,11 @@ namespace prm
 		Count,
 		None = Count,
 	};
+
+	inline bool is_leaf_type(ParamType t)
+	{
+		return t < ParamType::_LeafTypeEnd;
+	}
 
 	struct enum_param_val
 	{

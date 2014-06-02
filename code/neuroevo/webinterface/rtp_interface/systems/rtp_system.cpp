@@ -21,6 +21,41 @@ const std::array< std::string, NumSystems > SystemNames = {
 };
 
 
+namespace YAML {
+	template <>
+	struct convert< SystemType >
+	{
+		static Node encode(SystemType const& rhs)
+		{
+			return Node(SystemNames[rhs]);
+		}
+
+		static bool decode(Node const& node, SystemType& rhs)
+		{
+			if(!node.IsScalar())
+			{
+				return false;
+			}
+
+			auto it = mapping_.find(node.Scalar());
+			if(it == mapping_.end())
+			{
+				return false;
+			}
+
+			rhs = it->second;
+			return true;
+		}
+
+		static std::map< std::string, SystemType > const mapping_;
+	};
+
+	std::map< std::string, SystemType > const convert< SystemType >::mapping_ = {
+		{ "Physics 2D", SystemType::Physics2D },
+	};
+}
+
+
 system_type_param_type::system_type_param_type()
 {
 	for(size_t i = 0; i < NumSystems; ++i)
@@ -85,6 +120,36 @@ rtp_param_type* i_system::params(SystemType sys, bool evolvable)
 	}
 }
 
+YAML::Node i_system::get_schema(YAML::Node const& param_vals, bool evolvable)
+{
+	prm::schema_builder sb;
+
+	sb.add_enum_selection(
+		"System Type",
+		{ begin(SystemNames), end(SystemNames) }
+		);
+	sb.on_update();
+
+	auto node = param_vals["System Type"];
+	auto enum_sel = node ? node.as< SystemType >() : SystemType::Default;
+	switch(enum_sel)
+	{
+		case SystemType::Physics2D:
+		{
+			sb.add_nested_schema(
+				"Physics 2D Params",
+				rtp_phys::phys_system::get_schema(param_vals["Physics 2D Params"], evolvable)
+				);
+		}
+		break;
+
+		default:
+		assert(false);
+	}
+
+	return sb.get_schema();
+}
+
 std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(rtp_param param, bool evolvable)
 {
 	auto param_list = boost::any_cast<rtp_param_list>(param);
@@ -103,5 +168,10 @@ std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_popul
 		default:
 		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >(nullptr, nullptr, nullptr, nullptr, nullptr);
 	}
+}
+
+std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(YAML::Node const& param, bool evolvable)
+{
+	return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >();
 }
 

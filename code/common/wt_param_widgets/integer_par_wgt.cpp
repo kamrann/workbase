@@ -12,16 +12,31 @@ namespace prm
 	class integer_par_wgt::impl: public Wt::WSpinBox
 	{
 	public:
-		impl(integer_par_constraints const& c)
+		impl(YAML::Node const& script)
 		{
-			setMinimum(c.min);
-			setMaximum(c.max);
+			setMinimum(std::numeric_limits< int >::min());
+			setMaximum(std::numeric_limits< int >::max());
+			if(auto c = script["constraints"])
+			{
+				if(auto min = c["min"])
+				{
+					setMinimum(min.as< int >());
+				}
+				if(auto max = c["max"])
+				{
+					setMaximum(max.as< int >());
+				}
+			}
+			if(auto def = script["default"])
+			{
+				setValue(def.as< int >());
+			}
 		}
 	};
 
-	Wt::WWidget* integer_par_wgt::create_impl(pw_options const& opt)
+	Wt::WWidget* integer_par_wgt::create_impl(YAML::Node const& script)
 	{
-		m_impl = new impl(boost::get< integer_par_constraints >(opt));
+		m_impl = new impl(script);// boost::get< integer_par_constraints >(opt));
 		return m_impl;
 	}
 

@@ -15,6 +15,10 @@
 
 class b2World;
 
+namespace YAML {
+	class Node;
+}
+
 namespace rtp_phys {
 
 	class agent_body;
@@ -30,6 +34,7 @@ namespace rtp_phys {
 
 			Count,
 			None = Count,
+			Default = TestCreature,
 		};
 
 		static std::string const Names[Type::Count];
@@ -45,6 +50,9 @@ namespace rtp_phys {
 
 		static rtp_param_type* params(Type type);
 		static agent_body_spec* create_instance(Type type, rtp_param param);
+
+		static YAML::Node get_schema(YAML::Node const& param_vals);
+		static agent_body_spec* create_instance(YAML::Node const& param);
 
 	protected:
 		agent_body_spec(Type t);

@@ -22,6 +22,8 @@ namespace rtp_phys {
 			static rtp_param_type* params();
 			static spec* create_instance(rtp_param param);
 
+			static YAML::Node get_schema(YAML::Node const& param_vals);
+
 		public:
 			virtual agent_body* create_body(b2World* world);
 

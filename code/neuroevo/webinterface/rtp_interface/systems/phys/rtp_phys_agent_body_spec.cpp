@@ -8,6 +8,8 @@
 #include "bodies/basic_spaceship.h"
 #include "../../params/fixed_or_random_par.h"
 
+#include "wt_param_widgets/pw_yaml.h"
+
 
 namespace rtp_phys {
 
@@ -17,6 +19,47 @@ namespace rtp_phys {
 		"Test Biped",
 		"Spaceship",
 	};
+
+}
+
+namespace YAML {
+	template <>
+	struct convert< rtp_phys::agent_body_spec::Type >
+	{
+		static Node encode(rtp_phys::agent_body_spec::Type const& rhs)
+		{
+			return Node(rtp_phys::agent_body_spec::Names[rhs]);
+		}
+
+		static bool decode(Node const& node, rtp_phys::agent_body_spec::Type& rhs)
+		{
+			if(!node.IsScalar())
+			{
+				return false;
+			}
+
+			auto it = mapping_.find(node.Scalar());
+			if(it == mapping_.end())
+			{
+				return false;
+			}
+
+			rhs = it->second;
+			return true;
+		}
+
+		static std::map< std::string, rtp_phys::agent_body_spec::Type > const mapping_;
+	};
+
+	std::map< std::string, rtp_phys::agent_body_spec::Type > const convert< rtp_phys::agent_body_spec::Type >::mapping_ = {
+		{ "Test Creature", rtp_phys::agent_body_spec::Type::TestCreature },
+		{ "Test Quadruped", rtp_phys::agent_body_spec::Type::TestQuadruped },
+		{ "Test Biped", rtp_phys::agent_body_spec::Type::TestBiped },
+		{ "Spaceship", rtp_phys::agent_body_spec::Type::Spaceship },
+	};
+}
+
+namespace rtp_phys {
 
 	agent_body_spec::enum_param_type::enum_param_type()
 	{
@@ -115,6 +158,63 @@ namespace rtp_phys {
 		}
 	}
 
+	YAML::Node agent_body_spec::get_schema(YAML::Node const& param_vals)
+	{
+		prm::schema_builder sb;
+
+		sb.add_enum_selection(
+			"Spec Type",
+			{ begin(Names), end(Names) }
+		);
+		sb.on_update();
+
+		auto node = param_vals["Spec Type"];
+		auto enum_sel = node ? node.as< Type >() : Type::Default;
+		switch(enum_sel)
+		{
+			case Type::TestCreature:
+			{
+				sb.add_nested_schema(
+					"Test Creature Params",
+					test_body::spec::get_schema(param_vals["Test Creature Params"])
+					);
+			}
+			break;
+
+			case Type::TestQuadruped:
+			{
+				sb.add_nested_schema(
+					"Test Quadruped Params",
+					test_quadruped_body::spec::get_schema(param_vals["Test Quadruped Params"])
+					);
+			}
+			break;
+
+			case Type::TestBiped:
+			{
+				sb.add_nested_schema(
+					"Test Biped Params",
+					test_biped_body::spec::get_schema(param_vals["Test Biped Params"])
+					);
+			}
+			break;
+
+			case Type::Spaceship:
+			{
+				sb.add_nested_schema(
+					"Spaceship Params",
+					basic_spaceship::spec::get_schema(param_vals["Spaceship Params"])
+					);
+			}
+			break;
+
+			default:
+			assert(false);
+		}
+
+		return sb.get_schema();
+	}
+
 	agent_body_spec* agent_body_spec::create_instance(Type type, rtp_param param)
 	{
 		switch(type)
@@ -131,6 +231,28 @@ namespace rtp_phys {
 			case Spaceship:
 			return basic_spaceship::spec::create_instance(param);
 
+			default:
+			return nullptr;
+		}
+	}
+
+	agent_body_spec* agent_body_spec::create_instance(YAML::Node const& param)
+	{
+		auto type = param["Spec"].as< Type >();
+		switch(type)
+		{
+/* TODO:			case TestCreature:
+			return test_body::spec::create_instance(param);
+
+			case TestQuadruped:
+			return test_quadruped_body::spec::create_instance(param);
+
+			case TestBiped:
+			return test_biped_body::spec::create_instance(param);
+
+			case Spaceship:
+			return basic_spaceship::spec::create_instance(param);
+*/
 			default:
 			return nullptr;
 		}

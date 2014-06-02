@@ -16,7 +16,7 @@ namespace prm
 		virtual void set_from_param(param const& p);
 
 	protected:
-		virtual Wt::WWidget* create_impl(pw_options const& opt);
+		virtual Wt::WWidget* create_impl(YAML::Node const& script);
 
 	protected:
 		class impl;

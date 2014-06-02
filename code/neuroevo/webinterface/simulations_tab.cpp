@@ -65,7 +65,8 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	sim_params_panel->setCentralWidget(evo_params_widget->get_wt_widget());
 */
 
-	params_wgt = db_hierarchy_level< evorun_params_defn >::create_widget(param_mgr);
+	params_wgt = //db_hierarchy_level< evorun_params_defn >::create_widget(param_mgr);
+		prm::param_wgt::create(std::bind(&i_system::get_schema, std::placeholders::_1, true));
 	addWidget(params_wgt);
 
 	run_sim_btn = new WPushButton("Run Simulation", this);              // create a button

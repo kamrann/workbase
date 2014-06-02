@@ -13,13 +13,14 @@ namespace prm
 	{
 	public:
 		virtual param get_param() const;
+		virtual YAML::Node get_yaml_param() const;
 		virtual void set_from_param(param const& p);
 
 		void add_child(param_wgt* w);
 		void clear_children(size_t from_index = 0);
 
 	protected:
-		virtual Wt::WWidget* create_impl(pw_options const& opt);
+		virtual Wt::WWidget* create_impl(YAML::Node const& script);
 
 	protected:
 		class impl;

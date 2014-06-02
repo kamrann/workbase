@@ -103,6 +103,9 @@ namespace rtp_phys {
 		static rtp_param_type* params(bool evolvable);
 		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(rtp_param param, bool evolvable);
 
+		static YAML::Node get_schema(YAML::Node const& param_vals, bool evolvable);
+		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(YAML::Node const& param, bool evolvable = false);
+
 	private:
 		phys_system(phys_scenario* scenario, agent_body_spec* spec);
 

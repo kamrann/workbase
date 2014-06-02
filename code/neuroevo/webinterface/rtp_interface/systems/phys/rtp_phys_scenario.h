@@ -28,6 +28,7 @@ namespace rtp_phys
 			SpaceBased,
 
 			Count,
+			Default = GroundBased,
 		};
 
 		static const std::string Names[Type::Count];
@@ -57,6 +58,9 @@ namespace rtp_phys
 //		static rtp_named_param_list params(Type scen);
 
 		static phys_scenario* create_instance(rtp_param param);
+
+		static YAML::Node get_schema(YAML::Node const& param_vals);
+		static phys_scenario* create_instance(YAML::Node const& param);
 
 	public:
 		virtual boost::any generate_initial_state(rgen_t& rgen) const = 0;
