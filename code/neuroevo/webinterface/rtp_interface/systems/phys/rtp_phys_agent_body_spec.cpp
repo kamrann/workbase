@@ -136,6 +136,30 @@ namespace rtp_phys {
 		s->m_initial_ang_vel = boost::any_cast<f_or_r_t>(param_list[5]);
 	}
 
+	// TODO: Temp solution
+	fixed_or_random< double, boost::random::uniform_real_distribution< double >, rgen_t > extract_fixed_or_random(prm::random const& val)
+	{
+		if(val.is_fixed)
+		{
+			return { boost::get< double >(val.range) };
+		}
+		else
+		{
+			auto r = boost::get< std::pair< double, double > >(val.range);
+			return { r.first, r.second };
+		}
+	}
+
+	void agent_body_spec::create_base_instance(YAML::Node const& param, agent_body_spec* s)
+	{
+		s->m_initial_pos_x = extract_fixed_or_random(prm::find_value(param, "Initial X Pos").as< prm::random >());
+		s->m_initial_pos_y = extract_fixed_or_random(prm::find_value(param, "Initial Y Pos").as< prm::random >());
+		s->m_initial_orientation = extract_fixed_or_random(prm::find_value(param, "Initial Orientation").as< prm::random >());
+		s->m_initial_linear_dir = extract_fixed_or_random(prm::find_value(param, "Initial Linear Motion Angle").as< prm::random >());
+		s->m_initial_linear_speed = extract_fixed_or_random(prm::find_value(param, "Initial Linear Speed").as< prm::random >());
+		s->m_initial_ang_vel = extract_fixed_or_random(prm::find_value(param, "Initial Angular Velocity").as< prm::random >());
+	}
+
 	rtp_param_type* agent_body_spec::params(Type type)
 	{
 		switch(type)
@@ -158,53 +182,44 @@ namespace rtp_phys {
 		}
 	}
 
+	namespace sb = prm::schema;
+
 	YAML::Node agent_body_spec::get_schema(YAML::Node const& param_vals)
 	{
-		prm::schema_builder sb;
+		auto schema = sb::list("Spec");
 
-		sb.add_enum_selection(
+		auto type = sb::enum_selection(
 			"Spec Type",
 			{ begin(Names), end(Names) }
 		);
-		sb.on_update();
+		sb::on_update(type);
+		sb::append(schema, type);
 
-		auto node = param_vals["Spec Type"];
-		auto enum_sel = node ? node.as< Type >() : Type::Default;
+		auto node = prm::find_value(param_vals, "Spec Type");
+		auto enum_sel = node.IsNull() ? Type::Default : node.as< Type >();
 		switch(enum_sel)
 		{
 			case Type::TestCreature:
 			{
-				sb.add_nested_schema(
-					"Test Creature Params",
-					test_body::spec::get_schema(param_vals["Test Creature Params"])
-					);
+				sb::append(schema, test_body::spec::get_schema(param_vals/*["Test Creature Params"]*/));
 			}
 			break;
 
 			case Type::TestQuadruped:
 			{
-				sb.add_nested_schema(
-					"Test Quadruped Params",
-					test_quadruped_body::spec::get_schema(param_vals["Test Quadruped Params"])
-					);
+				sb::append(schema, test_quadruped_body::spec::get_schema(param_vals/*["Test Quadruped Params"]*/));
 			}
 			break;
 
 			case Type::TestBiped:
 			{
-				sb.add_nested_schema(
-					"Test Biped Params",
-					test_biped_body::spec::get_schema(param_vals["Test Biped Params"])
-					);
+				sb::append(schema, test_biped_body::spec::get_schema(param_vals/*["Test Biped Params"]*/));
 			}
 			break;
 
 			case Type::Spaceship:
 			{
-				sb.add_nested_schema(
-					"Spaceship Params",
-					basic_spaceship::spec::get_schema(param_vals["Spaceship Params"])
-					);
+				sb::append(schema, basic_spaceship::spec::get_schema(param_vals/*["Spaceship Params"]*/));
 			}
 			break;
 
@@ -212,7 +227,20 @@ namespace rtp_phys {
 			assert(false);
 		}
 
-		return sb.get_schema();
+		auto init_x = sb::random("Initial X Pos", 0.0, boost::none, boost::none, -10.0, 10.0);
+		sb::append(schema, init_x);
+		auto init_y = sb::random("Initial Y Pos", 0.0, boost::none, boost::none, -10.0, 10.0);
+		sb::append(schema, init_y);
+		auto init_orientation = sb::random("Initial Orientation", 0.0, -180.0, 180.0);
+		sb::append(schema, init_orientation);
+		auto init_linear_angle = sb::random("Initial Linear Motion Angle", 0.0, 0.0, 360.0);
+		sb::append(schema, init_linear_angle);
+		auto init_linear_speed = sb::random("Initial Linear Speed", 0.0, 0.0, boost::none, 0.0, 10.0);
+		sb::append(schema, init_linear_speed);
+		auto init_ang_vel = sb::random("Initial Angular Velocity", 0.0, boost::none, boost::none, -90.0, 90.0);
+		sb::append(schema, init_ang_vel);
+
+		return schema;
 	}
 
 	agent_body_spec* agent_body_spec::create_instance(Type type, rtp_param param)
@@ -238,10 +266,10 @@ namespace rtp_phys {
 
 	agent_body_spec* agent_body_spec::create_instance(YAML::Node const& param)
 	{
-		auto type = param["Spec"].as< Type >();
+		auto type = prm::find_value(param, "Spec Type").as< Type >();
 		switch(type)
 		{
-/* TODO:			case TestCreature:
+			case TestCreature:
 			return test_body::spec::create_instance(param);
 
 			case TestQuadruped:
@@ -252,9 +280,28 @@ namespace rtp_phys {
 
 			case Spaceship:
 			return basic_spaceship::spec::create_instance(param);
-*/
+
 			default:
 			return nullptr;
+		}
+	}
+
+	std::vector< std::string > agent_body_spec::sensor_inputs(Type type)
+	{
+		switch(type)
+		{
+			case TestCreature:
+			return test_body::spec::sensor_inputs();
+			case TestQuadruped:
+			return test_quadruped_body::spec::sensor_inputs();
+			case TestBiped:
+			return test_biped_body::spec::sensor_inputs();
+			case Spaceship:
+			return basic_spaceship::spec::sensor_inputs();
+
+			default:
+			assert(false);
+			return{};
 		}
 	}
 

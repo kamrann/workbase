@@ -18,6 +18,7 @@ public:
 //		Roulette,
 
 		Count,
+		Default = Random,
 	};
 
 	static std::string const Names[Count];
@@ -30,6 +31,7 @@ public:
 
 public:
 	static i_procreation_selection* create_instance(rtp_param param, rgen_t& rgen);
+	static i_procreation_selection* create_instance(Type type, rgen_t& rgen);
 };
 
 

@@ -250,6 +250,11 @@ struct record_base
 			dbo::field(action, val[1], name + "_y");
 		}
 
+		inline void operator() (prm::random& val)
+		{
+			// TODO:
+		}
+
 		inline void operator() (std::vector< prm::param >& val)
 		{
 			// TODO: ??? dbo::field(action, val, name);

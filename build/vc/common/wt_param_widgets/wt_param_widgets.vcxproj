@@ -88,9 +88,9 @@
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\container_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\enum_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\integer_par_wgt.cpp" />
-    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\param_manager.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\pw_yaml.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\random_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\realnum_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\string_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.cpp" />
@@ -103,6 +103,7 @@
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\param_manager.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_yaml.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\random_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\realnum_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\string_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.h" />

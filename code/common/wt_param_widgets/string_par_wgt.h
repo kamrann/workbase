@@ -9,7 +9,7 @@
 namespace prm
 {
 	class string_par_wgt:
-		public param_wgt
+		public param_tree::param_wgt
 	{
 	public:
 		virtual param get_param() const;

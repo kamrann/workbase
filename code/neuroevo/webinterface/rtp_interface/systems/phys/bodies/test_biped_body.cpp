@@ -16,13 +16,13 @@ namespace rtp_phys {
 		return new rtp_staticparamlist_param_type(p);
 	}
 
+	namespace sb = prm::schema;
+
 	YAML::Node test_biped_body::spec::get_schema(YAML::Node const& param_vals)
 	{
-		prm::schema_builder sb;
-
-		sb.add_integer("Placeholder", 0);
-
-		return sb.get_schema();
+		auto schema = sb::list("Test Biped Params");
+		sb::append(schema, sb::integer("Placeholder", 0));
+		return schema;
 	}
 
 	test_biped_body::spec* test_biped_body::spec::create_instance(rtp_param param)
@@ -31,6 +31,14 @@ namespace rtp_phys {
 		agent_body_spec::create_base_instance(param, s);
 		return s;
 	}
+
+	test_biped_body::spec* test_biped_body::spec::create_instance(YAML::Node const& param)
+	{
+		spec* s = new spec();
+		agent_body_spec::create_base_instance(param, s);
+		return s;
+	}
+
 
 	agent_body* test_biped_body::spec::create_body(b2World* world)
 	{

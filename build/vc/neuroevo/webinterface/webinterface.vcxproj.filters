@@ -200,12 +200,6 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genome_tbl.h">
       <Filter>evo_db</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\problem_domain_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\system_sim_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\sim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -482,43 +476,10 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_run_tbl.h">
       <Filter>evo_db</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\sys_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\sys_type_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\nac_sys_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_sys_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\table_traits.h">
       <Filter>evo_db</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_db.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_agent_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_agent_type_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_controller_type_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_controller_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_mlp_controller_params_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\phys_mlp_inputs_type_tbl.h">
       <Filter>evo_db</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_params.h">

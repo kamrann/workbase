@@ -4,7 +4,7 @@
 #define __SIMULATIONS_TAB_H
 
 //#include "rtp_interface/rtp_param_manager.h"
-#include "wt_param_widgets/param_manager.h"
+//#include "wt_param_widgets/param_manager.h"
 #include "rtp_interface/rtp_properties.h"
 
 #include <Wt/WContainerWidget>
@@ -28,6 +28,10 @@ class i_param_widget;
 class rtp_simulation;
 class properties_chart_widget;
 
+namespace prm {
+	class param_tree;
+}
+
 
 class SimulationsTab: public WContainerWidget
 {
@@ -50,8 +54,9 @@ private:
 	i_param_widget* evo_params_widget;
 	rtp_param_manager param_mgr;
 */
-	prm::param_mgr param_mgr;
-	Wt::WWidget* params_wgt;
+	//prm::param_mgr param_mgr;
+	prm::param_tree* system_params_tree;
+	prm::param_tree* evo_params_tree;
 
 	WPushButton* run_sim_btn;
 	WTextArea* txt_output;

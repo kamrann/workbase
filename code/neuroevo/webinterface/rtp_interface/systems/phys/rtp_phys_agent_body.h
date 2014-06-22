@@ -5,6 +5,8 @@
 
 #include "../../params/enum_par.h"
 
+#include "../rtp_agent.h"
+
 //
 namespace Wt {
 	class WPainter;
@@ -17,6 +19,18 @@ namespace rtp_phys {
 
 	class agent_body
 	{
+	public:
+		static agent_sensor_list sensor_inputs()
+		{
+			return{
+				"Pos[x]",
+				"Pos[y]",
+				"LinVel[x]",
+				"LinVel[y]",
+				"KE",
+			};
+		}
+
 	public:
 		virtual void translate(b2Vec2 const& vec) = 0;
 		virtual void rotate(float angle) = 0;

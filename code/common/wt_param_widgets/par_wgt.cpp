@@ -8,37 +8,118 @@
 #include "string_par_wgt.h"
 #include "enum_par_wgt.h"
 #include "vector_par_wgt.h"
+#include "random_par_wgt.h"
 
 #include "container_par_wgt.h"
+
+#include "pw_yaml.h"
 
 #include <Wt/WText>
 #include <Wt/WContainerWidget>
 #include <Wt/WFormWidget>
+#include <Wt/WGroupBox>
+#include <Wt/WHBoxLayout>
 
 #include <boost/variant/static_visitor.hpp>
 
 
 namespace prm
 {
-/*	void param_wgt::initialize(pw_options const& opt, std::string const& label)
+	YAML::Node find_subschema(YAML::Node const& schema, std::string const& name)
 	{
-		Wt::WText* label_w = new Wt::WText(label);
-		m_base_impl = create_impl(opt);
-		Wt::WContainerWidget* cont = new Wt::WContainerWidget();
-		cont->addWidget(label_w);
-		cont->addWidget(m_base_impl);
-		setImplementation(cont);
+		assert(schema.IsMap());
+
+		if(schema["name"].as< std::string >() == name)
+		{
+			return schema;
+		}
+		else if(schema["type"].as< prm::ParamType >() == prm::ParamType::List)
+		{
+			for(auto const& e : schema["children"])
+			{
+				YAML::Node n = find_subschema(e, name);
+				if(!n.IsNull())
+				{
+					return n;
+				}
+			}
+		}
+
+		return YAML::Node();
 	}
-*/
-	void param_wgt::initialize(YAML::Node const& script)
+
+	param_tree::param_tree()
+	{}
+
+	param_tree* param_tree::create(schema_provider_fn schema_provider)
 	{
-		Wt::WText* label_w = new Wt::WText(script["name"].as< std::string >());
-		m_base_impl = create_impl(script);
-		Wt::WContainerWidget* cont = new Wt::WContainerWidget();
-		cont->addWidget(label_w);
-		cont->addWidget(m_base_impl);
-		setImplementation(cont);
-		m_id = script["name"].as< std::string >();	// TODO: separate id element in schema
+		auto default_schema = schema_provider(YAML::Node());
+
+		param_tree* tree = new param_tree();
+		param_wgt* root = param_wgt::create(default_schema, tree->m_schema_accessor);
+		tree->setImplementation(root);
+		tree->m_schema_accessor = [schema_provider, root](std::string const& subschema_name)
+		{
+			auto complete_schema = schema_provider(root->get_yaml_param());
+			return find_subschema(complete_schema, subschema_name);
+		};
+
+		return tree;
+	}
+
+	YAML::Node param_tree::get_yaml_param()
+	{
+		auto root = static_cast<param_wgt const*>(implementation());
+		return root->get_yaml_param();
+	}
+
+	void param_tree::set_from_yaml_param(YAML::Node const& vals)
+	{
+		auto root = static_cast<param_wgt*>(implementation());
+		return root->set_from_yaml_param(vals);
+	}
+
+
+	void param_tree::param_wgt::initialize(YAML::Node const& script)//, schema_accessor_fn& schema_accessor)
+	{
+		m_id = script["name"].as< std::string >();
+
+		m_base_impl = create_impl(script);// , schema_accessor);
+
+		auto has_border = false;
+		auto label = std::string{ "" };
+		auto visual = script["visual"];
+		if(visual)
+		{
+			has_border = visual["border"] && visual["border"].as< bool >();
+			if(auto& label_node = visual["label"])
+			{
+				label = label_node.as< std::string >();
+			}
+		}
+
+		if(has_border)
+		{
+			auto box = new Wt::WGroupBox(label);
+			box->addWidget(m_base_impl);
+			setImplementation(box);
+		}
+		else if(!label.empty())
+		{
+			auto container = new Wt::WContainerWidget();
+			auto layout = new Wt::WHBoxLayout();
+			layout->setContentsMargins(0, 0, 0, 0);
+			container->setLayout(layout);
+			Wt::WText* label_w = new Wt::WText(label);
+			layout->addWidget(label_w);// , 0, Wt::AlignLeft | Wt::AlignTop);
+			layout->addWidget(m_base_impl);// , 0, Wt::AlignLeft | Wt::AlignTop);
+			layout->addStretch(1);
+			setImplementation(container);
+		}
+		else
+		{
+			setImplementation(m_base_impl);
+		}
 	}
 /*
 	param_wgt* param_wgt::create(ParamType type, pw_options const& opt, std::string const& id, std::string const& label)
@@ -84,7 +165,7 @@ namespace prm
 		pw->initialize(opt, label);
 		return pw;
 	}
-*/
+
 	prm::par_constraints parse_constraints(YAML::Node const& constraints, prm::ParamType type)
 	{
 		assert(constraints.IsMap() || constraints.IsNull());
@@ -143,10 +224,9 @@ namespace prm
 			return prm::par_null_constraints();
 		}
 	}
-
-
+	*/
+#if 0
 	prm::param_wgt* create_widget_from_schema(
-//		std::string const& schema_name,	// This is the value of the 'name' attribute, for which the following schema node is the value of the 'children' attribute 
 		YAML::Node const& schema,
 		std::shared_ptr< std::function< YAML::Node(std::string) > > const& schema_accessor);
 
@@ -162,30 +242,20 @@ namespace prm
 		for(auto i = index; i < schema.size(); ++i)
 		{
 			auto e = schema[i];
-
 			assert(e.IsMap());
 
-			std::string name = e["name"].as< std::string >();
 			prm::ParamType type = e["type"].as< prm::ParamType >();
-			YAML::Node constraints;
-			if(e["constraints"])
-			{
-				constraints = e["constraints"];
-			}
-
 			if(type == prm::ParamType::List)
 			{
 				assert(e["children"]);
-				YAML::Node const& sub = e["children"];
-				assert(sub.IsSequence());
 
-				parent->add_child(create_widget_from_schema(//e["name"].Scalar(), sub,
+				parent->add_child(create_widget_from_schema(
 					e,
 					schema_accessor));
 			}
 			else
 			{
-				prm::param_wgt* w = prm::param_wgt::create(e);//type, parse_constraints(constraints, type), name /* todo: separate id */, name);
+				prm::param_wgt* w = prm::param_wgt::create(e);
 
 				if(e["update"] && e["update"].Scalar() == "default")
 				{
@@ -205,46 +275,15 @@ namespace prm
 	}
 
 	prm::param_wgt* create_widget_from_schema(
-//		std::string const& schema_name,	// This is the value of the 'name' attribute, for which the following schema node is the value of the 'children' attribute 
 		YAML::Node const& schema,
 		std::shared_ptr< std::function< YAML::Node(std::string) > > const& schema_accessor)
 	{
-		//assert(schema.IsSequence());
 		assert(schema.IsMap() && schema["type"] && schema["type"].as< prm::ParamType >() == prm::ParamType::List);
-
-		// TODO: Group box/label??
-/*		prm::container_par_wgt* wgt = (prm::container_par_wgt*)prm::param_wgt::create(prm::ParamType::List, prm::par_null_constraints(), schema_name);
-
-		create_widget_contents_from_schema(wgt, schema_name, schema, schema_accessor);
-*/
 
 		prm::container_par_wgt* wgt = (prm::container_par_wgt*)prm::param_wgt::create(schema);
 		create_widget_contents_from_schema(wgt, schema["name"].as< std::string >(), schema["children"], schema_accessor);
 
 		return wgt;
-	}
-
-
-	YAML::Node find_subschema(YAML::Node const& schema, std::string const& name)
-	{
-		for(auto const& e : schema)
-		{
-			if(e["type"].as< prm::ParamType >() != prm::ParamType::List)
-			{
-				continue;
-			}
-
-			if(e["name"].Scalar() == name)
-			{
-				return e["children"];
-			}
-			else if(YAML::Node n = find_subschema(e["children"], name))
-			{
-				return n;
-			}
-		}
-
-		return YAML::Node();
 	}
 
 	param_wgt* param_wgt::create(YAML::Node const& script)
@@ -293,7 +332,9 @@ namespace prm
 		pw->initialize(script);//opt, label);
 		return pw;
 	}
+#endif
 
+/*
 	param_wgt* param_wgt::create(schema_provider_fn schema_provider)
 	{
 		YAML::Node schema = schema_provider(YAML::Node());
@@ -309,7 +350,7 @@ namespace prm
 		hack["type"] = prm::ParamType::List;
 		hack["children"] = schema;
 
-		param_wgt* wgt = create_widget_from_schema(/*"root",*/ hack/*schema*/, schema_accessor);
+		param_wgt* wgt = create_widget_from_schema(hack, schema_accessor);
 
 		*schema_accessor = [wgt, schema_provider](std::string name)
 		{
@@ -320,9 +361,65 @@ namespace prm
 
 		return wgt;
 	}
+*/
 
+	param_tree::param_wgt* param_tree::param_wgt::create(YAML::Node const& schema, schema_accessor_fn& schema_accessor)
+	{
+		assert(schema.IsMap());
 
-	void param_wgt::connect_changed_handler(boost::function< void() > const& handler)
+//		YAML::Node schema = schema_provider(YAML::Node());
+
+//		auto schema_accessor = std::make_shared< std::function< YAML::Node(std::string) > >();
+
+		auto type = schema["type"].as< prm::ParamType >();
+
+		param_wgt* pw = nullptr;
+		switch(type)
+		{
+			case ParamType::Boolean:
+			pw = new boolean_par_wgt();
+			break;
+
+			case ParamType::Integer:
+			pw = new integer_par_wgt();
+			break;
+
+			case ParamType::RealNumber:
+			pw = new realnum_par_wgt();
+			break;
+
+			case ParamType::String:
+			pw = new string_par_wgt();
+			break;
+
+			case ParamType::Enumeration:
+			pw = new enum_par_wgt();
+			break;
+
+			case ParamType::Vector2:
+			pw = new vector_par_wgt();
+			break;
+
+			case ParamType::Random:
+			pw = new random_par_wgt();
+			break;
+
+			case ParamType::List:
+			pw = new container_par_wgt(schema_accessor);
+			break;
+		}
+
+		if(pw == nullptr)
+		{
+			return nullptr;
+		}
+
+		//pw->set_parent(?);
+		pw->initialize(schema);// , schema_accessor);
+		return pw;
+	}
+
+	void param_tree::param_wgt::connect_changed_handler(std::function< void() > const& handler)
 	{
 		Wt::WFormWidget* fw = dynamic_cast<Wt::WFormWidget*>(m_base_impl);
 		if(fw)
@@ -348,9 +445,19 @@ namespace prm
 		}
 	};
 
-	YAML::Node param_wgt::get_yaml_param() const
+	YAML::Node param_tree::param_wgt::get_yaml_param() const
 	{
 		return boost::apply_visitor(yaml_param_visitor(), get_param());
+	}
+
+	std::string param_tree::param_wgt::get_yaml_script() const
+	{
+		return YAML::Dump(get_yaml_param());
+	}
+
+	void param_tree::param_wgt::set_from_yaml_param(YAML::Node const& vals)
+	{
+		// TODO:
 	}
 }
 

@@ -1,6 +1,7 @@
 // realnum_par_wgt.cpp
 
 #include "realnum_par_wgt.h"
+#include "pw_yaml.h"
 
 #include <Wt/WDoubleSpinBox>
 
@@ -16,18 +17,18 @@ namespace prm
 		{
 			setMinimum(-std::numeric_limits< double >::max());
 			setMaximum(std::numeric_limits< double >::max());
-			if(auto c = script["constraints"])
+			if(auto& c = script["constraints"])
 			{
-				if(auto min = c["min"])
+				if(auto& min = c["min"])
 				{
 					setMinimum(min.as< double >());
 				}
-				if(auto max = c["max"])
+				if(auto& max = c["max"])
 				{
 					setMaximum(max.as< double >());
 				}
 			}
-			if(auto def = script["default"])
+			if(auto& def = script["default"])
 			{
 				setValue(def.as< double >());
 			}

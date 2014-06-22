@@ -1,6 +1,7 @@
 // boolean_par_wgt.cpp
 
 #include "boolean_par_wgt.h"
+#include "pw_yaml.h"
 
 #include <Wt/WCheckBox>
 
@@ -15,7 +16,7 @@ namespace prm
 	public:
 		impl(YAML::Node const& script)
 		{
-			if(auto def = script["default"])
+			if(auto& def = script["default"])
 			{
 				setChecked(def.as< bool >());
 			}

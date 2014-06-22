@@ -10,6 +10,8 @@
 #include "rtp_genome_mapping.h"
 #include "rtp_procreation_selection.h"
 
+#include "wt_param_widgets/pw_yaml.h"
+
 #include "ga/ga.h"
 #include "ga/fitness.h"
 #include "ga/roulette_procreation_selection.h"
@@ -25,6 +27,42 @@
 #include <chrono>
 
 
+namespace YAML {
+	template <>
+	struct convert< rtp_procreation_selection::Type >
+	{
+		static Node encode(rtp_procreation_selection::Type const& rhs)
+		{
+			return Node(rtp_procreation_selection::Names[rhs]);
+		}
+
+		static bool decode(Node const& node, rtp_procreation_selection::Type& rhs)
+		{
+			if(!node.IsScalar())
+			{
+				return false;
+			}
+
+			auto it = mapping_.find(node.Scalar());
+			if(it == mapping_.end())
+			{
+				return false;
+			}
+
+			rhs = it->second;
+			return true;
+		}
+
+		static std::map< std::string, rtp_procreation_selection::Type > const mapping_;
+	};
+
+	std::map< std::string, rtp_procreation_selection::Type > const convert< rtp_procreation_selection::Type >::mapping_ = {
+		{ "Random", rtp_procreation_selection::Type::Random },
+		{ "Equal", rtp_procreation_selection::Type::Equal},
+//		{ "Roulette", rtp_procreation_selection::Type::Roulette },
+	};
+}
+
 rtp_named_param_list rtp_simulation::evo_params()
 {
 	rtp_named_param_list p;
@@ -35,6 +73,23 @@ rtp_named_param_list rtp_simulation::evo_params()
 	p.push_back(rtp_named_param(new rtp_procreation_selection::enum_param_type(), "Procreation"));
 	return p;
 }
+
+namespace sb = prm::schema;
+
+YAML::Node rtp_simulation::get_evo_schema(YAML::Node const& param_vals)
+{
+	auto schema = sb::list("evo_params");
+	sb::label(schema, "Evolutionary Params");
+
+	sb::append(schema, sb::integer("Population Size", 10, 1));
+	sb::append(schema, sb::integer("Num Generations", 10, 1));
+	sb::append(schema, sb::integer("Trials/Generation", 1, 1));
+	sb::append(schema, sb::integer("Random Seed", 0, 0));
+	sb::append(schema, sb::enum_selection("Procreation", { begin(rtp_procreation_selection::Names), end(rtp_procreation_selection::Names) }));
+
+	return schema;
+}
+
 
 rtp_simulation::rtp_simulation(rtp_param sys_param, rtp_param evo_param)
 {
@@ -56,6 +111,27 @@ rtp_simulation::rtp_simulation(rtp_param sys_param, rtp_param evo_param)
 	}
 	
 	proc_sel = rtp_procreation_selection::create_instance(evo_parameters[4], rgen);
+}
+
+rtp_simulation::rtp_simulation(YAML::Node const& sys_param, YAML::Node const& evo_param)
+{
+	std::tie(system, gn_mapping, a_factory, obs, resultant_obj) = i_system::create_instance(sys_param, true);
+
+	population_size = prm::find_value(evo_param, "Population Size").as< int >();
+	total_generations = prm::find_value(evo_param, "Num Generations").as< int >();
+	trials_per_generation = prm::find_value(evo_param, "Trials/Generation").as< int >();
+	int seed = prm::find_value(evo_param, "Random Seed").as< int >();	// TODO: uint version of param?
+	if(seed == 0)
+	{
+		// For now, 0 represents random
+		base_seed = static_cast<uint32_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff);
+	}
+	else
+	{
+		base_seed = seed;
+	}
+
+	proc_sel = rtp_procreation_selection::create_instance(prm::find_value(evo_param, "Procreation").as< rtp_procreation_selection::Type >(), rgen);
 }
 
 /*

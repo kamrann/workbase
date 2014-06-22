@@ -52,7 +52,10 @@ namespace rtp_phys {
 		static agent_body_spec* create_instance(Type type, rtp_param param);
 
 		static YAML::Node get_schema(YAML::Node const& param_vals);
+		static void create_base_instance(YAML::Node const& param, agent_body_spec* s);
 		static agent_body_spec* create_instance(YAML::Node const& param);
+
+		static std::vector< std::string > sensor_inputs(Type type);
 
 	protected:
 		agent_body_spec(Type t);

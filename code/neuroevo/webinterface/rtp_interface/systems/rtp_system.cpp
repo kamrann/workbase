@@ -10,6 +10,8 @@
 //#include "sat/rtp_sat_system.h"
 #include "phys/rtp_phys_system.h"
 
+#include "wt_param_widgets/pw_yaml.h"
+
 #include <Wt/WComboBox>
 #include <Wt/WContainerWidget>
 
@@ -120,26 +122,24 @@ rtp_param_type* i_system::params(SystemType sys, bool evolvable)
 	}
 }
 
+namespace sb = prm::schema;
+
 YAML::Node i_system::get_schema(YAML::Node const& param_vals, bool evolvable)
 {
-	prm::schema_builder sb;
+	auto schema = sb::list("sys_params");
+	sb::label(schema, "System Params");
 
-	sb.add_enum_selection(
-		"System Type",
-		{ begin(SystemNames), end(SystemNames) }
-		);
-	sb.on_update();
+	auto type = sb::enum_selection("System Type", { begin(SystemNames), end(SystemNames) });
+	sb::on_update(type);
+	sb::append(schema, type);
 
-	auto node = param_vals["System Type"];
-	auto enum_sel = node ? node.as< SystemType >() : SystemType::Default;
+	auto node = prm::find_value(param_vals, "System Type");
+	auto enum_sel = node.IsNull() ? SystemType::Default : node.as< SystemType >();
 	switch(enum_sel)
 	{
 		case SystemType::Physics2D:
 		{
-			sb.add_nested_schema(
-				"Physics 2D Params",
-				rtp_phys::phys_system::get_schema(param_vals["Physics 2D Params"], evolvable)
-				);
+			sb::append(schema, rtp_phys::phys_system::get_schema(param_vals, evolvable));
 		}
 		break;
 
@@ -147,7 +147,7 @@ YAML::Node i_system::get_schema(YAML::Node const& param_vals, bool evolvable)
 		assert(false);
 	}
 
-	return sb.get_schema();
+	return schema;
 }
 
 std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(rtp_param param, bool evolvable)
@@ -172,6 +172,20 @@ std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_popul
 
 std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(YAML::Node const& param, bool evolvable)
 {
-	return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >();
+	SystemType type = prm::find_value(param, "System Type").as< SystemType >();
+	switch(type)
+	{
+		/*		case NoughtsAndCrosses:
+		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
+
+		case ShipAndThrusters2D:
+		return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
+		*/
+		case Physics2D:
+		return rtp_phys::phys_system::create_instance(param, evolvable);
+
+		default:
+		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >(nullptr, nullptr, nullptr, nullptr, nullptr);
+	}
 }
 

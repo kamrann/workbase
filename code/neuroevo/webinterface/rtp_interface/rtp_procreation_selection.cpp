@@ -41,5 +41,23 @@ i_procreation_selection* rtp_procreation_selection::create_instance(rtp_param pa
 	}
 }
 
+i_procreation_selection* rtp_procreation_selection::create_instance(Type type, rgen_t& rgen)
+{
+	switch(type)
+	{
+		case Random:
+		return new proc_sel_wrapper< random_procreation_selection< rgen_t > >(rgen);
+
+		case Equal:
+		return new proc_sel_wrapper< equal_procreation_selection< rgen_t > >(rgen);
+
+		//		case Roulette:
+		//		return new proc_sel_wrapper< roulette_procreation_selection< rgen_t > >(rgen);
+
+		default:
+		return nullptr;
+	}
+}
+
 
 

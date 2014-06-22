@@ -8,6 +8,7 @@ std::string const i_population_wide_observer::Names[] = {
 	"Pareto Multiple Objective",
 };
 
+
 i_population_wide_observer::enum_param_type::enum_param_type()
 {
 	for(size_t i = 0; i < Type::Count; ++i)

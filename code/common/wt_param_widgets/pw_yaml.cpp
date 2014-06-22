@@ -13,6 +13,7 @@ namespace YAML {
 		"enum",
 		"vector2",
 		//"vector3",
+		"random",
 		"container",
 	};
 
@@ -24,129 +25,231 @@ namespace YAML {
 		{ "enum", prm::ParamType::Enumeration },
 		{ "vector2", prm::ParamType::Vector2 },
 		//{ "vector3", prm::ParamType::Vector3 },
+		{ "random", prm::ParamType::Random },
 		{ "container", prm::ParamType::List },
+	};
+
+
+	std::string const convert< prm::container_par_wgt::Layout >::names_[prm::container_par_wgt::Layout::Count] = {
+		"vertical",
+		"horizontal",
+	};
+
+	std::map< std::string, prm::container_par_wgt::Layout > const convert< prm::container_par_wgt::Layout >::mapping_ = {
+		{ "vertical", prm::container_par_wgt::Layout::Vertical },
+		{ "horizontal", prm::container_par_wgt::Layout::Horizontal },
+		{ "vert", prm::container_par_wgt::Layout::Vertical },
+		{ "horiz", prm::container_par_wgt::Layout::Horizontal },
+		{ "v", prm::container_par_wgt::Layout::Vertical },
+		{ "h", prm::container_par_wgt::Layout::Horizontal },
 	};
 
 }
 
 namespace prm {
+	namespace schema {
 
-	void schema_builder::push(YAML::Node const& n)
-	{
-		m_schema.push_back(n);
-	}
-
-	void schema_builder::reset()
-	{
-		m_schema = YAML::Node();
-	}
-
-	void schema_builder::add_boolean(std::string const& name, bool default_val)
-	{
-		YAML::Node n;
-		n["name"] = name;
-		n["type"] = prm::ParamType::Boolean;
-		n["default"] = default_val;
-		push(n);
-	}
-	
-	void schema_builder::add_integer(
-		std::string const& name,
-		int default_val,
-		boost::optional< int > min_val,
-		boost::optional< int > max_val)
-	{
-		YAML::Node n;
-		n["name"] = name;
-		n["type"] = prm::ParamType::Integer;
-		YAML::Node constraints;
-		if(min_val)
+		schema_builder boolean(std::string const& name, bool default_val)
 		{
-			constraints["min"] = *min_val;
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::Boolean;
+			n["default"] = default_val;
+			label(n, name);
+			return n;
 		}
-		if(max_val)
+
+		schema_builder integer(
+			std::string const& name,
+			int default_val,
+			boost::optional< int > min_val,
+			boost::optional< int > max_val)
 		{
-			constraints["max"] = *max_val;
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::Integer;
+			YAML::Node constraints;
+			if(min_val)
+			{
+				constraints["min"] = *min_val;
+			}
+			if(max_val)
+			{
+				constraints["max"] = *max_val;
+			}
+			if(constraints)
+			{
+				n["constraints"] = constraints;
+			}
+			n["default"] = default_val;
+			label(n, name);
+			return n;
 		}
-		if(constraints)
+
+		schema_builder real(
+			std::string const& name,
+			double default_val,
+			boost::optional< double > min_val,
+			boost::optional< double > max_val)
 		{
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::RealNumber;
+			YAML::Node constraints;
+			if(min_val)
+			{
+				constraints["min"] = *min_val;
+			}
+			if(max_val)
+			{
+				constraints["max"] = *max_val;
+			}
+			if(constraints)
+			{
+				n["constraints"] = constraints;
+			}
+			n["default"] = default_val;
+			label(n, name);
+			return n;
+		}
+
+		schema_builder string(std::string const& name, std::string const& default_val)
+		{
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::RealNumber;
+			n["default"] = default_val;
+			label(n, name);
+			return n;
+		}
+
+		schema_builder enum_selection(std::string const& name, std::vector< std::string > const& values)
+		{
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::Enumeration;
+			YAML::Node constraints;
+			for(auto val : values)
+			{
+				constraints["values"].push_back(val);
+			}
 			n["constraints"] = constraints;
+			label(n, name);
+			return n;
 		}
-		n["default"] = default_val;
-		push(n);
-	}
 
-	void schema_builder::add_real(
-		std::string const& name,
-		double default_val,
-		boost::optional< double > min_val,
-		boost::optional< double > max_val)
-	{
-		YAML::Node n;
-		n["name"] = name;
-		n["type"] = prm::ParamType::RealNumber;
-		YAML::Node constraints;
-		if(min_val)
+		schema_builder random(std::string const& name, double default_val, boost::optional< double > min_val, boost::optional< double > max_val, boost::optional< double > default_min, boost::optional< double > default_max)
 		{
-			constraints["min"] = *min_val;
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::Random;
+			YAML::Node constraints;
+			if(min_val)
+			{
+				constraints["min"] = *min_val;
+			}
+			if(max_val)
+			{
+				constraints["max"] = *max_val;
+			}
+			if(constraints)
+			{
+				n["constraints"] = constraints;
+			}
+			n["default"] = default_val;
+			if(default_min)
+			{
+				n["default_min"] = *default_min;
+			}
+			if(default_max)
+			{
+				n["default_max"] = *default_max;
+			}
+			label(n, name);
+			return n;
 		}
-		if(max_val)
+
+		schema_builder list(std::string const& name)
 		{
-			constraints["max"] = *max_val;
+			YAML::Node n;
+			n["name"] = name;
+			n["type"] = prm::ParamType::List;
+			border(n);
+			return n;
 		}
-		if(constraints)
+
+		void append(schema_builder& schema, schema_builder const& child)
 		{
-			n["constraints"] = constraints;
+			assert(schema["type"].as< ParamType >() == ParamType::List);
+			schema["children"].push_back(child);
 		}
-		n["default"] = default_val;
-		push(n);
-	}
 
-	void schema_builder::add_string(std::string const& name, std::string const& default_val)
-	{
-		YAML::Node n;
-		n["name"] = name;
-		n["type"] = prm::ParamType::RealNumber;
-		n["default"] = default_val;
-		push(n);
-	}
-
-	void schema_builder::add_enum_selection(std::string const& name, std::vector< std::string > const& values)
-	{
-		YAML::Node n;
-		n["name"] = name;
-		n["type"] = prm::ParamType::Enumeration;
-		YAML::Node constraints;
-		for(auto val : values)
+		void layout_vertical(schema_builder& schema)
 		{
-			constraints["values"].push_back(val);
+			assert(schema["type"].as< ParamType >() == ParamType::List);
+			schema["visual"]["layout"] = container_par_wgt::Layout::Vertical;
 		}
-		n["constraints"] = constraints;
-		push(n);
+
+		void layout_horizontal(schema_builder& schema)
+		{
+			assert(schema["type"].as< ParamType >() == ParamType::List);
+			schema["visual"]["layout"] = container_par_wgt::Layout::Horizontal;
+		}
+
+		void label(schema_builder& sb, std::string const& text)
+		{
+			sb["visual"]["label"] = text;
+		}
+
+		void unlabel(schema_builder& sb)
+		{
+			sb["visual"].remove("label");
+		}
+
+		void border(schema_builder& sb, boost::optional< std::string > label_text)
+		{
+			sb["visual"]["border"] = true;
+			if(label_text)
+			{
+				label(sb, *label_text);
+			}
+		}
+
+		void unborder(schema_builder& sb)
+		{
+			sb["visual"].remove("border");
+		}
+
+		void on_update(schema_builder& sb)
+		{
+			sb["update"] = "default";	// TODO:
+		}
+
 	}
 
-	void schema_builder::add_nested_schema(std::string const& name, YAML::Node const& child)
-	{
-		YAML::Node n;
-		n["name"] = name;
-		n["type"] = prm::ParamType::List;
-		n["children"] = child;
-		push(n);
-	}
 
-	void schema_builder::on_update()
+	YAML::Node find_value(YAML::Node const& node, std::string const& name)
 	{
-		assert(m_schema.IsSequence());
-		auto& node = m_schema[m_schema.size() - 1];
-		node["update"] = "default";	// TODO:
-	}
+		if(node.IsMap())
+		{
+			if(node[name])
+			{
+				return node[name];
+			}
+			for(auto entry : node)
+			{
+				auto val_node = entry.second;
+				auto result = find_value(val_node, name);
+				if(!result.IsNull())
+				{
+					return result;
+				}
+			}
+		}
 
-	YAML::Node schema_builder::get_schema() const
-	{
-		return m_schema;
+		return YAML::Node();
 	}
 
 }
-
 
 

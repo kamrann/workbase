@@ -13,6 +13,17 @@ namespace rtp_phys {
 	class simple_rigid_body: public agent_body
 	{
 	public:
+		static agent_sensor_list sensor_inputs()
+		{
+			auto inputs = agent_body::sensor_inputs();
+			inputs.insert(begin(inputs), {
+				"Orientation",
+				"AngVel",
+			});
+			return inputs;
+		}
+
+	public:
 		virtual void translate(b2Vec2 const& vec);
 		virtual void rotate(float angle);
 		virtual void set_linear_velocity(b2Vec2 const& linvel);

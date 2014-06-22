@@ -1,6 +1,7 @@
 // integer_par_wgt.cpp
 
 #include "integer_par_wgt.h"
+#include "pw_yaml.h"
 
 #include <Wt/WSpinBox>
 
@@ -16,18 +17,18 @@ namespace prm
 		{
 			setMinimum(std::numeric_limits< int >::min());
 			setMaximum(std::numeric_limits< int >::max());
-			if(auto c = script["constraints"])
+			if(auto& c = script["constraints"])
 			{
-				if(auto min = c["min"])
+				if(auto& min = c["min"])
 				{
 					setMinimum(min.as< int >());
 				}
-				if(auto max = c["max"])
+				if(auto& max = c["max"])
 				{
 					setMaximum(max.as< int >());
 				}
 			}
-			if(auto def = script["default"])
+			if(auto& def = script["default"])
 			{
 				setValue(def.as< int >());
 			}

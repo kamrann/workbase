@@ -1,9 +1,10 @@
 // vector_par_wgt.cpp
 
 #include "vector_par_wgt.h"
+#include "pw_yaml.h"
 
 #include <Wt/WContainerWidget>
-#include <Wt/WDoubleSpinBox>//WLineEdit>
+#include <Wt/WDoubleSpinBox>
 
 #include <boost/variant/get.hpp>
 
@@ -18,7 +19,7 @@ namespace prm
 			m_x_box = new Wt::WDoubleSpinBox(this);
 			m_y_box = new Wt::WDoubleSpinBox(this);
 
-			if(auto def = script["default"])
+			if(auto& def = script["default"])
 			{
 				set(def.as< vec2 >());
 			}

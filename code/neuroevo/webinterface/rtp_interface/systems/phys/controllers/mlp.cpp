@@ -9,6 +9,8 @@
 #include "../../../params/integer_par.h"
 #include "../../../rtp_fixednn_genome_mapping.h"
 
+#include "wt_param_widgets/pw_yaml.h"
+
 #include <Wt/WComboBox>
 
 #include <Box2D/Box2D.h>
@@ -22,8 +24,47 @@ namespace rtp_phys
 		"Test Biped",
 		"Spaceship",
 	};
+}
 
-	
+namespace YAML {
+	template <>
+	struct convert< rtp_phys::mlp_controller::Type >
+	{
+		static Node encode(rtp_phys::mlp_controller::Type const& rhs)
+		{
+			return Node(rtp_phys::mlp_controller::Names[rhs]);
+		}
+
+		static bool decode(Node const& node, rtp_phys::mlp_controller::Type& rhs)
+		{
+			if(!node.IsScalar())
+			{
+				return false;
+			}
+
+			auto it = mapping_.find(node.Scalar());
+			if(it == mapping_.end())
+			{
+				return false;
+			}
+
+			rhs = it->second;
+			return true;
+		}
+
+		static std::map< std::string, rtp_phys::mlp_controller::Type > const mapping_;
+	};
+
+	std::map< std::string, rtp_phys::mlp_controller::Type > const convert< rtp_phys::mlp_controller::Type >::mapping_ = {
+		{ "Test Controller", rtp_phys::mlp_controller::Type::TestType },
+		{ "Test Quadruped", rtp_phys::mlp_controller::Type::TestQuadruped },
+		{ "Test Biped", rtp_phys::mlp_controller::Type::TestBiped },
+		{ "Spaceship", rtp_phys::mlp_controller::Type::Spaceship },
+	};
+}
+
+namespace rtp_phys {
+
 	mlp_controller::enum_param_type::enum_param_type()
 	{
 		for(size_t i = 0; i < Type::Count; ++i)
@@ -51,6 +92,21 @@ namespace rtp_phys
 			default:
 			return rtp_named_param();
 		}
+	}
+
+	namespace sb = prm::schema;
+
+	YAML::Node mlp_controller::get_schema(YAML::Node const& param_vals)
+	{
+		auto schema = sb::list("mlp_controller");
+
+		auto type = sb::enum_selection("Inputs", { begin(Names), end(Names) });
+		sb::on_update(type);
+		sb::append(schema, type);
+
+		sb::append(schema, sb::integer("Num Layers", 3, 2, 5));
+
+		return schema;
 	}
 
 	std::pair< i_genome_mapping*, i_agent_factory* > mlp_controller::create_instance_evolvable(rtp_param param)
@@ -119,6 +175,72 @@ namespace rtp_phys
 			return std::pair< i_genome_mapping*, i_agent_factory* >(nullptr, nullptr);
 		}
 	}
+
+	std::pair< i_genome_mapping*, i_agent_factory* > mlp_controller::create_instance_evolvable(YAML::Node const& param)
+	{
+		auto type = prm::find_value(param, "Inputs").as< Type >();
+		int num_layers = prm::find_value(param, "Num Layers").as< int >();
+
+		switch(type)
+		{
+			case TestType:
+			{
+				size_t const NumNNOutputs = 1;// TODO:  cfg.num_thrusters();
+				size_t const NumPerHidden = (mlp_test_controller::NumNNInputs + NumNNOutputs + 1) / 2;
+				return std::pair< i_genome_mapping*, i_agent_factory* >(
+					new fixednn_genome_mapping(
+					num_layers,
+					mlp_test_controller::NumNNInputs,
+					NumNNOutputs,
+					NumPerHidden),
+					new mlp_controller_factory(type, num_layers, NumPerHidden, NumNNOutputs));
+			}
+
+			case TestQuadruped:
+			{
+				size_t const NumNNOutputs = 8;
+				size_t const NumPerHidden = (mlp_test_quadruped_controller::NumNNInputs + NumNNOutputs + 1) / 2;
+				return std::pair< i_genome_mapping*, i_agent_factory* >(
+					new fixednn_genome_mapping(
+					num_layers,
+					mlp_test_quadruped_controller::NumNNInputs,
+					NumNNOutputs,
+					NumPerHidden),
+					new mlp_controller_factory(type, num_layers, NumPerHidden, NumNNOutputs));
+			}
+
+			case TestBiped:
+			{
+				size_t const NumNNOutputs = 5;
+				size_t const NumPerHidden = (mlp_test_biped_controller::NumNNInputs + NumNNOutputs + 1) / 2;
+				return std::pair< i_genome_mapping*, i_agent_factory* >(
+					new fixednn_genome_mapping(
+					num_layers,
+					mlp_test_biped_controller::NumNNInputs,
+					NumNNOutputs,
+					NumPerHidden),
+					new mlp_controller_factory(type, num_layers, NumPerHidden, NumNNOutputs));
+			}
+
+			case Spaceship:
+			{
+				size_t const NumNNOutputs = 4;	// TODO:
+				size_t const NumPerHidden = (mlp_all_inputs_spaceship_controller::NumNNInputs + NumNNOutputs + 1) / 2;
+				return std::pair< i_genome_mapping*, i_agent_factory* >(
+					new fixednn_genome_mapping(
+					num_layers,
+					mlp_all_inputs_spaceship_controller::NumNNInputs,
+					NumNNOutputs,
+					NumPerHidden),
+					new mlp_controller_factory(type, num_layers, NumPerHidden, NumNNOutputs));
+			}
+
+			default:
+			assert(false);
+			return std::pair< i_genome_mapping*, i_agent_factory* >(nullptr, nullptr);
+		}
+	}
+
 
 	mlp_controller::mlp_controller(size_t num_layers, size_t per_hidden, size_t num_outputs): num_nn_layers(num_layers), num_per_hidden(per_hidden), num_nn_outputs(num_outputs)
 	{

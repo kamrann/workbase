@@ -12,6 +12,10 @@
 class i_genome_mapping;
 class i_agent_factory;
 
+namespace YAML {
+	class Node;
+}
+
 namespace rtp_phys
 {
 	class evolvable_controller
@@ -22,6 +26,7 @@ namespace rtp_phys
 
 			Count,
 			None = Count,
+			Default = MLP,
 		};
 
 		static std::string const Names[Type::Count];
@@ -34,6 +39,9 @@ namespace rtp_phys
 
 		static rtp_param_type* params(Type ea_type);
 		static std::tuple< i_genome_mapping*, i_agent_factory* > create_instance(Type type, rtp_param param);
+
+		static YAML::Node get_schema(YAML::Node const& param_vals);
+		static std::tuple< i_genome_mapping*, i_agent_factory* > create_instance(YAML::Node const& param);
 	};
 }
 

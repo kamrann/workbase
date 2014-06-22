@@ -15,8 +15,10 @@
 
 using namespace Wt;
 
-class i_param_widget;
-
+//class i_param_widget;
+namespace prm {
+	class param_tree;
+}
 
 class SystemTestTab: public WContainerWidget
 {
@@ -37,8 +39,10 @@ public:	// temp public
 private:
 	WVBoxLayout* vlayout;
 	WHBoxLayout* hlayout;
-	i_param_widget* system_params_widget;
-	rtp_param_manager param_mgr;
+//	i_param_widget* system_params_widget;
+//	rtp_param_manager param_mgr;
+	prm::param_tree* system_params_tree;
+
 	WWidget* system_widget;
 	WWidget* history_widget;
 };

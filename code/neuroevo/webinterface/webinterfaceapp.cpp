@@ -24,6 +24,7 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 
 	main_tabs = new WTabWidget(root());
 //	main_tabs->addTab(new DatabaseTab(db_session), "Evo Database");// , Wt::WTabWidget::PreLoading);
+	main_tabs->addTab(new Wt::WContainerWidget(), "Placeholder");
 	main_tabs->addTab(new SimulationsTab(), "Simulations");// , Wt::WTabWidget::PreLoading);
 	SystemTestTab* sys_tab = new SystemTestTab();
 	main_tabs->addTab(sys_tab, "System Test");// , Wt::WTabWidget::PreLoading);

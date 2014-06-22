@@ -24,6 +24,8 @@
 
 #include "observer_data_models.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <Wt/WLineEdit>
 #include <Wt/WTextArea>
 #include <Wt/WTableView>
@@ -65,9 +67,12 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 	sim_params_panel->setCentralWidget(evo_params_widget->get_wt_widget());
 */
 
-	params_wgt = //db_hierarchy_level< evorun_params_defn >::create_widget(param_mgr);
-		prm::param_wgt::create(std::bind(&i_system::get_schema, std::placeholders::_1, true));
-	addWidget(params_wgt);
+	system_params_tree = //db_hierarchy_level< evorun_params_defn >::create_widget(param_mgr);
+		prm::param_tree::create(std::bind(&i_system::get_schema, std::placeholders::_1, true));
+	addWidget(system_params_tree);
+
+	evo_params_tree = prm::param_tree::create(&rtp_simulation::get_evo_schema);
+	addWidget(evo_params_tree);
 
 	run_sim_btn = new WPushButton("Run Simulation", this);              // create a button
 	run_sim_btn->setFocus();
@@ -102,9 +107,9 @@ SimulationsTab::SimulationsTab(WContainerWidget* parent):
 void SimulationsTab::on_run_simulation()
 {
 	evo_chart->clear_content();
-	/*
-	rtp_param sys_param = system_params_widget->get_param();
-	rtp_param evo_param = evo_params_widget->get_param();
+	
+	auto sys_param = system_params_tree->get_yaml_param();
+	auto evo_param = evo_params_tree->get_yaml_param();
 	rtp_simulation* sim = new rtp_simulation(sys_param, evo_param);
 
 	WebInterfaceApplication* app = (WebInterfaceApplication*)WApplication::instance();
@@ -112,7 +117,7 @@ void SimulationsTab::on_run_simulation()
 	boost::function< void() > thread_func = boost::bind< void >(boost::mem_fn(&SimulationsTab::run_simulation_threadmain), this, app, sim);
 	sim_thread.swap(boost::shared_ptr< boost::thread >(new boost::thread(thread_func)));
 	run_sim_btn->setEnabled(false);
-	*/
+	
 #if 0
 	rtp_param sys_param = system_params_widget->get_param();
 

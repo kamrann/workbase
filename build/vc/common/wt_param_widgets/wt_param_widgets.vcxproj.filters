@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\string_par_wgt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\param_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,6 +43,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\pw_yaml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\random_par_wgt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_yaml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\random_par_wgt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

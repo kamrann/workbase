@@ -25,6 +25,7 @@ namespace prm
 		Enumeration,
 		Vector2,
 //		Vector3,
+		Random,
 		
 		_LeafTypeEnd,
 		__Composite = _LeafTypeEnd - 1,
@@ -100,6 +101,20 @@ namespace prm
 	typedef vec< WorldDimensionality::dim2D > vec2;
 	typedef vec< WorldDimensionality::dim3D > vec3;
 
+	struct random
+	{
+		bool is_fixed;
+		boost::variant<
+			double,
+			std::pair< double, double >
+		> range;
+
+		// TODO: distribution enum
+
+		random(): is_fixed(true), range(0.0)
+		{}
+	};
+
 
 	typedef boost::make_recursive_variant<
 		bool,
@@ -109,6 +124,7 @@ namespace prm
 		enum_param_val,
 		vec2,
 //		vec3,
+		random,
 
 		std::vector< boost::recursive_variant_ >
 
@@ -142,6 +158,9 @@ namespace prm
 
 //			case ParamType::Vector3:
 //			return param(vec3());
+
+			case ParamType::Random:
+			return param(random());
 
 			case ParamType::List:
 			return param(std::vector< param >());

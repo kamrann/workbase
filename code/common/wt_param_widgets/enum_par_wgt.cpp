@@ -1,6 +1,7 @@
 // enum_par_wgt.cpp
 
 #include "enum_par_wgt.h"
+#include "pw_yaml.h"
 
 #include <Wt/WComboBox>
 

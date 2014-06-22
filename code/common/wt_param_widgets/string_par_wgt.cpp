@@ -1,6 +1,7 @@
 // string_par_wgt.cpp
 
 #include "string_par_wgt.h"
+#include "pw_yaml.h"
 
 #include <Wt/WLineEdit>
 
@@ -15,7 +16,7 @@ namespace prm
 	public:
 		impl(YAML::Node const& script)
 		{
-			if(auto def = script["default"])
+			if(auto& def = script["default"])
 			{
 				setText(def.as< std::string >());
 			}

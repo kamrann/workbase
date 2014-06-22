@@ -4,6 +4,9 @@
 #define __NE_RTP_AGENT_H
 
 
+typedef std::vector< std::string > agent_sensor_list;
+
+
 class i_agent
 {
 public:

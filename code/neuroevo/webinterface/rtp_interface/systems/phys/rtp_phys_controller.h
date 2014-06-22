@@ -20,6 +20,7 @@ namespace rtp_phys
 			Interactive,
 
 			Count,
+			Default = Passive,
 		};
 
 		static std::string const Names[Type::Count];
@@ -32,6 +33,9 @@ namespace rtp_phys
 
 		static rtp_param_type* params(Type type);
 		static i_phys_controller* create_instance(Type type, rtp_param param);
+
+		static YAML::Node get_schema(YAML::Node const& param_vals);
+		static i_phys_controller* create_instance(YAML::Node const& param);
 
 	public:
 		virtual void update(phys_system::state& st, phys_system::scenario_data sdata) = 0;

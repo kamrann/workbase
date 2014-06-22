@@ -12,6 +12,10 @@
 #include <vector>
 
 
+namespace YAML {
+	class Node;
+}
+
 class i_population_wide_observer
 {
 public:
@@ -20,6 +24,7 @@ public:
 		Pareto,
 
 		Count,
+		Default = Single,
 	};
 
 	static std::string const Names[Count];

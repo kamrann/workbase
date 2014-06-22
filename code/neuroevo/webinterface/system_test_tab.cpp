@@ -7,6 +7,8 @@
 
 #include "generic_system_coordinator.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <Wt/WHBoxLayout>
 #include <Wt/WPushButton>
 #include <Wt/WPanel>
@@ -24,9 +26,14 @@ SystemTestTab::SystemTestTab(WContainerWidget* parent): WContainerWidget(parent)
 	WPanel* sys_params_panel = new WPanel;
 	sys_params_panel->setTitle("System parameters");
 
-	rtp_param_type* spt = i_system::params(false);
-	system_params_widget = spt->create_widget(&param_mgr);
-	sys_params_panel->setCentralWidget(system_params_widget->get_wt_widget());
+//	rtp_param_type* spt = i_system::params(false);
+//	system_params_widget = spt->create_widget(&param_mgr);
+
+	system_params_tree = prm::param_tree::create(
+		std::bind(&i_system::get_schema, std::placeholders::_1, false));
+
+	sys_params_panel->setCentralWidget(system_params_tree);
+		//system_params_widget->get_wt_widget());
 
 	vlayout->addWidget(sys_params_panel);
 
@@ -81,8 +88,11 @@ void SystemTestTab::set_history_widget(WWidget* w)
 
 void SystemTestTab::on_system_changed()
 {
-	rtp_param sys_param = system_params_widget->get_param();
+/*	rtp_param sys_param = system_params_widget->get_param();
 	i_system* sys = std::get< 0 >(i_system::create_instance(sys_param));
+*/
+	auto params = system_params_tree->get_yaml_param();
+	i_system* sys = std::get< 0 >(i_system::create_instance(params));
 
 	coordinator = new generic_sys_coordinator(sys);
 	std::pair< WWidget*, WWidget* > sys_widgets = coordinator->initialize();

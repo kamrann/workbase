@@ -21,13 +21,20 @@ class i_observer;
 class i_population_wide_observer;
 class i_procreation_selection;
 
+namespace YAML {
+	class Node;
+}
+
 class rtp_simulation
 {
 public:
 	rtp_simulation(rtp_param sys_param, rtp_param evo_param);
+	rtp_simulation(YAML::Node const& sys_param, YAML::Node const& evo_param);
 
 public:
 	static rtp_named_param_list evo_params();
+
+	static YAML::Node get_evo_schema(YAML::Node const& param_vals);
 
 public:
 	void init(boost::optional< uint32_t > seed = boost::none);

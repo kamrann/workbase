@@ -12,7 +12,11 @@ namespace rtp_phys
 	class resultant_objective
 	{
 	public:
+		static YAML::Node get_schema(YAML::Node const& param_vals);
+
+	public:
 		static i_population_wide_observer* create_instance(i_population_wide_observer::Type type, rtp_param param, std::set< agent_objective::Type >& required_observations);
+		static i_population_wide_observer* create_instance(YAML::Node const& param, std::set< agent_objective::Type >& required_observations);
 	};
 }
 

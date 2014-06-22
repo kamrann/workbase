@@ -24,6 +24,7 @@ namespace rtp_phys
 
 			Count,
 			None = Count,
+			Default = TestType,
 		};
 
 		static std::string const Names[Count];
@@ -42,6 +43,9 @@ namespace rtp_phys
 		};
 
 		static std::pair< i_genome_mapping*, i_agent_factory* > create_instance_evolvable(rtp_param param);
+
+		static YAML::Node get_schema(YAML::Node const& param_vals);
+		static std::pair< i_genome_mapping*, i_agent_factory* > create_instance_evolvable(YAML::Node const& param);
 
 	public:
 		//typedef typename sat_system< dim >::decision decision_t;

@@ -21,6 +21,8 @@
 #include "../../rtp_single_objective.h"
 #include "../../rtp_pareto.h"
 
+#include "wt_param_widgets/pw_yaml.h"
+
 #include <Wt/WComboBox>
 
 
@@ -132,21 +134,31 @@ namespace rtp_phys {
 		return new param_type(evolvable);
 	}
 
+	namespace sb = prm::schema;
+
 	YAML::Node phys_system::get_schema(YAML::Node const& param_vals, bool evolvable)
 	{
-		prm::schema_builder sb;
+		auto schema = sb::list("physics2d_params");
 
-		sb.add_nested_schema(
-			"Scenario",
-			phys_scenario::get_schema(param_vals["Scenario"])
-			);
+		auto scenario = phys_scenario::get_schema(param_vals);
+		sb::label(scenario, "Scenario");
+		sb::append(schema, scenario);
 
-		sb.add_nested_schema(
-			"Spec",
-			agent_body_spec::get_schema(param_vals["Spec"])
-			);
+		auto spec = agent_body_spec::get_schema(param_vals);
+		sb::label(spec, "Body Spec");
+		sb::append(schema, spec);
 
-		return sb.get_schema();
+		if(evolvable)
+		{
+			sb::append(schema, evolvable_controller::get_schema(param_vals));
+			sb::append(schema, resultant_objective::get_schema(param_vals));
+		}
+		else
+		{
+			sb::append(schema, i_phys_controller::get_schema(param_vals));
+		}
+
+		return schema;
 	}
 
 	std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > phys_system::create_instance(rtp_param param, bool evolvable)
@@ -187,7 +199,30 @@ namespace rtp_phys {
 
 	std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > phys_system::create_instance(YAML::Node const& param, bool evolvable)
 	{
-		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >();
+		std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > result;
+
+		phys_scenario* scenario = phys_scenario::create_instance(param);
+		agent_body_spec* spec = agent_body_spec::create_instance(param);
+
+		std::get< 0 >(result) = new phys_system(scenario, spec);
+		if(evolvable)
+		{
+			// TODO: Some easy way to access sub-tuple? (eg. result.firstN)
+			std::tie(
+				std::get< 1 >(result),
+				std::get< 2 >(result)
+				) = evolvable_controller::create_instance(param);
+
+			std::set< agent_objective::Type > required_observations;
+			std::get< 4 >(result) = resultant_objective::create_instance(param, required_observations);
+			std::get< 3 >(result) = composite_observer::create_instance(required_observations);
+		}
+		else
+		{
+			boost::shared_ptr< i_phys_controller > agent(i_phys_controller::create_instance(param));
+			std::get< 0 >(result)->register_agent(agent);
+		}
+		return result;
 	}
 
 

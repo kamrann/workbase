@@ -5,6 +5,8 @@
 #include "scenarios/space_based.h"
 #include "../../params/realnum_par.h"
 
+#include "wt_param_widgets/pw_yaml.h"
+
 #include <Wt/WComboBox>
 
 #include <boost/math/constants/constants.hpp>
@@ -105,23 +107,27 @@ namespace rtp_phys {
 	}
 */
 
+	namespace sb = prm::schema;
+
 	YAML::Node phys_scenario::get_schema(YAML::Node const& param_vals)
 	{
-		prm::schema_builder sb;
+		auto schema = sb::list("Scenario");
 
-		sb.add_enum_selection(
+		auto type = sb::enum_selection(
 			"World Type",
 			{ begin(Names), end(Names) }
-			);
+		);
+		sb::on_update(type);
+		sb::append(schema, type);
 
-		sb.add_real(
+		sb::append(schema, sb::real(
 			"Duration",
 			10.0,
 			0.0,
 			1000.0
-			);
+			));
 
-		return sb.get_schema();
+		return schema;
 	}
 
 	phys_scenario* phys_scenario::create_instance(rtp_param param)
@@ -151,7 +157,7 @@ namespace rtp_phys {
 
 	phys_scenario* phys_scenario::create_instance(YAML::Node const& param)
 	{
-		Type scenario_type = param["World Type"].as< Type >();
+		Type scenario_type = prm::find_value(param, "World Type").as< Type >();
 		phys_scenario* scenario = nullptr;
 		switch(scenario_type)
 		{
@@ -167,7 +173,7 @@ namespace rtp_phys {
 			assert(false);
 		}
 
-		scenario->m_duration = param["Duration"].as< double >();
+		scenario->m_duration = prm::find_value(param, "Duration").as< double >();
 
 		return scenario;
 	}
