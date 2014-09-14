@@ -11,29 +11,47 @@
 
 namespace prm
 {
-	class vector_par_wgt::impl: public Wt::WContainerWidget
+	class vector_par_wgt::default_impl:
+		public param_tree::param_wgt_impl,
+		public Wt::WContainerWidget
 	{
 	public:
-		impl(YAML::Node const& script)
+		default_impl(YAML::Node schema, bool readonly)
 		{
 			m_x_box = new Wt::WDoubleSpinBox(this);
 			m_y_box = new Wt::WDoubleSpinBox(this);
 
-			if(auto& def = script["default"])
+			if(auto& def = schema["default"])
 			{
-				set(def.as< vec2 >());
+				update_impl_from_yaml_param(def);
 			}
+
+			m_x_box->setReadOnly(readonly);
+			m_y_box->setReadOnly(readonly);
 		}
 
-		vec2 get_value() const
+		virtual Wt::WWidget* get_wt_widget()
 		{
-			return vec2(m_x_box->value(), m_y_box->value());
+			return this;
 		}
 
-		void set(vec2 const& v)
+		virtual Wt::Signals::connection connect_handler(pw_event::type type, pw_event_handler const& handler)
 		{
+			// TODO: !!
+			return Wt::Signals::connection();
+		}
+
+		virtual param get_locally_instantiated_yaml_param(bool) const
+		{
+			return param{ vec2(m_x_box->value(), m_y_box->value()) };
+		}
+
+		virtual bool update_impl_from_yaml_param(param const& p)
+		{
+			auto v = p.as< vec2 >();
 			m_x_box->setValue(v[0]);
 			m_y_box->setValue(v[1]);
+			return true;
 		}
 
 	protected:
@@ -41,20 +59,11 @@ namespace prm
 		Wt::WDoubleSpinBox* m_y_box;
 	};
 
-	Wt::WWidget* vector_par_wgt::create_impl(YAML::Node const& script)
-	{
-		m_impl = new impl(script);
-		return m_impl;
-	}
 
-	param vector_par_wgt::get_param() const
+	param_tree::param_wgt_impl* vector_par_wgt::create(YAML::Node schema, param_wgt_impl::options_t options)
 	{
-		return m_impl->get_value();
-	}
-
-	void vector_par_wgt::set_from_param(param const& p)
-	{
-		m_impl->set(boost::get< vec2 >(p));
+		bool readonly = schema["readonly"] && schema["readonly"].as< bool >(); //options & param_wgt_impl::ReadOnly != 0;
+		return new default_impl(schema, readonly);
 	}
 }
 

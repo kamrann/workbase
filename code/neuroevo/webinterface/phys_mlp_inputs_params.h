@@ -11,7 +11,7 @@ namespace phys {
 
 	class mlp_inputs_params
 	{
-		rtp_phys::mlp_controller::Type		type;
+		rtp::mlp_controller::Type		type;
 	};
 
 }

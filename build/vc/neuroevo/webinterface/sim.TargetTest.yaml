@@ -1,0 +1,234 @@
+- sim_params
+- container
+-
+  -
+    - sys_params
+    - container
+    -
+      -
+        - sys_type
+        - enum
+        -
+          - Physics 2D
+      -
+        - type_specific_sys_params
+        - container
+        -
+          -
+            - physics2d_params
+            - container
+            -
+              -
+                - updates_per_sec
+                - int
+                - 60
+              -
+                - scenario
+                - container
+                -
+                  -
+                    - world_type
+                    - enum
+                    -
+                      - Target
+                  -
+                    - type_specific
+                    - container
+                    -
+                      -
+                        - target
+                        - container
+                        -
+                          -
+                            - target_distance
+                            - random
+                            -
+                              - true
+                              - 5
+                  -
+                    - duration
+                    - real
+                    - 10
+              -
+                - agent_spec_list
+                - repeat
+                - 1:
+                    - spec
+                    - container
+                    -
+                      -
+                        - name
+                        - string
+                        - spec 1
+                      -
+                        - spec_type
+                        - enum
+                        -
+                          - Spaceship
+                      -
+                        - body_spec
+                        - container
+                        -
+                          -
+                            - spaceship
+                            - container
+                            -
+                              []
+              -
+                - agent_instance_list
+                - repeat
+                - 1:
+                    - agent
+                    - container
+                    -
+                      -
+                        - spec_reference
+                        - enum
+                        -
+                          - spec 1
+                      -
+                        - initial_conditions
+                        - container
+                        -
+                          -
+                            - init_x
+                            - random
+                            -
+                              - true
+                              - 0
+                          -
+                            - init_y
+                            - random
+                            -
+                              - true
+                              - 0
+                          -
+                            - init_orientation
+                            - random
+                            -
+                              - true
+                              - 0
+                          -
+                            - init_linear_angle
+                            - random
+                            -
+                              - true
+                              - 0
+                          -
+                            - init_linear_speed
+                            - random
+                            -
+                              - true
+                              - 0
+                          -
+                            - init_ang_vel
+                            - random
+                            -
+                              - true
+                              - 0
+                      -
+                        - controller_params
+                        - container
+                        -
+                          -
+                            - controller_type
+                            - enum
+                            -
+                              - Evolved
+                          -
+                            - controller_type_specific_params
+                            - container
+                            -
+                              -
+                                - evolved_controller_sel
+                                - enum
+                                -
+                                  - evolved 1
+  -
+    - evolved_container
+    - container
+    -
+      -
+        - evolved_list
+        - repeat
+        - 1:
+            - evolved
+            - container
+            -
+              -
+                - name
+                - string
+                - evolved 1
+              -
+                - compatible_agent_types
+                - enum
+                -
+                  - Spaceship
+              -
+                - evolvable_controller
+                - container
+                -
+                  -
+                    - ev_controller_type
+                    - enum
+                    -
+                      - MLP
+                  -
+                    - ev_controller_type_specific_params
+                    - container
+                    -
+                      -
+                        - mlp_controller
+                        - container
+                        -
+                          -
+                            - mlp_inputs
+                            - enum
+                            -
+                              - Orientation
+                              - AngVel
+                          -
+                            - mlp_num_layers
+                            - int
+                            - 3
+              -
+                - objective
+                - container
+                -
+                  -
+                    - obj_type
+                    - enum
+                    -
+                      - Single Objective
+                  -
+                    - objective_components
+                    - container
+                    -
+                      -
+                        - manual_objective
+                        - container
+                        -
+                          -
+                            - direction_type
+                            - enum
+                            -
+                              - Maximise
+                          -
+                            - state_val
+                            - enum
+                            -
+                              - 1
+                          -
+                            - value_type
+                            - enum
+                            -
+                              - Value
+                          -
+                            - objective_timespan
+                            - container
+                            -
+                              -
+                                - timepoint_type
+                                - enum
+                                -
+                                  - End

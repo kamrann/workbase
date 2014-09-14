@@ -4,20 +4,17 @@
 #define __NE_RTP_PHYS_SYSTEM_STATE_VALUES_H
 
 
-namespace rtp_phys {
+namespace rtp {
 
-	enum StateValue {
-		Time,
-		AgentPosX,
-		AgentPosY,
-		AgentVelX,
-		AgentVelY,
-		AgentSpeed,
-//		AgentAngle,
-		AgentKE,
+	struct _StateValue
+	{
+		enum StateValue {
+			Time,
 
-		Count,
+			Count,
+		};
 	};
+	typedef _StateValue::StateValue StateValue;
 
 	extern std::string const StateValueNames[StateValue::Count];
 

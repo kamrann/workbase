@@ -3,8 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Users\Cameron\Documents\GitHub\wt\installation_$(Platform)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Cameron\Documents\GitHub\wt\installation_$(Platform)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Coding Projects\External Libraries\wt-3.3.3\installation_$(Platform)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Coding Projects\External Libraries\wt-3.3.3\installation_$(Platform)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>

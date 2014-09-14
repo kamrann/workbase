@@ -1,0 +1,48 @@
+- spec
+- container
+-
+  -
+    - name
+    - string
+    - Man
+  -
+    - spec_type
+    - enum
+    -
+      - Test Biped
+  -
+    - body_spec
+    - container
+    -
+      -
+        - biped
+        - container
+        -
+          -
+            - max_torques
+            - container
+            -
+              -
+                - max_knee_torque
+                - real
+                - 75
+              -
+                - max_hip_torque
+                - real
+                - 75
+              -
+                - max_elbow_torque
+                - real
+                - 40
+              -
+                - max_shoulder_torque
+                - real
+                - 40
+              -
+                - max_pelvic_torque
+                - real
+                - 125
+              -
+                - max_neck_torque
+                - real
+                - 20

@@ -9,30 +9,28 @@
 #include "ga/rtp_interface/rtp_procreation_selection.h"
 
 
-class rtp_procreation_selection
-{
-public:
-	enum Type {
-		Random,
-		Equal,
-//		Roulette,
+namespace rtp {
 
-		Count,
-		Default = Random,
-	};
-
-	static std::string const Names[Count];
-
-	class enum_param_type: public rtp_enum_param_type
+	class rtp_procreation_selection
 	{
 	public:
-		enum_param_type();
+		enum Type {
+			Random,
+			Equal,
+			//		Roulette,
+
+			Count,
+			Default = Random,
+		};
+
+		static std::string const Names[Count];
+
+	public:
+		static std::unique_ptr< i_procreation_selection > create_instance(rtp_param param, rgen_t& rgen);
+		static std::unique_ptr< i_procreation_selection > create_instance(Type type, rgen_t& rgen);
 	};
 
-public:
-	static i_procreation_selection* create_instance(rtp_param param, rgen_t& rgen);
-	static i_procreation_selection* create_instance(Type type, rgen_t& rgen);
-};
+}
 
 
 #endif

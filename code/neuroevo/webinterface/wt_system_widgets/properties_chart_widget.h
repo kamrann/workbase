@@ -12,6 +12,7 @@
 #include <Wt/WApplication>
 #include <Wt/WTable>
 #include <Wt/WCheckBox>
+#include <Wt/WSelectionBox>
 #include <Wt/WHBoxLayout>
 
 #include <boost/math/constants/constants.hpp>
@@ -20,11 +21,11 @@
 class properties_chart_widget: public Wt::WContainerWidget
 {
 public:
-	struct series_cfg
+/*	struct series_cfg
 	{
 		Wt::WCheckBox* enabled_box;
 	};
-
+*/
 public:
 	properties_chart_widget(): model(nullptr)
 	{
@@ -53,9 +54,14 @@ public:
 		chart->setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 		layout->addWidget(chart, 1);
 
-		cfg_table = new Wt::WTable(this);
+/*		cfg_table = new Wt::WTable(this);
 		cfg_table->setMargin(Wt::WLength::Auto, Wt::Left | Wt::Right);
 		layout->addWidget(cfg_table, 0, Wt::AlignMiddle);
+*/
+		series_box = new Wt::WSelectionBox(this);
+		series_box->setSelectionMode(Wt::SelectionMode::ExtendedSelection);
+		series_box->changed().connect(this, &properties_chart_widget::on_config_changed);
+		layout->addWidget(series_box, 0, Wt::AlignMiddle);
 
 		reset();
 	}
@@ -66,10 +72,11 @@ public:
 		model->removeRows(0, model->rowCount());
 	}
 
-	void reset(boost::shared_ptr< i_properties const > props = nullptr)
+	void reset(std::shared_ptr< rtp::i_properties const > props = nullptr)
 	{
 		model->clear();
-		cfg_table->clear();
+		//cfg_table->clear();
+		series_box->clear();
 
 		if(props)
 		{
@@ -82,31 +89,35 @@ public:
 
 			for(int i = 1; i < model->columnCount(); ++i)
 			{
-				new Wt::WText(Wt::asString(model->headerData(i)), cfg_table->elementAt(i - 1, 0));
+/*				new Wt::WText(Wt::asString(model->headerData(i)), cfg_table->elementAt(i - 1, 0));
 
 				series_cfg& sc = series_config[i];
 				sc.enabled_box = new Wt::WCheckBox(cfg_table->elementAt(i - 1, 1));
 				sc.enabled_box->changed().connect(this, &properties_chart_widget::on_config_changed);
+*/
+				series_box->addItem(Wt::asString(model->headerData(i)));
 			}
 
-			cfg_table->enable();
+//			cfg_table->enable();
+			series_box->enable();
 		}
 		else
 		{
-			cfg_table->disable();
+//			cfg_table->disable();
+			series_box->disable();
 		}
 		
 		m_props = props;
 	}
 	
-	void append_data(boost::shared_ptr< i_property_values const > vals)
+	void append_data(std::shared_ptr< rtp::i_property_values const > vals)
 	{
 		model->appendRow(create_data_row(m_props, vals));
 		chart->update();
 	}
 
 protected:
-	std::vector< Wt::WStandardItem* > create_data_row(boost::shared_ptr< i_properties const >& props, boost::shared_ptr< i_property_values const > vals)
+	std::vector< Wt::WStandardItem* > create_data_row(std::shared_ptr< rtp::i_properties const >& props, std::shared_ptr< rtp::i_property_values const > vals)
 	{
 		std::vector< Wt::WStandardItem* > row;
 		Wt::WStandardItem* item;
@@ -130,22 +141,30 @@ protected:
 		std::vector< Wt::Chart::WDataSeries > series;
 
 		size_t num_props = m_props->num_properties();
-		for(size_t i = 1; i < num_props; ++i)
+/*		for(size_t i = 1; i < num_props; ++i)
 		{
 			if(series_config[i].enabled_box->isChecked())
 			{
 				series.push_back(Wt::Chart::WDataSeries(i, Wt::Chart::LineSeries));
 			}
 		}
+*/
+		auto sel = series_box->selectedIndexes();
+		for(auto idx : sel)
+		{
+			series.push_back(Wt::Chart::WDataSeries(idx + 1, Wt::Chart::LineSeries));
+		}
+
 		chart->setSeries(series);
 	}
 
 private:
 	Wt::WStandardItemModel* model;
 	Wt::Chart::WCartesianChart* chart;
-	Wt::WTable* cfg_table;
-	std::map< int, series_cfg > series_config;
-	boost::shared_ptr< i_properties const > m_props;
+//	Wt::WTable* cfg_table;
+//	std::map< int, series_cfg > series_config;
+	Wt::WSelectionBox* series_box;
+	std::shared_ptr< rtp::i_properties const > m_props;
 };
 
 

@@ -3,18 +3,25 @@
 #ifndef __NE_RTP_INTERACTIVE_INPUT_H
 #define __NE_RTP_INTERACTIVE_INPUT_H
 
+#include <set>
 
-// TODO: This is temp implementation
-class interactive_input
-{
-public:
-	interactive_input(size_t k = 0, bool d = false): key_index(k), down(d)
-	{}
 
-public:
-	size_t key_index;
-	bool down;
-};
+namespace rtp {
+
+	typedef std::set< unsigned long > interactive_input_set;
+
+	class interactive_input
+	{
+	public:
+		interactive_input(unsigned long k = 0, bool d = false): key_index(k), down(d)
+		{}
+
+	public:
+		unsigned long key_index;
+		bool down;
+	};
+
+}
 
 
 #endif

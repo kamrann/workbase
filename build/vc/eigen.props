@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Users\Cameron\Documents\Visual Studio 2012\Projects\eigen-eigen-ffa86ffb5570;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Coding Projects\External Libraries\eigen-eigen-6b38706d90a9;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

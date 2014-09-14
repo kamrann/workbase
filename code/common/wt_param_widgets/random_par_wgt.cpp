@@ -2,6 +2,8 @@
 
 #include "random_par_wgt.h"
 #include "pw_yaml.h"
+#include "schema_builder.h"
+#include "param_accessor.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/WComboBox>
@@ -13,10 +15,12 @@
 
 namespace prm
 {
-	class random_par_wgt::impl: public Wt::WContainerWidget
+	class random_par_wgt::default_impl:
+		public param_tree::param_wgt_impl,
+		public Wt::WContainerWidget
 	{
 	public:
-		impl(YAML::Node const& script)
+		default_impl(YAML::Node schema)
 		{
 			Wt::WHBoxLayout* layout = new Wt::WHBoxLayout();
 			layout->setContentsMargins(0, 0, 0, 0);
@@ -29,35 +33,35 @@ namespace prm
 			//	type_box->setMinimumSize(75, Wt::WLength::Auto);
 			layout->addWidget(type_box);
 
-			double default_val = script["default"].as< double >();
+			double default_val = schema["default"].as< double >();
 			double default_min = default_val;
 			double default_max = default_val;
 
 			// NOTE: Seems to be bug in YAML double conversions, that results in NAN when converting max double to Node then back to double. Therefore using float max instead.
 			
 			double min_val = -std::numeric_limits< float >::max();
-			if(auto& min = script["constraints"]["min"])
+			if(auto& min = schema["constraints"]["min"])
 			{
 				min_val = min.as< double >();
 				default_min = min_val;
 			}
 			double max_val = std::numeric_limits< float >::max();
-			if(auto& max = script["constraints"]["max"])
+			if(auto& max = schema["constraints"]["max"])
 			{
 				max_val = max.as< double >();
 				default_max = max_val;
 			}
 
-			if(auto& def_min = script["default_min"])
+			if(auto& def_min = schema["default_min"])
 			{
 				default_min = def_min.as< double >();
 			}
-			if(auto& def_max = script["default_max"])
+			if(auto& def_max = schema["default_max"])
 			{
 				default_max = def_max.as< double >();
 			}
 
-			fixed_tree = param_tree::create([=](YAML::Node const&)
+			fixed_tree = param_tree::create([=](qualified_path const&, param_accessor const&)
 			{
 				auto s = schema::real("fixed", default_val, min_val, max_val);
 				schema::unlabel(s);
@@ -70,7 +74,7 @@ namespace prm
 			internal_layout->setContentsMargins(0, 0, 0, 0);
 			cont->setLayout(internal_layout);
 			internal_layout->addWidget(new Wt::WText("["));
-			random_tree = param_tree::create([=](YAML::Node const&)
+			random_tree = param_tree::create([=](qualified_path const&, param_accessor const&)
 			{
 				auto s = schema::list("random");
 				schema::layout_horizontal(s);
@@ -111,39 +115,73 @@ namespace prm
 		}
 
 	public:
-		random get_value() const
+		virtual Wt::WWidget* get_wt_widget()
+		{
+			return this;
+		}
+
+		virtual Wt::Signals::connection connect_handler(pw_event::type type, pw_event_handler const& handler)
+		{
+			// TODO: !!
+			return Wt::Signals::connection();
+		}
+
+		virtual param get_locally_instantiated_yaml_param(bool) const
 		{
 			random result;
 			result.is_fixed = type_box->currentIndex() == 0;
 			if(result.is_fixed)
 			{
-				result.range = fixed_tree->get_yaml_param().as< double >();
+				auto param = fixed_tree->get_param_accessor();
+				result.range = param["fixed"].as< double >();
 			}
 			else
 			{
-				auto param = random_tree->get_yaml_param();
-				auto str = YAML::Dump(param);
+				auto param = random_tree->get_param_accessor();
 				result.range = std::make_pair(
-					find_value(param, "min").as< double >(),
-					find_value(param, "max").as< double >()
+					param["min"].as< double >(),
+					param["max"].as< double >()
 					);
 			}
-			return result;
+			return param{ result };
 		}
 
-		void set(random const& v)
+		virtual bool update_impl_from_yaml_param(param const& p)
 		{
-			// TODO:
-/*			type_box->setCurrentIndex(v.is_fixed ? 0 : 1);
+			auto v = p.as< random >();
+			type_box->setCurrentIndex(v.is_fixed ? 0 : 1);
+			widget(1)->setHidden(!v.is_fixed);
+			widget(2)->setHidden(v.is_fixed);
+
+			// TODO: This duplication from above schema construction sucks...
 			if(v.is_fixed)
 			{
-				fixed_tree->set_
+				auto val = boost::get< double >(v.range);
+				param fixed_p;
+				fixed_p[ParamNode::Name] = "fixed";
+				fixed_p[ParamNode::Type] = RealNumber;
+				fixed_p[ParamNode::Value] = val;
+				fixed_tree->set_from_yaml_param(fixed_p);
 			}
 			else
 			{
-
+				auto val = boost::get< std::pair< double, double > >(v.range);
+				param random_p;
+				random_p[ParamNode::Name] = "random";
+				random_p[ParamNode::Type] = List;
+				param min;
+				min[ParamNode::Name] = "min";
+				min[ParamNode::Type] = RealNumber;
+				min[ParamNode::Value] = val.first;
+				random_p[ParamNode::Value].push_back(min);
+				param max;
+				max[ParamNode::Name] = "max";
+				max[ParamNode::Type] = RealNumber;
+				max[ParamNode::Value] = val.second;
+				random_p[ParamNode::Value].push_back(max);
+				random_tree->set_from_yaml_param(random_p);
 			}
-			*/
+			return true;
 		}
 
 	private:
@@ -152,20 +190,74 @@ namespace prm
 		Wt::WComboBox* type_box;
 	};
 
-	Wt::WWidget* random_par_wgt::create_impl(YAML::Node const& script)
-	{
-		m_impl = new impl(script);
-		return m_impl;
-	}
 
-	param random_par_wgt::get_param() const
+	class random_par_wgt::readonly_impl:
+		public param_tree::param_wgt_impl,
+		public Wt::WText
 	{
-		return m_impl->get_value();
-	}
+	public:
+		readonly_impl(YAML::Node schema): m_value()
+		{
+			update_text_from_value();
+		}
 
-	void random_par_wgt::set_from_param(param const& p)
+	public:
+		virtual Wt::WWidget* get_wt_widget()
+		{
+			return this;
+		}
+
+		virtual Wt::Signals::connection connect_handler(pw_event::type type, pw_event_handler const& handler)
+		{
+			// TODO: !!
+			return Wt::Signals::connection();
+		}
+
+		virtual param get_locally_instantiated_yaml_param(bool) const
+		{
+			return param{ m_value };
+		}
+
+		virtual bool update_impl_from_yaml_param(param const& p)
+		{
+			m_value = p.as< random >();
+			update_text_from_value();
+			return true;
+		}
+
+	protected:
+		void update_text_from_value()
+		{
+			std::stringstream ss;
+			if(m_value.is_fixed)
+			{
+				ss << boost::get< double >(m_value.range);
+			}
+			else
+			{
+				auto range = boost::get< std::pair< double, double > >(m_value.range);
+				ss << "[" << range.first << ", " << range.second << ")";
+			}
+
+			setText(ss.str());
+		}
+
+	private:
+		random m_value;
+	};
+
+
+	param_tree::param_wgt_impl* random_par_wgt::create(YAML::Node schema, param_wgt_impl::options_t options)
 	{
-		m_impl->set(boost::get< random >(p));
+		bool readonly = schema["readonly"] && schema["readonly"].as< bool >(); //options & param_wgt_impl::ReadOnly != 0;
+		if(readonly)
+		{
+			return new readonly_impl(schema);
+		}
+		else
+		{
+			return new default_impl(schema);
+		}
 	}
 }
 

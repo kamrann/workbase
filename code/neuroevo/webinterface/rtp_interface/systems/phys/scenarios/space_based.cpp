@@ -3,15 +3,9 @@
 #include "space_based.h"
 
 
-namespace rtp_phys {
+namespace rtp {
 
-	rtp_named_param_list space_based_scenario::params()
-	{
-		rtp_named_param_list p;
-		return p;
-	}
-
-	space_based_scenario::space_based_scenario(rtp_param param)
+	space_based_scenario::space_based_scenario()
 	{
 
 	}
@@ -23,9 +17,9 @@ namespace rtp_phys {
 		return boost::any(data);
 	}
 
-	void space_based_scenario::load_initial_state(boost::any const& data, phys_system::state& st) const
+	void space_based_scenario::load_initial_state(boost::any const& data, b2World* world/*phys_system::state& st*/)
 	{
-		st.world->SetGravity(b2Vec2(0.0f, 0.0f));
+		/*st.*/world->SetGravity(b2Vec2(0.0f, 0.0f));
 	}
 }
 

@@ -22,53 +22,17 @@ inline float get_grav_potential_energy(b2Body const* b, float const g, float con
 	return b->GetMass() * g * (b->GetPosition().y - ground);
 }
 
-inline void draw_body(b2Body const* b, Wt::WPainter& painter)
+template < typename Container, typename XForm >
+inline void transform_points(Container& points, XForm const& xf)
 {
-	painter.save();
-	painter.translate(b->GetPosition().x, b->GetPosition().y);
-	painter.rotate(b->GetAngle() * 360.0 / (2 * b2_pi));
-
-	b2Fixture const* fix = b->GetFixtureList();
-	while(fix)
+	for(auto& v : points)
 	{
-		b2Shape const* shape = fix->GetShape();
-		switch(shape->GetType())
-		{
-			case b2Shape::e_polygon:
-			{
-				b2PolygonShape const* polygon = (b2PolygonShape const*)shape;
-				size_t const count = polygon->GetVertexCount();
-				std::vector< Wt::WPointF > points(count);
-				for(size_t i = 0; i < count; ++i)
-				{
-					b2Vec2 const& v = polygon->GetVertex(i);
-					points[i] = Wt::WPointF(v.x, v.y);
-				}
-				painter.drawPolygon(&points[0], points.size());
-			}
-			break;
-
-			case b2Shape::e_circle:
-			{
-				b2CircleShape const* circle = (b2CircleShape const*)shape;
-				Wt::WRectF rc(
-					circle->m_p.x - circle->m_radius,
-					circle->m_p.y - circle->m_radius,
-					circle->m_radius * 2,
-					circle->m_radius * 2
-					);
-				painter.drawEllipse(rc);
-			}
-			break;
-
-			// TODO: edge/chain
-		}
-
-		fix = fix->GetNext();
+		v = b2Mul(xf, v);
 	}
-
-	painter.restore();
 }
+
+
+void draw_body(b2Body const* b, Wt::WPainter& painter);
 
 
 #endif

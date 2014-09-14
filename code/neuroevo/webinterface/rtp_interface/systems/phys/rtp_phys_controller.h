@@ -3,42 +3,71 @@
 #ifndef __NE_RTP_PHYS_CONTROLLER_H
 #define __NE_RTP_PHYS_CONTROLLER_H
 
-#include "../rtp_agent.h"
-#include "rtp_phys_system.h"
-#include "../../params/enum_par.h"
+#include "../rtp_controller.h"
+
+#include "wt_param_widgets/pw_fwd.h"
 
 #include <string>
 
 
-namespace rtp_phys
+namespace rtp
 {
-	class i_phys_controller: public i_agent
+	class i_phys_controller: public i_controller
 	{
 	public:
 		enum Type {
+			Evolved,
+
 			Passive,
 			Interactive,
+			Database,
 
 			Count,
-			Default = Passive,
+			None = Count,
+			Default = None,
 		};
 
 		static std::string const Names[Type::Count];
 
-		class enum_param_type: public rtp_enum_param_type
+		static prm::param get_controller_agent_type(prm::param_accessor param);
+		static std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, bool evolvable);
+		static std::unique_ptr< i_controller_factory > create_factory(prm::param_accessor param);
+		static i_phys_controller* create_instance(prm::param_accessor param);
+		static i_phys_controller* create_instance(prm::param& param);
+	};
+}
+
+
+#include <yaml-cpp/yaml.h>
+
+namespace YAML {
+
+	template <>
+	struct convert < rtp::i_phys_controller::Type >
+	{
+		static Node encode(rtp::i_phys_controller::Type const& rhs)
 		{
-		public:
-			enum_param_type();
-		};
+			return Node(rtp::i_phys_controller::Names[rhs]);
+		}
 
-		static rtp_param_type* params(Type type);
-		static i_phys_controller* create_instance(Type type, rtp_param param);
+		static bool decode(Node const& node, rtp::i_phys_controller::Type& rhs)
+		{
+			if(!node.IsScalar())
+			{
+				return false;
+			}
 
-		static YAML::Node get_schema(YAML::Node const& param_vals);
-		static i_phys_controller* create_instance(YAML::Node const& param);
+			auto it = mapping_.find(node.Scalar());
+			if(it == mapping_.end())
+			{
+				return false;
+			}
 
-	public:
-		virtual void update(phys_system::state& st, phys_system::scenario_data sdata) = 0;
+			rhs = it->second;
+			return true;
+		}
+
+		static std::map< std::string, rtp::i_phys_controller::Type > const mapping_;
 	};
 }
 

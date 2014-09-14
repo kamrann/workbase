@@ -1,191 +1,320 @@
 // rtp_system.cpp
 
 #include "rtp_system.h"
-#include "../rtp_param_widget.h"
-#include "../params/paramlist_par.h"
-#include "../params/dimensionality_par.h"
-#include "../rtp_param_manager.h"
+#include "rtp_system_agents_data.h"
 
-//#include "nac/rtp_nac_system.h"
-//#include "sat/rtp_sat_system.h"
+#include "rtp_controller.h"
+#include "../rtp_genome_mapping.h"
+
 #include "phys/rtp_phys_system.h"
+#include "elevator/rtp_elevator_system.h"
 
 #include "wt_param_widgets/pw_yaml.h"
+#include "wt_param_widgets/schema_builder.h"
+#include "wt_param_widgets/param_accessor.h"
 
 #include <Wt/WComboBox>
 #include <Wt/WContainerWidget>
 
+#include <yaml-cpp/yaml.h>
 
-const std::array< std::string, NumSystems > SystemNames = {
-//	"Noughts & Crosses",
-//	"Ship & Thrusters 2D",
-	"Physics 2D",
-};
+#include <iomanip>
 
 
 namespace YAML {
-	template <>
-	struct convert< SystemType >
-	{
-		static Node encode(SystemType const& rhs)
-		{
-			return Node(SystemNames[rhs]);
-		}
-
-		static bool decode(Node const& node, SystemType& rhs)
-		{
-			if(!node.IsScalar())
-			{
-				return false;
-			}
-
-			auto it = mapping_.find(node.Scalar());
-			if(it == mapping_.end())
-			{
-				return false;
-			}
-
-			rhs = it->second;
-			return true;
-		}
-
-		static std::map< std::string, SystemType > const mapping_;
-	};
-
-	std::map< std::string, SystemType > const convert< SystemType >::mapping_ = {
-		{ "Physics 2D", SystemType::Physics2D },
+	std::map< std::string, rtp::SystemType > const convert< rtp::SystemType >::mapping_ = {
+			{ "Physics 2D", rtp::SystemType::Physics2D },
+			{ "Elevator", rtp::SystemType::Elevator },
 	};
 }
 
+namespace rtp {
 
-system_type_param_type::system_type_param_type()
-{
-	for(size_t i = 0; i < NumSystems; ++i)
+	const std::array< std::string, SystemType::Count > SystemNames = {
+		//	"Noughts & Crosses",
+		//	"Ship & Thrusters 2D",
+		"Physics 2D",
+		"Elevator",
+	};
+
+	namespace sb = prm::schema;
+
+	std::string i_system::update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, bool evolvable)
 	{
-		add_item(SystemNames[i], (SystemType)i);
-	}
-	set_default_index(1);
-}
+		auto relative = std::string{ "sys_params" };
+		auto path = prefix + relative;
 
-
-system_param_type::system_param_type(bool evolvable)
-{
-	m_evolvable = evolvable;
-	add_dependency("System Type", 1);
-}
-
-size_t system_param_type::provide_num_child_params(rtp_param_manager* mgr) const
-{
-	return 2;
-}
-
-rtp_named_param system_param_type::provide_child_param(size_t index, rtp_param_manager* mgr) const
-{
-	switch(index)
-	{
-		case 0:
-		return rtp_named_param(new system_type_param_type(), "System Type");
-
-		case 1:
+		(*provider)[path + std::string("sys_type")] = [](prm::param_accessor)
 		{
-			SystemType system = boost::any_cast<SystemType>(mgr->retrieve_param("System Type"));
-			return i_system::params(system, m_evolvable);
+			auto s = sb::enum_selection(
+				"sys_type",
+				std::vector < std::string > { begin(SystemNames), end(SystemNames) },
+				0, 1);
+			sb::label(s, "System Type");
+			sb::trigger(s, "sys_type_changed");
+			return s;
+		};
+
+		path += std::string("type_specific_sys_params");
+
+		auto phys2d_rel = rtp::phys_system::update_schema_providor(provider, path, evolvable);
+		auto elevator_rel = rtp::elevator_system::update_schema_providor(provider, path, evolvable);
+
+		(*provider)[path] = [=](prm::param_accessor param_vals)
+		{
+			auto s = sb::list("type_specific_sys_params");
+			auto node = param_vals["sys_type"];
+			auto enum_sel = (!node || node.as< prm::is_unspecified >()) ? SystemType::Default : node[0].as< SystemType >();
+			switch(enum_sel)
+			{
+				case SystemType::Physics2D:
+				sb::append(s, provider->at(path + phys2d_rel)(param_vals));
+				break;
+				case SystemType::Elevator:
+				sb::append(s, provider->at(path + elevator_rel)(param_vals));
+				break;
+			}
+			sb::unborder(s);
+			sb::update_on(s, "sys_type_changed");
+			return s;
+		};
+
+		path.pop();
+
+		(*provider)[path + std::string("random_seed")] = [](prm::param_accessor)
+		{
+			auto s = sb::integer(
+				"random_seed",
+				0,
+				0);
+			sb::label(s, "Random Seed");
+			return s;
+		};
+
+		(*provider)[path] = [=](prm::param_accessor param_vals)
+		{
+			auto s = sb::list(relative);
+			sb::append(s, provider->at(path + std::string("sys_type"))(param_vals));
+			sb::append(s, provider->at(path + std::string("type_specific_sys_params"))(param_vals));
+			if(!evolvable)
+			{
+				sb::append(s, provider->at(path + std::string("random_seed"))(param_vals));
+			}
+			sb::label(s, "System");
+			return s;
+		};
+
+		return relative;
+	}
+
+	std::unique_ptr< i_system_factory > i_system::generate_system_factory(prm::param_accessor param_vals)
+	{
+		std::unique_ptr< i_system_factory > result{};
+
+		param_vals.push_relative_path(prm::qualified_path("sys_params"));
+		auto sys_type_node = param_vals["sys_type"];
+		if(sys_type_node.as< prm::is_unspecified >())
+		{
+			throw prm::required_unspecified("System Type");
+		}
+		SystemType type = sys_type_node[0].as< SystemType >();
+		param_vals.push_relative_path(prm::qualified_path("type_specific_sys_params"));
+
+		switch(type)
+		{
+			/*		case NoughtsAndCrosses:
+			return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
+
+			case ShipAndThrusters2D:
+			return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
+			*/
+			case SystemType::Physics2D:
+			result = rtp::phys_system::generate_factory(param_vals);
+			break;
+			case SystemType::Elevator:
+			result = rtp::elevator_system::generate_factory(param_vals);
+			break;
 		}
 
-		default:
-		return rtp_named_param();
-	}
-}
+		param_vals.pop_relative_path();
 
-
-rtp_param_type* i_system::params(bool evolvable)
-{
-	return new system_param_type(evolvable);
-}
-
-rtp_param_type* i_system::params(SystemType sys, bool evolvable)
-{
-	switch(sys)
-	{
-/*		case NoughtsAndCrosses:
-		// TODO:
-		return new rtp_staticparamlist_param_type(rtp_named_param_list());
-
-		case ShipAndThrusters2D:
-		return rtp_sat::sat_system< WorldDimensionality::dim2D >::params(evolvable);
-*/
-		case Physics2D:
-		return rtp_phys::phys_system::params(evolvable);
-
-		default:
-		return nullptr;
-	}
-}
-
-namespace sb = prm::schema;
-
-YAML::Node i_system::get_schema(YAML::Node const& param_vals, bool evolvable)
-{
-	auto schema = sb::list("sys_params");
-	sb::label(schema, "System Params");
-
-	auto type = sb::enum_selection("System Type", { begin(SystemNames), end(SystemNames) });
-	sb::on_update(type);
-	sb::append(schema, type);
-
-	auto node = prm::find_value(param_vals, "System Type");
-	auto enum_sel = node.IsNull() ? SystemType::Default : node.as< SystemType >();
-	switch(enum_sel)
-	{
-		case SystemType::Physics2D:
+		if(param_vals["random_seed"])
 		{
-			sb::append(schema, rtp_phys::phys_system::get_schema(param_vals, evolvable));
+			auto rseed = param_vals["random_seed"].as< uint32_t >();
+			// TODO: 0 should be a valid seed, we need control allowing integer input and also special options, in this
+			// case <auto>.
+			if(rseed != 0)
+			{
+				result->set_random_seed(rseed);
+			}
 		}
-		break;
 
-		default:
-		assert(false);
+		param_vals.pop_relative_path();
+
+		return result;
 	}
 
-	return schema;
-}
-
-std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(rtp_param param, bool evolvable)
-{
-	auto param_list = boost::any_cast<rtp_param_list>(param);
-	SystemType type = boost::any_cast<SystemType>(param_list[0]);
-	switch(type)
+	agents_data i_system::generate_agents_data(prm::param_accessor param_vals, bool evolvable)
 	{
-/*		case NoughtsAndCrosses:
-		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
-	
-		case ShipAndThrusters2D:
-		return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
-*/	
-		case Physics2D:
-		return rtp_phys::phys_system::create_instance(param_list[1], evolvable);
-	
-		default:
-		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >(nullptr, nullptr, nullptr, nullptr, nullptr);
-	}
-}
+		agents_data result{};
 
-std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(YAML::Node const& param, bool evolvable)
-{
-	SystemType type = prm::find_value(param, "System Type").as< SystemType >();
-	switch(type)
+		param_vals.push_relative_path(prm::qualified_path("sys_params"));
+		SystemType type = param_vals["sys_type"][0].as< SystemType >();
+		param_vals.push_relative_path(prm::qualified_path("type_specific_sys_params"));
+
+		switch(type)
+		{
+			/*		case NoughtsAndCrosses:
+			return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
+
+			case ShipAndThrusters2D:
+			return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
+			*/
+			case SystemType::Physics2D:
+			result = rtp::phys_system::generate_agents_data(param_vals, evolvable);
+			break;
+			case SystemType::Elevator:
+			result = rtp::elevator_system::generate_agents_data(param_vals, evolvable);
+			break;
+		}
+
+		param_vals.pop_relative_path();
+		param_vals.pop_relative_path();
+
+		return result;
+	}
+
+	std::vector< std::string > i_system::get_agent_type_names(SystemType sys_type)
 	{
-		/*		case NoughtsAndCrosses:
-		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
+		switch(sys_type)
+		{
+			case SystemType::Physics2D:
+			return phys_system::get_agent_type_names();
+			case SystemType::Elevator:
+			return elevator_system::get_agent_type_names();
 
-		case ShipAndThrusters2D:
-		return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
-		*/
-		case Physics2D:
-		return rtp_phys::phys_system::create_instance(param, evolvable);
-
-		default:
-		return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >(nullptr, nullptr, nullptr, nullptr, nullptr);
+			default:
+			throw std::exception("Invalid system type");
+		}
 	}
-}
 
+	std::vector< std::string > i_system::get_agent_sensor_names(SystemType sys_type, prm::param agent_type, prm::param_accessor param_vals)
+	{
+		switch(sys_type)
+		{
+			case SystemType::Physics2D:
+			return phys_system::get_agent_sensor_names(agent_type, param_vals);
+			case SystemType::Elevator:
+			return elevator_system::get_agent_sensor_names(agent_type, param_vals);
+
+			default:
+			throw std::exception("Invalid system type");
+		}
+	}
+
+	size_t i_system::get_agent_num_effectors(SystemType sys_type, prm::param agent_type)
+	{
+		switch(sys_type)
+		{
+			case SystemType::Physics2D:
+			return phys_system::get_agent_num_effectors(agent_type);
+			case SystemType::Elevator:
+			return elevator_system::get_agent_num_effectors(agent_type);
+
+			default:
+			throw std::exception("Invalid system type");
+		}
+	}
+
+	std::vector< std::string > i_system::get_system_state_values(prm::param_accessor param_vals)
+	{
+		auto sys_type = param_vals["sys_type"][0].as< SystemType >();
+		switch(sys_type)
+		{
+			case SystemType::Physics2D:
+			return phys_system::get_state_values(param_vals);
+			case SystemType::Elevator:
+			return elevator_system::get_state_values(param_vals);
+
+			default:
+			throw std::exception("Invalid System Type");
+		}
+	}
+
+
+	void i_system::set_random_seed(unsigned long rseed)
+	{
+		m_rgen.seed(rseed);
+	}
+
+	void i_system::output_performance_data(perf_data_t const& pd, std::ostream& strm)
+	{
+		typedef std::chrono::duration< double > d_dur;
+		auto total_time = d_dur{};
+		for(auto const& entry : pd)
+		{
+			total_time += entry.second;
+		}
+		
+		strm << "\nOverall performance data:\n";
+		auto denom = 0.01 * total_time.count();
+		strm << std::setprecision(2);
+		for(auto const& entry : pd)
+		{
+			strm << entry.first << ": " << entry.second.count() / denom << "%" << std::endl;
+		}
+		strm << std::endl;
+	}
+
+
+#if 0
+	std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(prm::param_accessor param_vals, bool evolvable)
+	{
+		std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > result{ nullptr, nullptr, nullptr, nullptr, nullptr };
+		param_vals.push_relative_path(prm::qualified_path("sys_params"));
+		SystemType type = param_vals["sys_type"][0].as< SystemType >();
+		param_vals.push_relative_path(prm::qualified_path("type_specific_sys_params"));
+		switch(type)
+		{
+			/*		case NoughtsAndCrosses:
+			return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
+
+			case ShipAndThrusters2D:
+			return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
+			*/
+			case Physics2D:
+			{
+				result = rtp::phys_system::create_instance(param_vals, evolvable);
+				break;
+			}
+		}
+
+		param_vals.pop_relative_path();
+		param_vals.pop_relative_path();
+
+		return result;
+	}
+
+	std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > i_system::create_instance(prm::param& param_vals, bool evolvable)
+	{
+		SystemType type = param_vals["type"].as< SystemType >();
+		switch(type)
+		{
+			/*		case NoughtsAndCrosses:
+			return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer* >(nullptr, nullptr, nullptr, nullptr);
+
+			case ShipAndThrusters2D:
+			return rtp_sat::sat_system< WorldDimensionality::dim2D >::create_instance(param_list[1], evolvable);
+			*/
+			case Physics2D:
+			{
+				return rtp::phys_system::create_instance(param_vals, evolvable);
+			}
+
+			default:
+			return std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* >(nullptr, nullptr, nullptr, nullptr, nullptr);
+		}
+	}
+#endif
+
+}

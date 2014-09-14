@@ -1,55 +1,107 @@
 // test_body.cpp
 
 #include "test_body.h"
-#include "../../../params/paramlist_par.h"
+#include "../rtp_phys_entity_data.h"
+#include "../rtp_phys_system.h"
+
 #include "wt_param_widgets/pw_yaml.h"
+#include "wt_param_widgets/schema_builder.h"
+#include "wt_param_widgets/param_accessor.h"
 
 #include "Box2D/Box2D.h"
 
 
-namespace rtp_phys {
-
-	rtp_param_type* test_body::spec::params()
-	{
-		rtp_named_param_list p = agent_body_spec::base_params();
-		// Add more here
-		return new rtp_staticparamlist_param_type(p);
-	}
+namespace rtp {
 
 	namespace sb = prm::schema;
 
-	YAML::Node test_body::spec::get_schema(YAML::Node const& param_vals)
+	prm::schema::schema_node test_body::spec::get_schema(prm::param_accessor param_vals)
 	{
-		auto schema = sb::list("Test Creature Params");
-		sb::append(schema, sb::integer("Placeholder", 0));
+		auto schema = sb::list("test_creature");
+		sb::append(schema, sb::real("max_torque", 200.0));
+		sb::label(sb::last(schema), "Max Joint Torque");
 		return schema;
 	}
 
-	test_body::spec* test_body::spec::create_instance(rtp_param param)
+	std::string test_body::spec::update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
 	{
+		auto relative = std::string{ "test_creature" };
+		auto path = prefix + relative;
+
+		(*provider)[path + std::string("max_torque")] = [](prm::param_accessor)
+		{
+			auto s = sb::real("max_torque", 200.0);
+			sb::label(s, "Max Joint Torque");
+			return s;
+		};
+
+
+		(*provider)[path] = [=](prm::param_accessor param_vals)
+		{
+			auto s = sb::list(relative);
+			sb::append(s, provider->at(path + std::string("max_torque"))(param_vals));
+			return s;
+		};
+
+		return relative;
+	}
+	/*
+	i_agent_factory* test_body::create_factory(prm::param_accessor spec_acc, prm::param_accessor inst_acc)
+	{
+
+	}
+	*/
+
+	test_body::spec* test_body::spec::create_instance(prm::param_accessor param)
+	{
+		param.push_relative_path(prm::qualified_path("test_creature"));
 		spec* s = new spec();
 		agent_body_spec::create_base_instance(param, s);
+		s->max_joint_torque = param["max_torque"].as< double >();
+		param.pop_relative_path();
 		return s;
 	}
 
-	test_body::spec* test_body::spec::create_instance(YAML::Node const& param)
+	test_body::spec* test_body::spec::create_instance(prm::param& param)
 	{
 		spec* s = new spec();
 		agent_body_spec::create_base_instance(param, s);
+		s->max_joint_torque = param["max_torque"].as< double >();
 		return s;
+	}
+
+	agent_sensor_name_list test_body::spec::sensor_inputs()
+	{
+		auto inputs = composite_rigid_body::sensor_inputs();
+		inputs.insert(
+			end(inputs),
+			{
+			std::string("Joint Angle"),
+			std::string("Joint Speed"),
+			});
+		return inputs;
+	}
+
+	size_t test_body::spec::num_effectors()
+	{
+		return 1;
 	}
 
 
 	agent_body* test_body::spec::create_body(b2World* world)
 	{
-		return new test_body(*this, world);
+		return nullptr;// new test_body(*this, world);
 	}
 
 	test_body::spec::spec(): agent_body_spec(agent_body_spec::Type::TestCreature)
-	{}
-
-	test_body::test_body(spec const& spc, b2World* world)
 	{
+	}
+
+
+	test_body::test_body(phys_agent_specification const& spec, phys_system* system) : composite_rigid_body(spec, system)
+	{
+		auto world = system->get_world();
+
 		float32 const initial_y = 2.5f;
 		m_rear_len = 4.0f;
 		m_fore_len = 2.0f;
@@ -102,8 +154,37 @@ namespace rtp_phys {
 
 		joint = (b2RevoluteJoint*)world->CreateJoint(&jd);
 
-		m_bodies.push_back(rear);
-		m_bodies.push_back(fore);
+		add_component_body(rear, entity_data::val_t{});
+		add_component_body(fore, entity_data::val_t{});
+
+		m_max_joint_torque = spec.spec_acc["max_torque"].as< double >();
+	}
+
+	double test_body::get_sensor_value(agent_sensor_id const& sensor) const
+	{
+		switch(sensor)
+		{
+			case spec::Sensors::JointAngle:
+			return joint->GetJointAngle();
+			case spec::Sensors::JointSpeed:
+			return joint->GetJointSpeed();
+			default:
+			return composite_rigid_body::get_sensor_value(sensor);
+		}
+	}
+
+	void test_body::activate_effectors(std::vector< double > const& activations)
+	{
+		agent_body::activate_effectors(activations);
+
+		auto torque = activations[0] * m_max_joint_torque;
+		fore->ApplyTorque(torque, true);
+		rear->ApplyTorque(-torque, true);
+	}
+
+	double test_body::get_max_joint_torque() const
+	{
+		return m_max_joint_torque;
 	}
 
 /*
@@ -137,6 +218,4 @@ namespace rtp_phys {
 	}
 */
 }
-
-
 

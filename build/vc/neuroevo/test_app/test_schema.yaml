@@ -1,0 +1,16 @@
+name: root
+type: container
+visual:
+  label: A grouped list
+  border: true
+children:
+  -
+   name: edit1
+   type: string
+   visual:
+     label: A text edit
+  -
+   name: check1
+   type: bool
+   visual:
+     label: A check box

@@ -8,19 +8,13 @@
 
 namespace prm
 {
-	class vector_par_wgt:
-		public param_tree::param_wgt
+	class vector_par_wgt
 	{
 	public:
-		virtual param get_param() const;
-		virtual void set_from_param(param const& p);
+		static param_tree::param_wgt_impl* create(YAML::Node schema, param_wgt_impl::options_t options = param_wgt_impl::Default);
 
-	protected:
-		virtual Wt::WWidget* create_impl(YAML::Node const& script);
-
-	protected:
-		class impl;
-		impl* m_impl;
+	private:
+		class default_impl;
 	};
 }
 

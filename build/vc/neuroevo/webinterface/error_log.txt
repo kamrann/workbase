@@ -1,0 +1,17 @@
+Option no-compression is implied because wthttp was built without zlib support.
+Option no-compression is implied because wthttp was built without zlib support.
+127.0.0.1 - - [2014-Sep-13 16:44:33.681386] "GET /home HTTP/1.1" 200 7606
+127.0.0.1 - - [2014-Sep-13 16:44:33.715410] "GET /home HTTP/1.1" 200 7607
+127.0.0.1 - - [2014-Sep-13 16:44:33.724416] "POST /?wtd=CSNvkLOibO95bQQD HTTP/1.1" 404 85
+127.0.0.1 - - [2014-Sep-13 16:44:34.492962] "GET /home?wtd=qDYVawtFatauJk2q&request=style HTTP/1.1" 200 141
+127.0.0.1 - - [2014-Sep-13 16:44:34.511976] "GET /style/param_widgets.css HTTP/1.1" 304 0
+127.0.0.1 - - [2014-Sep-13 16:44:34.552005] "GET /home?wtd=qDYVawtFatauJk2q&sid=-848853914&webGL=true&tz=60&htmlHistory=true&deployPath=%2Fhome&request=script&rand=3648077625 HTTP/1.1" 200 166078
+127.0.0.1 - - [2014-Sep-13 16:44:34.623056] "GET /resources/themes/polished/title-gradient.png HTTP/1.1" 304 0
+127.0.0.1 - - [2014-Sep-13 16:44:34.682097] "POST /home?wtd=qDYVawtFatauJk2q HTTP/1.1" 200 5156
+127.0.0.1 - - [2014-Sep-13 16:44:37.351996] "POST /home?wtd=qDYVawtFatauJk2q HTTP/1.1" 200 0
+127.0.0.1 - - [2014-Sep-13 16:44:37.384037] "POST /home?wtd=qDYVawtFatauJk2q HTTP/1.1" 200 17449
+127.0.0.1 - - [2014-Sep-13 16:44:37.404032] "GET /resources/themes/polished/gradient.png HTTP/1.1" 304 0
+127.0.0.1 - - [2014-Sep-13 16:44:37.405033] "GET /resources/themes/polished/dropdown.png HTTP/1.1" 304 0
+127.0.0.1 - - [2014-Sep-13 16:44:37.409035] "GET /resources/themes/default/spin-buttons.png HTTP/1.1" 304 0
+127.0.0.1 - - [2014-Sep-13 16:45:27.474624] "POST /home?wtd=qDYVawtFatauJk2q HTTP/1.1" 200 0
+127.0.0.1 - - [2014-Sep-13 16:46:17.474163] "POST /home?wtd=qDYVawtFatauJk2q HTTP/1.1" 200 0

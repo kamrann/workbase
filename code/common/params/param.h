@@ -4,6 +4,7 @@
 #define __WB_PARAM_H
 
 #include "util/dimensionality.h"
+#include "util/fixed_or_random.h"
 
 #include <boost/variant/variant.hpp>
 #include <boost/variant/recursive_wrapper.hpp>
@@ -12,7 +13,12 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
+
+namespace YAML {
+	class Node;
+}
 
 namespace prm
 {
@@ -32,6 +38,7 @@ namespace prm
 
 		// Composite
 		List,	// A list of params
+		Repeat,
 
 		Count,
 		None = Count,
@@ -116,6 +123,93 @@ namespace prm
 	};
 
 
+	typedef YAML::Node param;
+
+
+	template < typename T >
+	inline T extract_as(param const& p, T const& default_value = T())
+	{
+		try
+		{
+			return p.as< T >();
+		}
+		catch(...)
+		{
+			return default_value;
+		}
+	}
+
+	template < typename T >
+	inline bool extract_to(param const& p, T& dest, T const& default_value = T())
+	{
+		try
+		{
+			dest = p.as< T >();
+			return true;
+		}
+		catch(...)
+		{
+			dest = default_value;
+			return false;
+		}
+	}
+
+
+/*	enum ParamNode {
+		Name,
+		Type,
+		Value,
+	};
+*/
+	struct ParamNode
+	{
+		static const int Name = 0;
+		static const int Type = 1;
+		static const int Value = 2;
+	};
+
+	bool is_param_node(YAML::Node n);
+
+	class qualified_path;
+
+	param instantiate_includes(
+		param const& node,
+		bool recursive
+		);
+
+	std::set< qualified_path > construct_abs_paths(
+		param const& p,
+		qualified_path const& cur_path
+		);
+		
+	qualified_path resolve_id(
+		std::string const& name,
+		param const& p,
+		qualified_path const& path,
+		std::set< qualified_path > const& all_paths
+		);
+
+	param find_value(
+		param const& node,
+		qualified_path const& name
+		);
+
+	///////////// TODO: Temp solution
+}
+#include <boost/random/mersenne_twister.hpp>
+namespace prm {
+
+	fixed_or_random<
+		double,
+		boost::random::uniform_real_distribution< double >,
+		boost::random::mt19937
+	> extract_fixed_or_random(
+		prm::param const& node,
+		double default_value = 0.0
+		);
+	///////////////////
+
+	/*
 	typedef boost::make_recursive_variant<
 		bool,
 		int,
@@ -170,6 +264,7 @@ namespace prm
 			return param();
 		}
 	}
+	*/
 }
 
 

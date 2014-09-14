@@ -11,25 +11,28 @@
 #include <vector>
 
 
-class rtp_pareto: public i_population_wide_observer
-{
-public:
-	rtp_pareto(std::vector< std::string > const& components);
+namespace rtp {
 
-public:
-	virtual eval_data_t initialize(size_t pop_size) const;
-	virtual void register_datapoint(population_observations_t const& observations, eval_data_t& edata) const;
-	virtual std::vector< boost::any > evaluate(eval_data_t const& edata, boost::optional< std::string >& analysis) const;
-//	virtual std::string get_analysis(eval_data_t const& edata) const;
+	class rtp_pareto: public i_population_wide_observer
+	{
+	public:
+		rtp_pareto(std::vector< std::string > const& components);
 
-protected:
-	std::vector< std::string > m_components;
+	public:
+		virtual eval_data_t initialize(size_t pop_size) const;
+		virtual void register_datapoint(population_observations_t const& observations, eval_data_t& edata) const;
+		virtual std::vector< boost::any > evaluate(eval_data_t const& edata, boost::optional< std::string >& analysis) const;
+		//	virtual std::string get_analysis(eval_data_t const& edata) const;
 
-//	typedef std::vector< double > obj_components;
-	typedef std::vector< pareto< double > > idv_datapoints;
-	typedef std::vector< idv_datapoints > eval_data;
-};
+	protected:
+		std::vector< std::string > m_components;
 
+		//	typedef std::vector< double > obj_components;
+		typedef std::vector< pareto< double > > idv_datapoints;
+		typedef std::vector< idv_datapoints > eval_data;
+	};
+
+}
 
 
 #endif

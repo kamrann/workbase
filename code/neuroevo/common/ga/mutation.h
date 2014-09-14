@@ -31,7 +31,7 @@ struct basic_real_mutation
 	template < typename Genome >
 	inline void operator() (Genome& child, double rate)
 	{
-		genome_t& child_gn = rtp_cast<genome_t>(child);
+		genome_t& child_gn = rtp::rtp_cast<genome_t>(child);
 
 		// For each gene, dependent upon mutation rate...
 		for(auto& gene: child_gn)

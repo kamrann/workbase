@@ -9,7 +9,7 @@
 #include <boost/math/constants/constants.hpp>
 
 
-namespace rtp_phys {
+namespace rtp {
 
 /*	struct maintain_upright_stance_obj_fn: public objective_fn
 	{

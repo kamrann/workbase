@@ -1,0 +1,21 @@
+.expander {
+	width: 21px;
+	height: 21px;
+	background: transparent url("../resources/themes/polished/expander.png") no-repeat;
+	background-position: 0px 0px;
+	border: 1px solid rgb(100, 100, 100);
+	border-radius: 2px;
+}
+
+.expander:hover {
+	background-position: 0px 0px;
+	background-color: red;/*rgb(245, 245, 245);*/
+	border: 1px solid rgb(100, 100, 100);
+}
+
+.expander:focus {
+	background-position: 1px 1px;
+	background-color: rgb(230, 230, 230);
+/*	border: 1px solid rgb(100, 100, 100);*/
+	border: none;
+}

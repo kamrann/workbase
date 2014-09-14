@@ -19,13 +19,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -89,9 +89,13 @@
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\enum_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\integer_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\par_wgt.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\par_wgt_holder.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\pw_yaml.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\qualified_path.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\random_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\realnum_par_wgt.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\repeat_par_wgt.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\schema_builder.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\string_par_wgt.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.cpp" />
   </ItemGroup>
@@ -100,11 +104,20 @@
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\container_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\enum_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\integer_par_wgt.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\param_accessor.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\param_manager.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\par_wgt.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\par_wgt_holder.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_exceptions.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_fwd.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_schema.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_unspecified.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\pw_yaml.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\qualified_path.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\random_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\realnum_par_wgt.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\repeat_par_wgt.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\schema_builder.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\string_par_wgt.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_param_widgets\vector_par_wgt.h" />
   </ItemGroup>

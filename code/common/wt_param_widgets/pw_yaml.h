@@ -5,6 +5,7 @@
 
 #include "params/param.h"
 #include "container_par_wgt.h"
+#include "pw_unspecified.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -47,18 +48,18 @@ namespace YAML {
 	{
 		static Node encode(prm::enum_param_val const& rhs)
 		{
-			return Node(boost::any_cast< std::string >(rhs.contents));
+			return Node(boost::any_cast< std::vector< std::string > >(rhs.contents));
 		}
 
 		static bool decode(Node const& node, prm::enum_param_val& rhs)
 		{
-			if(!node.IsScalar())
+			if(!node.IsSequence())//IsScalar())
 			{
 				return false;
 			}
 
 			rhs = prm::enum_param_val();
-			rhs.contents = node.Scalar();
+			rhs.contents = node.as< std::vector< std::string > >();//node.Scalar();
 			return true;
 		}
 	};
@@ -113,7 +114,11 @@ namespace YAML {
 
 		static bool decode(Node const& node, prm::random& rhs)
 		{
-			assert(node.IsSequence() && node.size() == 2); // todo: dist
+			if(!(node.IsSequence() && node.size() == 2)) // todo: dist
+			{
+				return false;
+			}
+
 			rhs.is_fixed = node[0].as< bool >();
 			if(rhs.is_fixed)
 			{
@@ -157,39 +162,28 @@ namespace YAML {
 		static std::map< std::string, prm::container_par_wgt::Layout > const mapping_;
 	};
 
-}
-
-
-namespace prm {
-
-	namespace schema
+	template <>
+	struct convert < prm::is_unspecified >
 	{
-		typedef YAML::Node schema_builder;
+		static Node encode(prm::is_unspecified const& rhs)
+		{
+			throw std::exception("is_unspecified: encode() shouldn't be called!");
+		}
 
-		schema_builder boolean(std::string const& name, bool default_val);
-		schema_builder integer(std::string const& name, int default_val, boost::optional< int > min_val = boost::optional< int >(), boost::optional< int > max_val = boost::optional< int >());
-		schema_builder real(std::string const& name, double default_val, boost::optional< double > min_val = boost::optional< double >(), boost::optional< double > max_val = boost::optional< double >());
-		schema_builder string(std::string const& name, std::string const& default_val = "");
-		schema_builder enum_selection(std::string const& name, std::vector< std::string > const& values);
-		schema_builder random(std::string const& name, double default_val, boost::optional< double > min_val, boost::optional< double > max_val, boost::optional< double > default_min = boost::none, boost::optional< double > default_max = boost::none);
-		schema_builder list(std::string const& name);
+		static bool decode(Node const& node, prm::is_unspecified& rhs)
+		{
+			// Should only be called for an enum_par_wgt, with single selection setup
+			if(!node.IsSequence() || node.size() != 1 || !node[0].IsScalar())
+			{
+				return false;
+			}
 
-		void append(schema_builder& schema, schema_builder const& child);
-		void layout_vertical(schema_builder& schema);
-		void layout_horizontal(schema_builder& schema);
-
-		void label(schema_builder& sb, std::string const& text);
-		void unlabel(schema_builder& sb);
-		void border(schema_builder& sb, boost::optional< std::string > label_text = boost::none);
-		void unborder(schema_builder& sb);
-		void on_update(schema_builder& sb);
-	}
-
-	// Used only for param value YAML	
-	YAML::Node find_value(YAML::Node const& node, std::string const& name);
+			rhs.val = node[0].Scalar() == prm::unspecified;
+			return true;
+		}
+	};
 
 }
-
 
 
 #endif

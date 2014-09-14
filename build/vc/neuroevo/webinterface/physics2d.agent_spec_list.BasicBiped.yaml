@@ -1,0 +1,3 @@
+- agent_spec_list
+- repeat
+- 1: !<!import> physics2d.agent_spec.BasicBiped.yaml

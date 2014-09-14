@@ -4,12 +4,12 @@
 #define __NE_RTP_PHYS_OBJECTIVES_H
 
 #include "rtp_phys_system.h"
-#include "rtp_phys_observers.h"
+#include "../../rtp_observer.h"
 
 #include "ga/single_objective.h"
 
 
-namespace rtp_phys
+namespace rtp
 {
 	class agent_objective
 	{
@@ -21,12 +21,13 @@ namespace rtp_phys
 //			MaintainUprightStance,
 			MinAverageKE,
 			MaintainAltitude,
+			MinNonFootContacts,
 
 			Count,
 		};
 
 		static std::string const Names[Count];
-
+		/*
 		class enum_param_type: public rtp_enum_param_type
 		{
 		public:
@@ -42,11 +43,12 @@ namespace rtp_phys
 
 		//static rtp_param_type* params(Type type);
 		static i_phys_observer* create_instance(Type type, rtp_param param);
+		*/
 	};
 
 
 	// TODO: May not need to distinguish objective from observer
-	class phys_objective_fn: public i_phys_observer
+	class phys_objective_fn: public i_observer
 	{};
 
 	template <
@@ -71,9 +73,9 @@ namespace rtp_phys
 			ofd = of_data_t();
 		}
 
-		virtual void update(/*decision,*/ state_t const& st)
+		virtual void update(i_system const* system)
 		{
-			ofd.update(/* TODO: Decision ??? */(int)0, (agent_state_t const&)st, (envt_state_t const&)st);
+			ofd.update(system);// /* TODO: Decision ??? */(int)0, (agent_state_t const&)st, (envt_state_t const&)st);
 		}
 
 		virtual observations_t record_observations(trial_data_t const& td)

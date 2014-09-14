@@ -1,0 +1,15 @@
+.groupbox fieldset {
+	position: relative;
+	padding: 6px 6px;
+	border: none;
+	border-bottom: 1px solid rgb(100, 100, 100);
+}
+
+.groupbox legend {
+	position: relative;
+	left: -6px;
+	padding: 0px 0px;
+/* Screws up layouts	width: 100%; */
+	font: 100% arial, sans-serif;
+	border-bottom: 1px solid rgb(100, 100, 100);
+}

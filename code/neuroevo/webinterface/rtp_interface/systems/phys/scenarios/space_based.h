@@ -6,7 +6,7 @@
 #include "../rtp_phys_scenario.h"
 
 
-namespace rtp_phys
+namespace rtp
 {
 	class space_based_scenario: public phys_scenario
 	{
@@ -18,13 +18,11 @@ namespace rtp_phys
 			Count,
 		};
 
-		static rtp_named_param_list params();
-
-		space_based_scenario(rtp_param param);
+		space_based_scenario();
 
 	public:
 		virtual boost::any generate_initial_state(rgen_t& rgen) const;
-		virtual void load_initial_state(boost::any const& data, phys_system::state& st) const;
+		virtual void load_initial_state(boost::any const& data, b2World* world);
 
 	protected:
 		struct init_state_data

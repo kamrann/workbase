@@ -8,20 +8,39 @@
 
 class b2Body;
 
-namespace rtp_phys {
+namespace rtp {
 
 	class simple_rigid_body: public agent_body
 	{
 	public:
-		static agent_sensor_list sensor_inputs()
+		typedef agent_body base_t;
+
+		enum Sensors {
+			_Prev = base_t::Sensors::_Next - 1,
+
+			Orientation,
+			AngularVelocity,
+			LocalVelocity_X,
+			LocalVelocity_Y,
+
+			_Next,
+		};
+
+		static agent_sensor_name_list sensor_inputs()
 		{
 			auto inputs = agent_body::sensor_inputs();
-			inputs.insert(begin(inputs), {
-				"Orientation",
-				"AngVel",
-			});
+			inputs.insert(
+				end(inputs),
+				{
+					std::string("Orientation"),
+					std::string("AngVel"),
+					std::string("Local Vel[x]"),
+					std::string("Local Vel[y]"),
+				});
 			return inputs;
 		}
+
+		using agent_body::agent_body;
 
 	public:
 		virtual void translate(b2Vec2 const& vec);
@@ -36,13 +55,19 @@ namespace rtp_phys {
 
 		virtual b2Vec2 get_position() const;
 		virtual b2Vec2 get_linear_velocity() const;
+		virtual b2Vec2 get_local_linear_velocity() const;
 		virtual float get_kinetic_energy() const;
 
 		virtual float get_orientation() const;
 		virtual float get_angular_velocity() const;
 		virtual float get_orientation_wrt_linear_velocity() const;
 
+		virtual double get_sensor_value(agent_sensor_id const& sensor) const;
+
 		virtual void draw(Wt::WPainter& painter) const;
+
+	protected:
+		void set_body(b2Body* body);
 
 	public:
 		b2Body* m_body;

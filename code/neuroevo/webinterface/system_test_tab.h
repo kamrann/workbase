@@ -5,17 +5,16 @@
 
 #include "system_coordinator.h"
 
-#include "rtp_interface/rtp_param_manager.h"
-
 #include <Wt/WContainerWidget>
-#include <Wt/WComboBox>
+#include <Wt/WPushButton>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>
+
+#include <memory>
 
 
 using namespace Wt;
 
-//class i_param_widget;
 namespace prm {
 	class param_tree;
 }
@@ -31,20 +30,22 @@ public:
 
 private:
 	void on_system_changed();
+	void on_stop();
 	void on_restart();
 
 public:	// temp public
-	system_coordinator* coordinator;
+	std::unique_ptr< system_coordinator > coordinator;
 
 private:
 	WVBoxLayout* vlayout;
 	WHBoxLayout* hlayout;
-//	i_param_widget* system_params_widget;
-//	rtp_param_manager param_mgr;
 	prm::param_tree* system_params_tree;
 
 	WWidget* system_widget;
 	WWidget* history_widget;
+
+	WPushButton* stop_button;
+	WPushButton* restart_button;
 };
 
 

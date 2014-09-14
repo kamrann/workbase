@@ -2,6 +2,8 @@
 
 #include "table_traits.h"
 
+#if 0
+
 #include "evo_run_tbl.h"
 #include "sys_params_tbl.h"
 #include "sys_type_tbl.h"
@@ -50,7 +52,7 @@ namespace Wt { namespace Dbo {
 
 	dbo_traits<phys_agent_type>::IdType dbo_traits<phys_agent_type>::invalidId()
 	{
-		return rtp_phys::agent_body_spec::Type::None;
+		return rtp::agent_body_spec::Type::None;
 	}
 
 	dbo_traits<phys_controller_params>::IdType dbo_traits<phys_controller_params>::invalidId()
@@ -60,7 +62,7 @@ namespace Wt { namespace Dbo {
 
 	dbo_traits<phys_controller_type>::IdType dbo_traits<phys_controller_type>::invalidId()
 	{
-		return rtp_phys::evolvable_controller::Type::None;
+		return rtp::evolvable_controller::Type::None;
 	}
 
 	dbo_traits<phys_mlp_controller_params>::IdType dbo_traits<phys_mlp_controller_params>::invalidId()
@@ -70,7 +72,7 @@ namespace Wt { namespace Dbo {
 
 	dbo_traits<phys_mlp_inputs_type>::IdType dbo_traits<phys_mlp_inputs_type>::invalidId()
 	{
-		return rtp_phys::mlp_controller::Type::None;
+		return rtp::mlp_controller::Type::None;
 	}
 
 //	template<>
@@ -95,6 +97,7 @@ namespace Wt { namespace Dbo {
 }
 }
 
+#endif
 
 
 

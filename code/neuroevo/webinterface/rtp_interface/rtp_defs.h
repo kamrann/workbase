@@ -8,10 +8,14 @@
 #include <cstdint>
 
 
-typedef uint32_t agent_id_t;
-typedef double genotype_diversity_measure;
+namespace rtp {
 
-typedef boost::random::mt19937 rgen_t;
+	typedef uint32_t agent_id_t;
+	typedef double genotype_diversity_measure;
+
+	typedef boost::random::mt19937 rgen_t;
+
+}
 
 
 #endif

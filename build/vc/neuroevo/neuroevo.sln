@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "manual_thrusters_test", "manual_thrusters_test\manual_thrusters_test.vcxproj", "{66704DC4-FE69-4767-935E-E4A582D69DC5}"
 EndProject
@@ -20,6 +20,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "systems", "common\systems\systems.vcxproj", "{03CB50F6-DD56-4560-9D5A-2CE0E7DAB8F6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wt_param_widgets", "..\common\wt_param_widgets\wt_param_widgets.vcxproj", "{51B32241-2A77-4223-9D29-87CF3EE53997}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wt_custom_widgets", "..\common\wt_custom_widgets\wt_custom_widgets.vcxproj", "{F7C9C12A-FC74-4498-BCAA-D46D3E788314}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "neuralnet", "common\neuralnet\neuralnet.vcxproj", "{5E3419DC-727F-44DA-A09F-27E8C6EA016D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,6 +135,26 @@ Global
 		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|Win32.ActiveCfg = Release|Win32
 		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|Win32.Build.0 = Release|Win32
 		{51B32241-2A77-4223-9D29-87CF3EE53997}.Release|x64.ActiveCfg = Release|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Debug|Win32.Build.0 = Debug|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Debug|x64.ActiveCfg = Debug|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|Win32.ActiveCfg = Release|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|Win32.Build.0 = Release|Win32
+		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|x64.ActiveCfg = Release|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Debug|Win32.Build.0 = Debug|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Debug|x64.ActiveCfg = Debug|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Release|Win32.ActiveCfg = Release|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Release|Win32.Build.0 = Release|Win32
+		{5E3419DC-727F-44DA-A09F-27E8C6EA016D}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

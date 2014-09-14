@@ -3,6 +3,8 @@
 #ifndef __CROSSOVER_H
 #define __CROSSOVER_H
 
+#include "rtp_interface/rtp_genome_wrap.h"
+
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
@@ -70,7 +72,7 @@ struct basic_crossover
 		// TODO: Temp
 		*offspring = *parents[0];	// Hack: invoke clone to construct genome
 		//
-		genome_t& offspring_gn = rtp_cast<genome_t>(*offspring);// ->genome);
+		genome_t& offspring_gn = rtp::rtp_cast<genome_t>(*offspring);// ->genome);
 
 		// TODO: Should this be done here, or higher up? eg. when creating next_gen in gen_alg::epoch()
 		offspring_gn.resize(genome_length);
@@ -78,7 +80,7 @@ struct basic_crossover
 		// Now copy over the corresponding segment of genome from each parent to the child
 		for(size_t i = 0; i < NumParents; ++i)
 		{
-			genome_t const& parent_gn = rtp_cast<genome_t>(*parents[p_order[i]]);// ->genome);
+			genome_t const& parent_gn = rtp::rtp_cast<genome_t>(*parents[p_order[i]]);// ->genome);
 
 			std::copy(
 				parent_gn.begin() + cx_points[i],

@@ -7,7 +7,7 @@
 #include "../../rtp_observer.h"
 
 
-namespace rtp_phys
+namespace rtp
 {
 	class i_phys_observer: public i_observer
 	{
@@ -16,7 +16,6 @@ namespace rtp_phys
 		typedef phys_system::trial_data trial_data_t;
 
 	public:
-		virtual void update(/*decision,*/ state_t const& st) = 0;
 		virtual i_observer::observations_t record_observations(trial_data_t const& td) = 0;
 	};
 }

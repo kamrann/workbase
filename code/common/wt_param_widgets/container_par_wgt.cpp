@@ -12,58 +12,24 @@
 
 namespace prm
 {
-	container_par_wgt::container_par_wgt(schema_accessor_fn& schema_accessor): m_schema_accessor(schema_accessor)
-	{
-
-	}
-
-	void container_par_wgt::create_child_widgets(
-		std::string const& schema_name,
-		YAML::Node const& schema,
-		size_t start_index)
-	{
-		assert(schema.IsSequence());
-
-		for(auto index = start_index; index < schema.size(); ++index)
-		{
-			auto e = schema[index];
-			assert(e.IsMap());
-
-			param_wgt* child = param_wgt::create(e, m_schema_accessor);
-
-			if(e["update"] && e["update"].Scalar() == "default")
-			{
-				child->connect_changed_handler([this, schema_name, index]
-				{
-					YAML::Node sub_schema = m_schema_accessor(schema_name);
-
-					clear_children(index + 1);
-					create_child_widgets(schema_name, sub_schema["children"], index + 1);
-				});
-			}
-
-			add_child(child);
-		}
-	}
-
-
-	// TODO: Multiple implementations (eg. combo box based), which can be selected through options of param_wgt::create()
-	class container_par_wgt::impl: public Wt::WContainerWidget
+	class container_par_wgt::default_impl:
+		public param_tree::param_wgt_impl,
+		public Wt::WContainerWidget
 	{
 	public:
-		impl(YAML::Node const& script)
+		default_impl(YAML::Node schema, qualified_path const& id, param_tree* tree)
 		{
-			Layout style = Layout::Vertical;
-			if(auto& visual = script["visual"])
+			m_layout_orientation = Layout::Vertical;
+			if(auto& visual = schema["visual"])
 			{
 				if(auto& layout = visual["layout"])
 				{
-					style = layout.as< Layout >();
+					m_layout_orientation = layout.as< Layout >();
 				}
 			}
 
 			Wt::WBoxLayout* layout = nullptr;
-			switch(style)
+			switch(m_layout_orientation)
 			{
 				case Horizontal:
 				layout = new Wt::WHBoxLayout();
@@ -78,69 +44,162 @@ namespace prm
 
 			layout->setContentsMargins(0, 0, 0, 0);
 			setLayout(layout);
+
+			if(schema["children"])
+			{
+//				auto readonly = schema["readonly"] && schema["readonly"].as< bool >();
+				create_child_widgets(schema["name"].as< std::string >(), schema["children"], id, tree, false);// readonly);
+			}
 		}
+
+		virtual Wt::WWidget* get_wt_widget()
+		{
+			return this;
+		}
+
+		virtual Wt::Signals::connection connect_handler(pw_event::type type, pw_event_handler const& handler)
+		{
+			// TODO:
+			if(type == "changed")
+			{
+				return m_changed_event.connect(std::bind(handler));
+			}
+
+			return Wt::Signals::connection();
+		}
+
+		virtual param get_locally_instantiated_yaml_param(bool recursively_instantiate) const;
+		virtual bool update_impl_from_yaml_param(param const& p);
+
+	protected:
+		void create_child_widgets(
+			std::string const& schema_name,
+			YAML::Node const& schema,
+			qualified_path const& id,
+			param_tree* tree,
+			bool readonly,
+			size_t start_index = 0)
+		{
+			assert(schema.IsSequence());
+
+			auto layout_ = static_cast<Wt::WBoxLayout*>(layout());
+			Wt::WBoxLayout* sublayout = nullptr;
+			bool previous_unbordered = false;
+			for(auto index = start_index; index < schema.size(); ++index)
+			{
+				auto e = schema[index];
+				assert(e.IsMap());
+
+//				bool child_readonly = e["readonly"] && e["readonly"].as< bool >();
+//				e["readonly"] = child_readonly || readonly;
+				auto child = tree->create_widget(e, id);
+
+				bool standalone =
+					e["visual"]["border"] && e["visual"]["border"].as< bool >() ||
+					!is_leaf_type(e["type"].as< ParamType >());
+				if(standalone)
+				{
+					// Add directly to layout
+					layout_->addWidget(child, 0, Wt::AlignLeft | Wt::AlignTop);
+					sublayout = nullptr;
+				}
+				else
+				{
+					if(sublayout == nullptr)
+					{
+						sublayout = m_layout_orientation == Layout::Vertical ?
+							(Wt::WBoxLayout*)new Wt::WVBoxLayout :
+							(Wt::WBoxLayout*)new Wt::WHBoxLayout;
+						layout_->addLayout(sublayout, 0, Wt::AlignLeft | Wt::AlignTop);
+					}
+					sublayout->addWidget(child);
+				}
+
+				// Emit a changed signal any time a child does.
+				child->connect_handler("changed", [=]
+				{
+					tree->find_widget(id)->notify(child->get_id(), 0);
+
+					m_changed_event.emit(changed());
+				});
+			}
+		}
+
+	protected:
+		Layout m_layout_orientation;
+
+		struct changed
+		{};
+
+		Wt::Signal< changed > m_changed_event;
 	};
 
-	Wt::WWidget* container_par_wgt::create_impl(YAML::Node const& script)//, schema_accessor_fn& schema_accessor)
+/*
+	YAML::Node condense_single_entry_map_sequence(YAML::Node const& seq)
 	{
-		m_impl = new impl(script);
-		// Move into impl constructor?
-		if(script["children"])
+		YAML::Node mp;
+		for(auto const& n : seq)
 		{
-			create_child_widgets(/*this, */script["name"].as< std::string >(), script["children"]);// , schema_accessor);
-		}
-		//
-		return m_impl;
-	}
-	
-	void container_par_wgt::add_child(param_wgt* w)
-	{
-		m_impl->layout()->addWidget(w);
-	}
-	
-	void container_par_wgt::clear_children(size_t from_index)
-	{
-		auto layout = m_impl->layout();
-		while(m_impl->count() > from_index)
-		{
-			auto child = m_impl->widget(from_index);
-			layout->removeWidget(child);
-			delete child;
-		}
-	}
+			assert(n.IsMap() && n.size() == 1);
 
-	param container_par_wgt::get_param() const
+			auto const& entry = *n.begin();
+			mp[entry.first] = entry.second;
+		}
+		return mp;
+	}
+*/
+	param container_par_wgt::default_impl::get_locally_instantiated_yaml_param(bool recursively_instantiate) const
 	{
-		std::vector< param > child_params;
-		auto num = m_impl->count();
+		param content = YAML::Load("[]");
+		auto num = count();
 		for(auto i = 0; i < num; ++i)
 		{
-			Wt::WWidget* w = m_impl->widget(i);
+			Wt::WWidget* w = widget(i);
 			// TODO: For now just assuming that all children are param_wgts
-			param_wgt* pw = (param_wgt*)w;
-			child_params.push_back(pw->get_param());
+			param_tree::param_wgt* pw = (param_tree::param_wgt*)w;
+			content.push_back(pw->get_yaml_param(recursively_instantiate));
 		}
-		return child_params;
+		return content;
 	}
 
-	YAML::Node container_par_wgt::get_yaml_param() const
+	bool container_par_wgt::default_impl::update_impl_from_yaml_param(param const& p)
 	{
-		YAML::Node node;
-		auto num = m_impl->count();
-		for(auto i = 0; i < num; ++i)
+		auto val_param = p;
+		auto num_params = val_param.size();
+		std::list< param > child_params{ val_param.begin(), val_param.end() };
+
+		auto num_children = count();
+		bool success = num_params == num_children;
+		for(size_t i_child = 0; i_child < num_children; ++i_child)
 		{
-			Wt::WWidget* w = m_impl->widget(i);
+			Wt::WWidget* w = widget(i_child);
 			// TODO: For now just assuming that all children are param_wgts
-			param_wgt* pw = (param_wgt*)w;
-			node[pw->get_id()] = pw->get_yaml_param();
+			param_tree::param_wgt* pw = (param_tree::param_wgt*)w;
+
+			bool child_success = false;
+			for(auto it = child_params.begin(); it != child_params.end(); ++it)
+			{
+				if(pw->set_from_yaml_param(*it))
+				{
+					child_success = true;
+					child_params.erase(it);
+					break;
+				}
+			}
+			success = success && child_success;
 		}
-		return node;
+		return success;
 	}
 
-	void container_par_wgt::set_from_param(param const& p)
+
+	param_tree::param_wgt_impl* container_par_wgt::create(
+		YAML::Node schema,
+		qualified_path const& id,
+		param_tree* tree,
+		param_wgt_impl::options_t options)
 	{
-		//m_impl->setText(boost::get< std::string >(p));
-		// TODO: To implement. Clear children then use visitor to actually create new widgets???
+		//bool readonly = options & param_wgt_impl::ReadOnly != 0;
+		return new default_impl(schema, id, tree);
 	}
 }
 

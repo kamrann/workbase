@@ -1,0 +1,99 @@
+- evolved
+- container
+-
+  -
+    - name
+    - string
+    - evolved 1
+  -
+    - compatible_agent_types
+    - enum
+    -
+      - Elevator 1
+  -
+    - evolvable_controller
+    - container
+    -
+      -
+        - ev_controller_type
+        - enum
+        -
+          - MLP
+      -
+        - ev_controller_type_specific_params
+        - container
+        -
+          -
+            - mlp_controller
+            - container
+            -
+              -
+                - mlp_inputs
+                - enum
+                -
+                  - Location
+                  - "Ground Floor: Up Pressed"
+                  - "Ground Floor: Down Pressed"
+                  - "Ground Floor: Is Destination"
+                  - "Floor 1: Up Pressed"
+                  - "Floor 1: Down Pressed"
+                  - "Floor 1: Is Destination"
+                  - "Floor 2: Up Pressed"
+                  - "Floor 2: Down Pressed"
+                  - "Floor 2: Is Destination"
+                  - "Floor 3: Up Pressed"
+                  - "Floor 3: Down Pressed"
+                  - "Floor 3: Is Destination"
+                  - "Floor 4: Up Pressed"
+                  - "Floor 4: Down Pressed"
+                  - "Floor 4: Is Destination"
+              -
+                - mlp_num_layers
+                - int
+                - 3
+  -
+    - objective
+    - container
+    -
+      -
+        - obj_type
+        - enum
+        -
+          - Single Objective
+      -
+        - objective_components
+        - container
+        -
+          -
+            - manual_objective
+            - container
+            -
+              -
+                - direction_type
+                - enum
+                -
+                  - Minimise
+              -
+                - state_val
+                - enum
+                -
+                  - ::agent::18
+              -
+                - value_type
+                - enum
+                -
+                  - Value
+              -
+                - objective_timespan
+                - container
+                -
+                  -
+                    - timepoint_type
+                    - enum
+                    -
+                      - End
+          -
+            - trial_merging
+            - enum
+            -
+              - Average

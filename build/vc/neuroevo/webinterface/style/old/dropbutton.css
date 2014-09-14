@@ -1,0 +1,22 @@
+button.dropbutton {
+	width: 21px;
+	height: 20px;
+	background: transparent url("../resources/themes/polished/dropdown.png") no-repeat;
+	background-position: -2px 1px;
+	border: none;
+	border-bottom-style: solid;
+	border-width: 1px;
+	border-color: rgb(100, 100, 100);
+	border-radius: 2px;
+}
+
+button.dropbutton:hover {
+	background-position: -3px 0px;
+	border: 1px solid rgb(100, 100, 100);
+}
+
+button.dropbutton:focus {
+	background-position: -2px 1px;
+	background-color: rgb(230, 230, 230);
+	border: none;
+}

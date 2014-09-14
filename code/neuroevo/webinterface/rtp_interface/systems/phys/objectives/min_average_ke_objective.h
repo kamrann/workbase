@@ -7,7 +7,7 @@
 #include "ga/objective_fn.h"
 
 
-namespace rtp_phys {
+namespace rtp {
 
 	struct min_average_ke_obj_fn: public objective_fn
 	{

@@ -3,8 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Box2D_v2.3.0\Box2D;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Box2D_v2.3.0\Box2D\Build\vs2012\bin\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Coding Projects\External Libraries\box2d v2.3.1\Box2D;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Coding Projects\External Libraries\box2d v2.3.1\Box2D\Build\vs2013\bin\x32\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>

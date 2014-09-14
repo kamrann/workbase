@@ -7,7 +7,9 @@
 #include "../rtp_decision.h"
 #include "../rtp_agent.h"
 #include "../../rtp_pop_wide_observer.h"
-#include "../../params/paramlist_par.h"
+#include "rtp_phys_contacts.h"
+
+#include "wt_param_widgets/param_accessor.h"
 
 #include <Box2D/Box2D.h>
 
@@ -15,29 +17,42 @@
 #include <boost/any.hpp>
 
 #include <set>
+#include <chrono>
 
 
 class b2World;
 
-namespace rtp_phys {
+namespace rtp {
 
-	class phys_system_base: public i_system
+	// TODO: Better to store in more accessible form (ie. pre extract the values), or is that going to be
+	// less maintainable? (one extra place to change when we add/modify a property of any agent type)
+	struct phys_agent_specification
 	{
-	public:
+		prm::param_accessor spec_acc;
+		prm::param_accessor inst_acc;
 	};
 
 
 	class phys_scenario;
 	class agent_body_spec;
 	class agent_body;
-	class i_phys_controller;
+	class i_controller;
 
-	class phys_system: public phys_system_base
+	struct phys_sensor_defn;
+	struct phys_sensor;
+
+	struct entity_data;
+	struct entity_fix_data;
+	struct entity_joint_data;
+
+	class phys_system:
+		public i_system,
+		public b2ContactListener
 	{
 	public:
 		struct agent_state
 		{
-			boost::shared_ptr< agent_body > body;
+//			boost::shared_ptr< agent_body > body;
 
 			agent_state()
 			{
@@ -47,10 +62,10 @@ namespace rtp_phys {
 
 		struct envt_state
 		{
-			double							time;
-			boost::shared_ptr< b2World >	world;
+			double						time;
+//			std::unique_ptr< b2World >	world;
 
-			envt_state(): time(0.0), world(nullptr)
+			envt_state(): time(0.0)//, world(nullptr)
 			{}
 		};
 
@@ -59,6 +74,7 @@ namespace rtp_phys {
 			public agent_state	// For now, just a single agent system
 		{};
 
+		// TODO: serializable state
 		struct serializable_initial_state
 		{
 			b2Vec2 body_pos;
@@ -85,41 +101,92 @@ namespace rtp_phys {
 
 		typedef boost::any scenario_data;
 
+	public:
+		static std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, bool evolvable);
+		static std::string update_agentspeclist_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, bool evolvable);
+		static std::string update_agentinstancelist_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, bool evolvable);
+//		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(prm::param_accessor param, bool evolvable = false);
+//		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(prm::param& param, bool evolvable = false);
 
-		class param_type: public rtp_paramlist_param_type
-		{
-		public:
-			param_type(bool evolvable = false);
+		static std::unique_ptr< i_system_factory > generate_factory(prm::param_accessor param_vals);
+		static agents_data generate_agents_data(prm::param_accessor param_vals, bool evolvable);
 
-		public:
-			virtual size_t provide_num_child_params(rtp_param_manager* mgr) const;
-			virtual rtp_named_param provide_child_param(size_t index, rtp_param_manager* mgr) const;
-
-		private:
-			bool m_evolvable;
-		};
+		static std::vector< std::string > get_state_values(prm::param_accessor param_vals);
+		static std::vector< std::string > get_agent_type_names();
+		static std::vector< std::string > get_agent_sensor_names(prm::param agent_type, prm::param_accessor param_vals);
+		static size_t get_agent_num_effectors(prm::param agent_type);
 
 	public:
-		static rtp_param_type* params(bool evolvable);
-		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(rtp_param param, bool evolvable);
+		phys_system(std::unique_ptr< phys_scenario > scenario, /*agent_body_spec* spec,*/ double hertz);
+		~phys_system();
 
-		static YAML::Node get_schema(YAML::Node const& param_vals, bool evolvable);
-		static std::tuple< i_system*, i_genome_mapping*, i_agent_factory*, i_observer*, i_population_wide_observer* > create_instance(YAML::Node const& param, bool evolvable = false);
-
-	private:
-		phys_system(phys_scenario* scenario, agent_body_spec* spec);
+		void release_body_user_data();
 
 	public:
-		virtual boost::any generate_initial_state(rgen_t& rgen) const;
-		virtual void set_state(boost::any const& st);
+		virtual update_info get_update_info() const override;
+
+//		virtual boost::any generate_initial_state() const;
+//		virtual void set_state(boost::any const& st);
+		virtual void initialize() override;
 		virtual void clear_agents();
-		virtual boost::optional< agent_id_t > register_agent(boost::shared_ptr< i_agent > agent);
+		virtual boost::optional< agent_id_t > register_agent(boost::shared_ptr< i_controller > agent);
+		virtual agent_id register_agent(agent_specification const& spec);// , std::unique_ptr< i_controller >&& controller);
+		void register_agent_controller(agent_id agent, std::unique_ptr< i_controller > controller);
+		
+		virtual i_agent const& get_agent(agent_id id) const;
+		virtual i_controller const& get_agent_controller(agent_id id) const;
+
 		virtual bool update(i_observer* obs);
 		virtual void register_interactive_input(interactive_input const& input);
 		virtual i_observer::observations_t record_observations(i_observer* obs) const;
-		virtual boost::shared_ptr< i_properties const > get_state_properties() const;
-		virtual boost::shared_ptr< i_property_values const > get_state_property_values() const;
-		virtual i_system_drawer* get_drawer() const;
+		virtual std::shared_ptr< i_properties const > get_state_properties() const;
+		virtual std::shared_ptr< i_property_values const > get_state_property_values() const;
+		virtual double get_state_value(state_value_id id) const override;
+		virtual std::unique_ptr< i_system_drawer > get_drawer() const;
+
+	public:
+		b2World* get_world()
+		{
+			return //m_state.world.get();
+				m_world.get();
+		}
+
+		struct agent_instance
+		{
+			std::unique_ptr< agent_body >		agent;
+			std::unique_ptr< i_controller >		controller;
+
+			agent_instance();
+			agent_instance(std::unique_ptr< agent_body > a, std::unique_ptr< i_controller > c);
+			agent_instance(agent_instance&& rhs);
+			agent_instance& operator= (agent_instance&& rhs);
+			~agent_instance();
+		};
+
+		typedef std::vector< agent_instance > agent_list;
+		typedef std::pair< agent_list::iterator, agent_list::iterator > agent_range;
+		typedef std::pair< agent_list::const_iterator, agent_list::const_iterator > const_agent_range;
+
+//		typedef std::vector< std::unique_ptr< i_controller > > controller_list;
+
+		/* TODO: WTF why is use of the following causing internal compiler error???
+		 - in phys_sys_drawer...
+		agent_range get_agents()
+		{
+			return{ begin(m_agents), end(m_agents) };
+		}
+
+		const_agent_range get_agent_range() const
+		{
+			return{ begin(m_agents), end(m_agents) };
+		}
+		*/
+	public:
+		void BeginContact(b2Contact* contact) override;
+		void EndContact(b2Contact* contact) override;
+		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
+
+		void on_contact(b2Contact* contact, ContactType ctype);
 
 	protected:
 		state const& get_state() const
@@ -127,14 +194,34 @@ namespace rtp_phys {
 			return m_state;
 		}
 
-	private:
-		phys_scenario* m_scenario;
-		agent_body_spec* m_body_spec;
-		boost::optional< boost::shared_ptr< i_phys_controller > > m_agent;
-		state m_state;
-		trial_data m_td;
+		std::unique_ptr< agent_body > create_agent_from_specification(phys_agent_specification const& spec);
 
-	friend class phys_system_drawer;
+	private:
+		std::unique_ptr< phys_scenario > m_scenario;
+		state m_state;
+		std::unique_ptr< b2World > m_world;
+//		std::list< entity_data > m_entity_data;
+//		std::list< entity_fix_data > m_fixture_data;
+//		std::list< entity_joint_data > m_joint_data;
+		std::unique_ptr< b2DestructionListener > m_world_destructor;
+
+		trial_data m_td;
+		double m_hertz;
+
+	public:	// TODO: Temp public, see above re internal compiler error
+		agent_list m_agents;
+
+//#ifdef PERF_LOGGING
+	public:
+		std::chrono::high_resolution_clock::duration
+			m_agent_update_time,
+			m_b2d_update_time,
+			m_observer_update_time;
+
+		virtual void concatenate_performance_data(perf_data_t& pd) const override;
+//#endif
+
+		friend class phys_system_drawer;
 	};
 
 }

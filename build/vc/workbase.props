@@ -3,8 +3,9 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Users\Cameron\Documents\GitHub\workbase\code\common;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Coding Projects\External Libraries\boost_1_55_0;$(SolutionDir)\..\..\..\code\common;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)\intermediate\$(ProjectName)\$(Configuration)\</IntDir>
+    <LibraryPath>D:\Coding Projects\External Libraries\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <Choose>
     <When Condition=" '$(ConfigurationType)' == 'StaticLibrary' ">
@@ -20,7 +21,7 @@
   </Choose>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>

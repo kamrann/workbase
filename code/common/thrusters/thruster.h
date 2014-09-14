@@ -21,20 +21,32 @@ static const double COOLDOWN_RATE = 1.0;
 class thruster
 {
 public:
-	bool	engaged;
-	double	heat;
+	bool					engaged;
+//	double					heat;
+	double					activity;
+	std::vector< double >	activity_buffer;
+	size_t					buffer_pos;
 
 public:
-	thruster()
+	thruster(double expected_freq = 60.0, double cooldown_time = 1.0)
 	{
 		engaged = false;
-		heat = 0.0;
+//		heat = 0.0;
+
+		activity = 0.0;
+		buffer_pos = 0;
+		auto buffer_size = (size_t)(cooldown_time * expected_freq);
+		activity_buffer.resize(buffer_size, 0.0);
 	}
 
 	void engage()
 	{
 		engaged = true;
-		heat = 1.0;
+//		heat = 1.0;
+		activity -= activity_buffer[buffer_pos];
+		activity_buffer[buffer_pos] = 1.0;
+		activity += 1.0;
+		buffer_pos = (buffer_pos + 1) % activity_buffer.size();
 	}
 
 	void disengage()
@@ -45,8 +57,13 @@ public:
 	void cool_down(double time)
 	{
 		engaged = false;
-		heat -= time * COOLDOWN_RATE;
-		heat = std::max(heat, 0.0);
+//		heat -= time * COOLDOWN_RATE;
+//		heat = std::max(heat, 0.0);
+
+		// TODO: This is assuming constant (or roughly constant) update frequency, as specified in constructor
+		activity -= activity_buffer[buffer_pos];
+		activity_buffer[buffer_pos] = 0.0;
+		buffer_pos = (buffer_pos + 1) % activity_buffer.size();
 	}
 
 	bool is_engaged() const
@@ -56,12 +73,13 @@ public:
 
 	bool is_hot() const
 	{
-		return heat > 0.0;
+		return temperature() > 0.0;
 	}
 
 	double temperature() const
 	{
-		return heat;
+//		return heat;
+		return activity / activity_buffer.size();
 	}
 };
 

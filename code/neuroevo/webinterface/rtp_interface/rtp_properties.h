@@ -9,81 +9,91 @@
 #include <vector>
 #include <map>
 
-// TODO: Provide some type information??
 
-class i_properties
-{
-public:
-	virtual size_t num_properties() const = 0;
-	virtual std::string get_property_name(size_t index) const = 0;
-};
+namespace rtp {
 
-class i_property_values
-{
-public:
-	virtual boost::any get_property(std::string const& prop_name) const = 0;
-};
+	// TODO: Provide some type information??
 
-/*
-struct rtp_properties_pair
-{
+	class i_properties
+	{
+	public:
+		virtual size_t num_properties() const = 0;
+		virtual std::string get_property_name(size_t index) const = 0;
+
+	public:
+		virtual ~i_properties() {}
+	};
+
+	class i_property_values
+	{
+	public:
+		virtual boost::any get_property(std::string const& prop_name) const = 0;
+
+	public:
+		virtual ~i_property_values() {}
+	};
+
+	/*
+	struct rtp_properties_pair
+	{
 	i_properties* props;
 	i_property_values* vals;
 
 	rtp_properties_pair(i_properties* _props = nullptr, i_property_values* _vals = nullptr): props(_props), vals(_vals)
 	{}
-};
-*/
+	};
+	*/
 
-class rtp_stored_properties: public i_properties
-{
-public:
-	virtual size_t num_properties() const
+	class rtp_stored_properties: public i_properties
 	{
-		return m_prop_names.size();
-	}
-
-	virtual std::string get_property_name(size_t index) const
-	{
-		return m_prop_names[index];
-	}
-
-public:
-	void add_property(std::string const& name)
-	{
-		m_prop_names.push_back(name);
-	}
-
-private:
-	std::vector< std::string > m_prop_names;
-};
-
-class rtp_stored_property_values: public i_property_values
-{
-public:
-	virtual boost::any get_property(std::string const& prop_name) const
-	{
-		auto it = m_values.find(prop_name);
-		if(it == m_values.end())
+	public:
+		virtual size_t num_properties() const
 		{
-			return boost::any();
+			return m_prop_names.size();
 		}
-		else
+
+		virtual std::string get_property_name(size_t index) const
 		{
-			return it->second;
+			return m_prop_names[index];
 		}
-	}
 
-public:
-	void set_value(std::string const& prop_name, boost::any const& val)
+	public:
+		void add_property(std::string const& name)
+		{
+			m_prop_names.push_back(name);
+		}
+
+	private:
+		std::vector< std::string > m_prop_names;
+	};
+
+	class rtp_stored_property_values: public i_property_values
 	{
-		m_values[prop_name] = val;
-	}
+	public:
+		virtual boost::any get_property(std::string const& prop_name) const
+		{
+			auto it = m_values.find(prop_name);
+			if(it == m_values.end())
+			{
+				return boost::any();
+			}
+			else
+			{
+				return it->second;
+			}
+		}
 
-private:
-	std::map< std::string, boost::any > m_values;
-};
+	public:
+		void set_value(std::string const& prop_name, boost::any const& val)
+		{
+			m_values[prop_name] = val;
+		}
 
+	private:
+		std::map< std::string, boost::any > m_values;
+	};
+
+}
 
 
 #endif

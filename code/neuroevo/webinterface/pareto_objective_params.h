@@ -12,7 +12,7 @@ namespace phys {
 
 	struct pareto_objective_params
 	{
-		std::set< rtp_phys::agent_objective::Type >		objectives;
+		std::set< rtp::agent_objective::Type >		objectives;
 	};
 
 }

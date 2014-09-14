@@ -3,15 +3,15 @@
 #ifndef __SIMULATIONS_TAB_H
 #define __SIMULATIONS_TAB_H
 
-//#include "rtp_interface/rtp_param_manager.h"
-//#include "wt_param_widgets/param_manager.h"
 #include "rtp_interface/rtp_properties.h"
+
+#include "wt_param_widgets/pw_fwd.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/Dbo/ptr>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
+#include <memory>
+#include <thread>
 
 
 using namespace Wt;
@@ -22,10 +22,17 @@ class Wt::WTextArea;
 class Wt::WTableView;
 class WebInterfaceApplication;
 
+namespace YAML {
+	class Node;
+}
+
+namespace rtp {
+	class rtp_simulation;
+}
+
 class evo_run;
 
 class i_param_widget;
-class rtp_simulation;
 class properties_chart_widget;
 
 namespace prm {
@@ -48,6 +55,7 @@ private:
 
 public:
 	SimulationsTab(WContainerWidget* parent = nullptr);
+	~SimulationsTab();
 
 private:
 /*	i_param_widget* system_params_widget;
@@ -63,16 +71,16 @@ private:
 	WTableView* observations_table;
 	properties_chart_widget* evo_chart;
 
-	boost::shared_ptr< boost::thread > sim_thread;
+	std::unique_ptr< std::thread > sim_thread;
 
 private:
 	void evo_started_cb(Wt::Dbo::ptr< evo_run > ep);
-	void generation_cb(std::vector< boost::shared_ptr< i_property_values const > > per_gen_prop_vals, std::string txt);
+	void generation_cb(std::vector< std::shared_ptr< rtp::i_property_values const > > per_gen_prop_vals, std::string txt);
 	void completion_cb(std::string txt);
 
 //	template < typename Sim >
 //	void run_simulation_threadmain(WebInterfaceApplication* app, sim_params params);
-	void run_simulation_threadmain(WebInterfaceApplication* app, rtp_simulation* sim);
+	void run_simulation_threadmain(WebInterfaceApplication* app, prm::param_accessor sys_param, prm::param_accessor evo_param);//rtp_simulation* sim);
 
 public:
 	void on_run_simulation();

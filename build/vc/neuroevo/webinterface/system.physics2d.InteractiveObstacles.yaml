@@ -1,0 +1,267 @@
+- physics2d_params
+- container
+-
+  -
+    - updates_per_sec
+    - int
+    - 60
+  -
+    - scenario
+    - container
+    -
+      -
+        - world_type
+        - enum
+        -
+          - Obstacles
+      -
+        - type_specific
+        - container
+        -
+          -
+            - obstacles
+            - container
+            -
+              -
+                - x_expanse
+                - real
+                - 200
+              -
+                - y_expanse
+                - real
+                - 150
+              -
+                - x_center
+                - real
+                - 0
+              -
+                - y_center
+                - real
+                - 0
+              -
+                - density
+                - real
+                - 0.0015
+              -
+                - min_size
+                - real
+                - 4
+              -
+                - max_size
+                - real
+                - 12
+              -
+                - max_elongation
+                - real
+                - 3
+              -
+                - max_speed
+                - real
+                - 5
+              -
+                - max_angular_speed
+                - real
+                - 5
+              -
+                - freezone_x
+                - real
+                - 0
+              -
+                - freezone_y
+                - real
+                - 0
+              -
+                - freezone_radius
+                - real
+                - 20
+      -
+        - duration
+        - real
+        - 10
+  -
+    - agent_spec_list
+    - repeat
+    - 1:
+        - spec
+        - container
+        -
+          -
+            - name
+            - string
+            - spec 1
+          -
+            - spec_type
+            - enum
+            -
+              - Spaceship
+          -
+            - body_spec
+            - container
+            -
+              -
+                - spaceship
+                - container
+                -
+                  -
+                    - size
+                    - real
+                    - 2
+                  -
+                    - mass
+                    - real
+                    - 1
+                  -
+                    - rotational_inertia
+                    - real
+                    - 6
+                  -
+                    - thruster_strength
+                    - real
+                    - 7.5
+                  -
+                    - sensor_range
+                    - real
+                    - 10
+  -
+    - agent_instance_list
+    - repeat
+    - 1:
+        - agent
+        - container
+        -
+          -
+            - spec_reference
+            - enum
+            -
+              - spec 1
+          -
+            - initial_conditions
+            - container
+            -
+              -
+                - init_x
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_y
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_orientation
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_linear_angle
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_linear_speed
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_ang_vel
+                - random
+                -
+                  - true
+                  - 0
+          -
+            - controller_params
+            - container
+            -
+              -
+                - controller_type
+                - enum
+                -
+                  - Interactive
+              -
+                - controller_type_specific_params
+                - container
+                -
+                  -
+                    - ic_direct_bindings
+                    - container
+                    -
+                      -
+                        - Effector 1
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 2
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 3
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 4
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 5
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 6
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 7
+                        - enum
+                        -
+                          - <unspecified>
+                      -
+                        - Effector 8
+                        - enum
+                        -
+                          - <unspecified>
+                  -
+                    - spaceship_bindings
+                    - container
+                    -
+                      -
+                        - rotate_anticw
+                        - enum
+                        -
+                          - 65
+                      -
+                        - rotate_cw
+                        - enum
+                        -
+                          - 68
+                      -
+                        - forwards
+                        - enum
+                        -
+                          - 73
+                      -
+                        - backwards
+                        - enum
+                        -
+                          - 75
+                      -
+                        - left
+                        - enum
+                        -
+                          - 74
+                      -
+                        - right
+                        - enum
+                        -
+                          - 76

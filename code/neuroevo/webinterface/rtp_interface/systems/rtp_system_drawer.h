@@ -10,44 +10,57 @@ namespace Wt {
 	class WPainter;
 }
 
-class i_system_drawer
-{
-public:
-	virtual void draw_system(Wt::WPainter& painter) = 0;
-};
+namespace rtp {
 
-/*
-class async_system_drawer
-{
-public:
-	async_system_drawer(): m_mtx(nullptr)
-	{}
-
-	void set_mutex(boost::mutex* mtx)
+	class i_system_drawer
 	{
-		m_mtx = mtx;
-	}
-
-	void lock()
-	{
-		if(m_mtx)
+	public:
+		struct options_t
 		{
-			m_mtx->lock();
-		}
-	}
+			double zoom;
 
-	void unlock()
+			options_t():
+				zoom(1.0)
+			{}
+		};
+
+	public:
+		virtual bool is_animated() const = 0;
+		virtual void draw_system(Wt::WPainter& painter, options_t const& options = options_t()) = 0;
+	};
+
+	class animated_system_drawer:
+		public i_system_drawer
 	{
-		if(m_mtx)
+	public:
+		virtual bool is_animated() const override
 		{
-			m_mtx->unlock();
+			return true;
 		}
-	}
 
-private:
-	boost::mutex* m_mtx;
-};
-*/
+		enum class Result {
+			Finished,
+			Ongoing,
+		};
+
+		// Called once for each state that the system enters
+		virtual void start() = 0;
+		// Advances animation, and return value signals whether or not current animation is completed
+		virtual Result advance() = 0;
+	};
+
+	class static_system_drawer:
+		public i_system_drawer
+	{
+	public:
+		virtual bool is_animated() const override
+		{
+			return false;
+		}
+	};
+
+}
+
 
 #endif
 

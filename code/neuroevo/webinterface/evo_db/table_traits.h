@@ -3,6 +3,8 @@
 #ifndef __GADB_TABLE_TRAITS_H
 #define __GADB_TABLE_TRAITS_H
 
+#if 0
+
 #include "../rtp_interface/systems/rtp_system.h"	// For SystemType
 #include "../rtp_interface/systems/phys/rtp_phys_agent_body_spec.h"
 #include "../rtp_interface/systems/phys/rtp_phys_evolvable_controller.h"
@@ -79,7 +81,7 @@ namespace Wt { namespace Dbo {
 	template<>
 	struct dbo_traits<phys_agent_type>: public dbo_default_traits
 	{
-		typedef rtp_phys::agent_body_spec::Type IdType;
+		typedef rtp::agent_body_spec::Type IdType;
 
 		static IdType invalidId();
 
@@ -99,7 +101,7 @@ namespace Wt { namespace Dbo {
 	template<>
 	struct dbo_traits<phys_controller_type>: public dbo_default_traits
 	{
-		typedef rtp_phys::evolvable_controller::Type IdType;
+		typedef rtp::evolvable_controller::Type IdType;
 
 		static IdType invalidId();
 
@@ -119,7 +121,7 @@ namespace Wt { namespace Dbo {
 	template<>
 	struct dbo_traits<phys_mlp_inputs_type>: public dbo_default_traits
 	{
-		typedef rtp_phys::mlp_controller::Type IdType;
+		typedef rtp::mlp_controller::Type IdType;
 
 		static IdType invalidId();
 
@@ -139,7 +141,7 @@ namespace Wt { namespace Dbo {
 }
 }
 
-
+#endif
 
 #endif
 

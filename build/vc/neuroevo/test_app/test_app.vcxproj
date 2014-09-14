@@ -60,6 +60,7 @@
     <Import Project="..\..\fann_dbg.props" />
     <Import Project="..\neuroevo.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\box2d_dbg.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="..\..\eigen.props" />
@@ -103,7 +104,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;BOOST_ALL_DYN_LINK; BOOST_AUTO_LINK_TAGGED;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <PrecompiledHeaderFile />
@@ -138,7 +139,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;BOOST_ALL_DYN_LINK; BOOST_AUTO_LINK_TAGGED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
@@ -173,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\neuroevo\test_app\test.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\test_app\test2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\house.h" />
@@ -181,10 +183,14 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\targetver.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\test.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\yaml_test.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_manual_objective.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\wt_param_widgets\wt_param_widgets.vcxproj">
       <Project>{51b32241-2a77-4223-9d29-87cf3ee53997}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\neuralnet\neuralnet.vcxproj">
+      <Project>{5e3419dc-727f-44da-a09f-27e8c6ea016d}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

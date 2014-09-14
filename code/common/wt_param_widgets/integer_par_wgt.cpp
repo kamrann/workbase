@@ -10,14 +10,16 @@
 
 namespace prm
 {
-	class integer_par_wgt::impl: public Wt::WSpinBox
+	class integer_par_wgt::spinbox_impl:
+		public param_tree::param_wgt_impl,
+		public Wt::WSpinBox
 	{
 	public:
-		impl(YAML::Node const& script)
+		spinbox_impl(YAML::Node schema, bool readonly)
 		{
 			setMinimum(std::numeric_limits< int >::min());
 			setMaximum(std::numeric_limits< int >::max());
-			if(auto& c = script["constraints"])
+			if(auto& c = schema["constraints"])
 			{
 				if(auto& min = c["min"])
 				{
@@ -28,27 +30,42 @@ namespace prm
 					setMaximum(max.as< int >());
 				}
 			}
-			if(auto& def = script["default"])
+			if(auto& def = schema["default"])
 			{
 				setValue(def.as< int >());
 			}
+
+			setReadOnly(readonly);
+		}
+
+		virtual Wt::WWidget* get_wt_widget()
+		{
+			return this;
+		}
+
+		virtual Wt::Signals::connection connect_handler(pw_event::type type, pw_event_handler const& handler)
+		{
+			// TODO: others
+			return changed().connect(std::bind(handler));
+		}
+
+		virtual param get_locally_instantiated_yaml_param(bool) const
+		{
+			return param{ value() };
+		}
+
+		virtual bool update_impl_from_yaml_param(param const& p)
+		{
+			setValue(p.as< int >());
+			return true;
 		}
 	};
 
-	Wt::WWidget* integer_par_wgt::create_impl(YAML::Node const& script)
-	{
-		m_impl = new impl(script);// boost::get< integer_par_constraints >(opt));
-		return m_impl;
-	}
 
-	param integer_par_wgt::get_param() const
+	param_tree::param_wgt_impl* integer_par_wgt::create(YAML::Node schema, param_wgt_impl::options_t options)
 	{
-		return m_impl->value();
-	}
-
-	void integer_par_wgt::set_from_param(param const& p)
-	{
-		m_impl->setValue(boost::get< int >(p));
+		bool readonly = schema["readonly"] && schema["readonly"].as< bool >(); //options & param_wgt_impl::ReadOnly != 0;
+		return new spinbox_impl(schema, readonly);
 	}
 }
 

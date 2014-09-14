@@ -1,0 +1,8 @@
+0: cw, right
+1: cw, left
+2: a, left
+3: a, right
+4: a, down
+5: a, up
+6: cw, down
+7: cw, up

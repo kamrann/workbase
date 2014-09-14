@@ -7,15 +7,9 @@
 //
 
 
-namespace rtp_phys {
+namespace rtp {
 
-	rtp_named_param_list ground_based_scenario::params()
-	{
-		rtp_named_param_list p;
-		return p;
-	}
-
-	ground_based_scenario::ground_based_scenario(rtp_param param)
+	ground_based_scenario::ground_based_scenario()
 	{
 
 	}
@@ -27,13 +21,13 @@ namespace rtp_phys {
 		return boost::any(data);
 	}
 
-	void ground_based_scenario::load_initial_state(boost::any const& data, phys_system::state& st) const
+	void ground_based_scenario::load_initial_state(boost::any const& data, b2World* world/*phys_system::state& st*/)
 	{
-		st.world->SetGravity(b2Vec2(0.0f, -9.81f));
+		/*st.*/world->SetGravity(b2Vec2(0.0f, -9.81f));
 
 		{
 			b2BodyDef bd;
-			b2Body* ground = st.world->CreateBody(&bd);
+			b2Body* ground = /*st.*/world->CreateBody(&bd);
 
 			b2EdgeShape shape;
 			shape.Set(b2Vec2(-GroundSize, 0.0f), b2Vec2(GroundSize, 0.0f));

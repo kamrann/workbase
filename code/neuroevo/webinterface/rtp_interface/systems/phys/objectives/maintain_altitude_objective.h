@@ -7,7 +7,7 @@
 #include "ga/objective_fn.h"
 
 
-namespace rtp_phys {
+namespace rtp {
 
 	struct maintain_altitude_obj_fn: public objective_fn
 	{

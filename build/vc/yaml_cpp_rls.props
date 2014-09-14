@@ -3,8 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\coding_libraries\yaml-cpp-0.5.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\coding_libraries\yaml-cpp-0.5.1\build\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Coding Projects\External Libraries\yaml-cpp\installation_$(Platform)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Coding Projects\External Libraries\yaml-cpp\installation_$(Platform)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>

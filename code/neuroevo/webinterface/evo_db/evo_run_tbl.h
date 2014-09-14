@@ -4,10 +4,12 @@
 #define __GADB_EVO_RUN_H
 
 #include "table_traits.h"
+#include "custom_fields.h"
 
 #include <Wt/Dbo/Types>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 
 namespace dbo = Wt::Dbo;
@@ -25,8 +27,10 @@ public:
 //	dbo::weak_ptr< evo_params >		evolution_params;
 	std::string						sys_params;		// YAML
 	std::string						evo_params;		// YAML
-	boost::posix_time::ptime		started;
-	boost::posix_time::ptime		ended;
+//	boost::posix_time::ptime		started;
+//	boost::posix_time::ptime		ended;
+	std::chrono::system_clock::time_point	started;
+	std::chrono::system_clock::time_point	ended;
 	generation_list					generations;
 
 	inline size_t num_generations() const

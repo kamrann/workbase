@@ -11,6 +11,9 @@
 #include <Wt/WTabWidget>
 #include <Wt/WServer>
 
+#include <Wt/WBootstrapTheme>
+#include <Wt/WCssTheme>
+
 
 WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::SqlConnectionPool& db):
 	WApplication(env),
@@ -18,7 +21,23 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 	db_session(db)
 {
 	setTitle("NeuroEvo Web Interface");
-	setCssTheme("polished");
+
+	bool const BootstrapTheme = false;
+
+	if(BootstrapTheme)
+	{
+		auto theme = new Wt::WBootstrapTheme(this);
+		theme->setVersion(Wt::WBootstrapTheme::Version3);
+		theme->setResponsive(true);
+		setTheme(theme);
+
+		// load the default bootstrap3 (sub-)theme
+		useStyleSheet("resources/themes/bootstrap/3/bootstrap-theme.min.css");
+	}
+	else
+	{
+		setCssTheme("polished");
+	}
 
 	styleSheet().addRule(".wb_numerical_input", "text-align: right;");
 
@@ -33,6 +52,14 @@ WebInterfaceApplication::WebInterfaceApplication(const WEnvironment& env, dbo::S
 //	noughts_and_crosses_widget< 2, 3 >* nac_w = new noughts_and_crosses_widget< 2, 3 >();
 //	sys_tab->set_system_widget(nac_w);
 
+	useStyleSheet("style/param_widgets.css");
+
+/*	useStyleSheet("style/everywidget.css");
+	useStyleSheet("style/dragdrop.css");
+	useStyleSheet("style/combostyle.css");
+	useStyleSheet("style/pygments.css");
+	useStyleSheet("style/layout.css");
+*/
 	enableUpdates(true);	// TODO: Right place?
 }
 

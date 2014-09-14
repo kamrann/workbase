@@ -10,33 +10,49 @@
 
 namespace prm
 {
-	// TODO: Multiple implementations (eg. combo box based), which can be selected through options of param_wgt::create()
-	class string_par_wgt::impl: public Wt::WLineEdit
+	class string_par_wgt::default_impl:
+		public param_tree::param_wgt_impl,
+		public Wt::WLineEdit
 	{
 	public:
-		impl(YAML::Node const& script)
+		default_impl(YAML::Node schema, bool readonly)
 		{
-			if(auto& def = script["default"])
+			if(auto& def = schema["default"])
 			{
 				setText(def.as< std::string >());
 			}
+
+			setReadOnly(readonly);
+		}
+
+		virtual Wt::WWidget* get_wt_widget()
+		{
+			return this;
+		}
+
+		virtual Wt::Signals::connection connect_handler(pw_event::type type, pw_event_handler const& handler)
+		{
+			// TODO: others
+			return changed().connect(std::bind(handler));
+		}
+
+		virtual param get_locally_instantiated_yaml_param(bool) const
+		{
+			return param{ text().toUTF8() };
+		}
+
+		virtual bool update_impl_from_yaml_param(param const& p)
+		{
+			setText(p.as< std::string >());
+			return true;
 		}
 	};
 
-	Wt::WWidget* string_par_wgt::create_impl(YAML::Node const& script)
-	{
-		m_impl = new impl(script);
-		return m_impl;
-	}
 
-	param string_par_wgt::get_param() const
+	param_tree::param_wgt_impl* string_par_wgt::create(YAML::Node schema, param_wgt_impl::options_t options)
 	{
-		return m_impl->text().toUTF8();
-	}
-
-	void string_par_wgt::set_from_param(param const& p)
-	{
-		m_impl->setText(boost::get< std::string >(p));
+		bool readonly = schema["readonly"] && schema["readonly"].as< bool >(); //options & param_wgt_impl::ReadOnly != 0;
+		return new default_impl(schema, readonly);
 	}
 }
 

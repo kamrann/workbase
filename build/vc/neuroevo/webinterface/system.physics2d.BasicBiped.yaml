@@ -1,0 +1,131 @@
+- physics2d_params
+- container
+-
+  -
+    - updates_per_sec
+    - int
+    - 60
+  -
+    - scenario
+    - container
+    -
+      -
+        - world_type
+        - enum
+        -
+          - Ground Based
+      -
+        - type_specific
+        - container
+        -
+          []
+      -
+        - duration
+        - real
+        - 10
+  -
+    - agent_spec_list
+    - repeat
+    - 1:
+        - spec
+        - container
+        -
+          -
+            - name
+            - string
+            - spec 1
+          -
+            - spec_type
+            - enum
+            -
+              - Minimal Biped
+          -
+            - body_spec
+            - container
+            -
+              -
+                - minimal_biped
+                - container
+                -
+                  -
+                    - max_torques
+                    - container
+                    -
+                      -
+                        - max_knee_torque
+                        - real
+                        - 50
+                      -
+                        - max_hip_torque
+                        - real
+                        - 50
+                  -
+                    - contact_damage
+                    - bool
+                    - false
+  -
+    - agent_instance_list
+    - repeat
+    - 1:
+        - agent
+        - container
+        -
+          -
+            - spec_reference
+            - enum
+            -
+              - spec 1
+          -
+            - initial_conditions
+            - container
+            -
+              -
+                - init_x
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_y
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_orientation
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_linear_angle
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_linear_speed
+                - random
+                -
+                  - true
+                  - 0
+              -
+                - init_ang_vel
+                - random
+                -
+                  - true
+                  - 0
+          -
+            - controller_params
+            - container
+            -
+              -
+                - controller_type
+                - enum
+                -
+                  - <unspecified>
+              -
+                - controller_type_specific_params
+                - container
+                -
+                  []

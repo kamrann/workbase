@@ -10,8 +10,7 @@
 #include <Wt/WPaintDevice>
 #include <Wt/WPainter>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp>
+#include <mutex>
 
 
 class sys_display_widget: public Wt::WPaintedWidget
@@ -23,87 +22,83 @@ public:
 	};
 
 public:
-	sys_display_widget(boost::mutex& mtx): m_sys_drawer(nullptr), m_mtx(mtx)
+	sys_display_widget(std::mutex& mtx): m_sys_drawer(), m_mtx(mtx), m_zoom(1.0)
 	{
-		m_interaction_enabled = false;
 		setLayoutSizeAware(true);
 
 		setAttributeValue("tabindex", "0");
 
 		keyWentDown().connect([this](Wt::WKeyEvent e)
 		{
-			if(!m_interaction_enabled)
+			switch(e.key())
 			{
+				case Wt::Key_PageDown:
+				m_zoom /= 1.5;
+				return;
+				case Wt::Key_PageUp:
+				m_zoom *= 1.5;
 				return;
 			}
 
-/*			int const base = 0x31;
-			if(e.key() >= base && e.key() < base + 8)
+			auto it = m_input_states.find(e.key());
+			if(it != m_input_states.end())
 			{
-				size_t idx = e.key() - base;
-				m_thruster_signal.emit(idx, true);
+				bool& active = it->second;
+				if(!active)
+				{
+					m_input_signal.emit(rtp::interactive_input(e.key(), true));
+					active = true;
+				}
 			}
-			*/
-			size_t idx = 0;
-			switch(e.key())
-			{
-				case Wt::Key_Q:		idx = 0;	break;
-				case Wt::Key_W:		idx = 1;	break;
-				case Wt::Key_E:		idx = 2;	break;
-				case Wt::Key_R:		idx = 3;	break;
-				case Wt::Key_T:		idx = 4;	break;
-				case Wt::Key_Y:		idx = 5;	break;
-				default: return;
-			}
-			m_input_signal.emit(interactive_input(idx, true));
 		}
 		);
 
 		keyWentUp().connect([this](Wt::WKeyEvent e)
 		{
-			if(!m_interaction_enabled)
+			auto it = m_input_states.find(e.key());
+			if(it != m_input_states.end())
 			{
-				return;
+				bool& active = it->second;
+				if(active)
+				{
+					m_input_signal.emit(rtp::interactive_input(e.key(), false));
+					active = false;
+				}
+				else
+				{
+					throw std::exception("keyWentUp(): Input not active!");
+				}
 			}
-			/*
-			int const base = 0x31;
-			if(e.key() >= base && e.key() < base + 8)
-			{
-				size_t idx = e.key() - base;
-				m_thruster_signal.emit(idx, false);
-			}
-			*/
-			size_t idx = 0;
-			switch(e.key())
-			{
-				case Wt::Key_Q:		idx = 0;	break;
-				case Wt::Key_W:		idx = 1;	break;
-				case Wt::Key_E:		idx = 2;	break;
-				case Wt::Key_R:		idx = 3;	break;
-				case Wt::Key_T:		idx = 4;	break;
-				case Wt::Key_Y:		idx = 5;	break;
-				default: return;
-			}
-			m_input_signal.emit(interactive_input(idx, false));
 		}
 		);
 	}
 
 public:
-	void set_drawer(i_system_drawer* drawer)
+	void set_drawer(std::unique_ptr< rtp::i_system_drawer > drawer)
 	{
-		m_sys_drawer = drawer;
+		m_sys_drawer = std::move(drawer);
 	}
 
-	void enable_interaction(bool enable)
+	rtp::i_system_drawer* get_drawer()
 	{
-		if(m_interaction_enabled != enable)
+		return m_sys_drawer.get();
+	}
+
+	void enable_interaction(rtp::interactive_input_set const& required)
+	{
+		//m_required_inputs = required;
+		m_input_states.clear();
+		std::transform(
+			std::begin(required),
+			std::end(required),
+			std::inserter(m_input_states, m_input_states.end()),
+			[](unsigned long key)
 		{
-			m_interaction_enabled = enable;
-		}
+			return std::make_pair(key, false);
+		});
 	}
 
-	Wt::Signal< interactive_input >& interactive_input_sig()
+	Wt::Signal< rtp::interactive_input >& interactive_input_sig()
 	{
 		return m_input_signal;
 	}
@@ -121,16 +116,20 @@ protected:
 			// TODO: Not currently threadsafe with asio implementation of system updating!!!!!!!!!!!!!!!!
 			Wt::WPainter painter(device);
 
-			boost::lock_guard< boost::mutex > guard(m_mtx);
-			m_sys_drawer->draw_system(painter);
+			std::lock_guard< std::mutex > guard(m_mtx);
+			rtp::i_system_drawer::options_t options;
+			options.zoom = m_zoom;
+			m_sys_drawer->draw_system(painter, options);
 		}
 	}
 
 private:
-	i_system_drawer* m_sys_drawer;
-	bool m_interaction_enabled;
-	Wt::Signal< interactive_input > m_input_signal;
-	boost::mutex& m_mtx;
+	std::unique_ptr< rtp::i_system_drawer > m_sys_drawer;
+	//rtp::interactive_input_set m_required_inputs;
+	std::map< unsigned long, bool > m_input_states;
+	Wt::Signal< rtp::interactive_input > m_input_signal;
+	double m_zoom;
+	std::mutex& m_mtx;
 };
 
 

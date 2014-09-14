@@ -8,6 +8,8 @@ Adds some extensions to the std namespace.
 
 #include <algorithm>
 #include <functional>
+#include <ratio>
+#include <cstdint>
 
 
 namespace std
@@ -56,6 +58,60 @@ namespace std
 	{
 		std::generate_n(first, count, [&initial] { return initial++; });
 	}
+
+
+	/* Multiply a compile time ratio by a runtime integer, given result as a whole number */
+	template <
+		std::intmax_t Num,
+		std::intmax_t Den
+	>
+	inline std::intmax_t ratio_product(std::intmax_t value)
+	{
+		return value * Num / Den;
+	}
+
+	template <
+		typename Ratio
+	>
+	inline std::intmax_t ratio_product(std::intmax_t value)
+	{
+		return ratio_product< Ratio::num, Ratio::den >(value);
+	}
+
+	/* Return the max/min of two compile time ratios */
+	template <
+		typename R1,
+		typename R2,
+		bool R1_Greater
+	>
+	struct ratio_minmax_impl
+	{
+		typedef R1 max_type;
+		typedef R2 min_type;
+	};
+
+	template <
+		typename R1,
+		typename R2
+	>
+	struct ratio_minmax_impl< R1, R2, false >
+	{
+		typedef R2 max_type;
+		typedef R1 min_type;
+	};
+
+	template <
+		typename R1,
+		typename R2
+	>
+	using ratio_max = typename ratio_minmax_impl< R1, R2, ratio_greater< R1, R2 >::value >::max_type;
+
+	template <
+		typename R1,
+		typename R2
+	>
+	using ratio_min = typename ratio_minmax_impl< R1, R2, ratio_greater< R1, R2 >::value >::min_type;
+
 }
 
 

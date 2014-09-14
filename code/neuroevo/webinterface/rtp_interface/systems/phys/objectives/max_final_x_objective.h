@@ -7,7 +7,7 @@
 #include "../rtp_phys_agent_body.h"
 
 
-namespace rtp_phys {
+namespace rtp {
 
 	struct max_final_x_obj_fn: public objective_fn
 	{

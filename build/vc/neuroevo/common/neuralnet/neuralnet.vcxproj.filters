@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{a2be1a24-48da-4f63-beff-54a7744b26f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="implementations">
+      <UniqueIdentifier>{f9ab1e8d-dba6-4169-988b-ccf551017262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="implementations\fann">
+      <UniqueIdentifier>{3a6642d6-5b99-4c7a-bfb5-dd111cbe11db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="implementations\mlf">
+      <UniqueIdentifier>{4d95b288-94fe-4a00-9c72-02439939b5e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visualisation">
+      <UniqueIdentifier>{e16bff9c-ef8b-4583-babd-f5bcaf961dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visualisation\wt">
+      <UniqueIdentifier>{d4d1fb0e-1316-4195-a626-17d96bc9f9ec}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\mlp.cpp">
+      <Filter>implementations\mlf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\layout.cpp">
+      <Filter>visualisation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_filter.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\string_constants.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_visualiser.cpp">
+      <Filter>visualisation\wt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_controlpanel.cpp">
+      <Filter>visualisation\wt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_nndisplay.cpp">
+      <Filter>visualisation\wt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\coordinator.cpp">
+      <Filter>visualisation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\text_output.cpp">
+      <Filter>visualisation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_infopane.cpp">
+      <Filter>visualisation\wt</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\access_options.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_functions.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\basic_types.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\input.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\internal_state_access.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_access.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuralnet.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_access.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\output.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\mlp.h">
+      <Filter>implementations\mlf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_type.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\nnet_fwd.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\layout.h">
+      <Filter>visualisation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\connection_access.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\connection.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layers.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_filter.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\iterator.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\iterator_range.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_visualiser.h">
+      <Filter>visualisation\wt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_controlpanel.h">
+      <Filter>visualisation\wt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_nndisplay.h">
+      <Filter>visualisation\wt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\coordinator.h">
+      <Filter>visualisation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\text_output.h">
+      <Filter>visualisation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_infopane.h">
+      <Filter>visualisation\wt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_functions_concept.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -10,10 +10,14 @@
 //#include <boost/any.hpp>
 
 
-typedef individual<
-	rtp_genome_wrapper,
-	double	// TODO: boost::any, with a fitness comparison interface?
-> rtp_individual;
+namespace rtp {
+
+	typedef individual<
+		rtp_genome_wrapper,
+		double	// TODO: boost::any, with a fitness comparison interface?
+	> rtp_individual;
+
+}
 
 
 #endif

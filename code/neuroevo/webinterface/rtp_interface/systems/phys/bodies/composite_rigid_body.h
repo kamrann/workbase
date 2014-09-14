@@ -5,15 +5,40 @@
 
 #include "../rtp_phys_agent_body.h"
 
-#include <vector>
+#include <boost/any.hpp>
+
+#include <list>
 
 
 class b2Body;
 
-namespace rtp_phys {
+namespace rtp {
 
 	class composite_rigid_body: public agent_body
 	{
+	public:
+		typedef agent_body base_t;
+
+		enum Sensors {
+			_Prev = base_t::Sensors::_Next - 1,
+
+			_Next,
+		};
+
+		static agent_sensor_name_list sensor_inputs()
+		{
+			auto inputs = base_t::sensor_inputs();
+/*			inputs.insert(
+				end(inputs),
+				{
+					std::string("Orientation"),
+					std::string("AngVel"),
+				});
+*/			return inputs;
+		}
+
+		using agent_body::agent_body;
+
 	public:
 		virtual void translate(b2Vec2 const& vec);
 		virtual void rotate(float angle);
@@ -27,10 +52,15 @@ namespace rtp_phys {
 		virtual b2Vec2 get_com_position() const;
 		virtual b2Vec2 get_com_linear_velocity() const;
 
+		virtual double get_sensor_value(agent_sensor_id const& sensor) const;
+
 		virtual void draw(Wt::WPainter& painter) const;
 
 	protected:
-		std::vector< b2Body* > m_bodies;
+		void add_component_body(b2Body* comp, boost::any&& data);
+
+	protected:
+		std::list< b2Body* > m_bodies;
 	};
 
 }

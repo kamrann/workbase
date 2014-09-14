@@ -1,6 +1,8 @@
 // composite_rigid_body.cpp
 
 #include "composite_rigid_body.h"
+#include "../rtp_phys_entity_data.h"
+#include "../rtp_phys_system.h"
 
 #include "../b2d_util.h"
 
@@ -11,7 +13,7 @@
 #include <Box2D/Box2D.h>
 
 
-namespace rtp_phys {
+namespace rtp {
 
 	void composite_rigid_body::translate(b2Vec2 const& vec)
 	{
@@ -103,6 +105,15 @@ namespace rtp_phys {
 		return (1.0f / sum_mass) * com_vel;
 	}
 	
+	double composite_rigid_body::get_sensor_value(agent_sensor_id const& sensor) const
+	{
+		switch(sensor)
+		{
+			default:
+			return agent_body::get_sensor_value(sensor);
+		}
+	}
+
 	void composite_rigid_body::draw(Wt::WPainter& painter) const
 	{
 		for(b2Body const* b : m_bodies)
@@ -110,6 +121,19 @@ namespace rtp_phys {
 			::draw_body(b, painter);
 		}
 	}
+
+	void composite_rigid_body::add_component_body(b2Body* comp, boost::any&& data)
+	{
+		m_bodies.insert(
+			std::end(m_bodies),
+			comp);
+		entity_data ed{};
+		ed.type = entity_data::Type::Agent;
+		ed.type_value = static_cast< agent_body* >(this);
+		ed.value = std::move(data);
+		set_body_data(comp, std::move(ed));
+	}
+
 }
 
 

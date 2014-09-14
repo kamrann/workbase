@@ -1,0 +1,53 @@
+.feedbackheader {
+	font-style: italic;
+/*	border-top: 1px;
+	border-bottom: 1px;
+	border-color: rgb(200, 200, 200);
+*/	padding: 2px;
+	margin: 4px;
+}
+
+.fb_subelement {
+	font-size: 85%;
+}
+
+.feedbacktable th,
+.feedbacktable td {
+	padding: 2px 5px;
+}
+
+.outerfeedbacktable {
+	border-collapse: separate;
+	border-spacing: 0px 8px;
+}
+
+
+.controlpanel {
+      width: 100%;
+      float: left;
+      margin: 0 0 3em 0;
+      padding: 0;
+      list-style: none;
+      background-color: #f2f2f2;
+      border-bottom: 5px solid #ccc; 
+      border-top: 1px solid #ccc;
+}
+
+.controlpanel li {
+      float: left;
+}
+
+.controlpanel li a {
+      display: block;
+      padding: 8px 15px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #069;
+      border-right: 1px solid #ccc;
+}
+
+.controlpanel li a:hover {
+      color: #c00;
+      background-color: #fff;
+}
+

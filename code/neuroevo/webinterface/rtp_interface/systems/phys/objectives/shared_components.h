@@ -6,7 +6,7 @@
 #include "ga/objective_fn_data_component.h"
 
 
-namespace rtp_phys {
+namespace rtp {
 
 	struct timesteps_ofd: public ofd_component
 	{

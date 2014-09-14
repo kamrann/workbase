@@ -7,19 +7,19 @@
 #include "../rtp_system_accessor.h"
 
 
-namespace rtp_phys {
+namespace rtp {
 
 	class phys_system;
 
 	class phys_system_drawer:
-		public i_system_drawer
+		public static_system_drawer
 //		, public async_system_drawer
 	{
 	public:
 		phys_system_drawer(phys_system const& sys);
 
 	public:
-		virtual void draw_system(Wt::WPainter& painter);
+		virtual void draw_system(Wt::WPainter& painter, options_t const& options) override;
 
 	private:
 		phys_system const& m_sys;

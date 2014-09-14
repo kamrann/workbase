@@ -1,0 +1,93 @@
+.status {
+	font-style: italic;
+	font-color: rgb(200, 200, 200);
+}
+
+.inlinelabel, .boxedlabel {
+
+}
+
+.inlinelabel {
+	font: arial, sans-serif;
+}
+
+.boxedlabel {
+	font: 100% arial, sans-serif;
+}
+
+.boxed {
+}
+
+.bordered {
+	border: 1px solid rgb(100, 100, 100);
+}
+
+
+button.dropbutton {
+	width: 21px;
+	height: 20px;
+	background: transparent url("../resources/themes/polished/dropdown.png") no-repeat;
+	background-position: -2px 1px;
+	border: none;
+	border-bottom-style: solid;
+	border-width: 1px;
+	border-color: rgb(100, 100, 100);
+	border-radius: 2px;
+}
+
+button.dropbutton:hover {
+	background-position: -3px 0px;
+	border: 1px solid rgb(100, 100, 100);
+}
+
+button.dropbutton:focus {
+	background-position: -2px 1px;
+	background-color: rgb(230, 230, 230);
+	border: none;
+}
+
+.expander {
+	width: 21px;
+	height: 21px;
+	background: transparent url("../resources/themes/polished/expander.png") no-repeat;
+	background-position: 0px 0px;
+	border: 1px solid rgb(100, 100, 100);
+	border-radius: 2px;
+}
+
+.expander:hover {
+	background-position: 0px 0px;
+	background-color: red;/*rgb(245, 245, 245);*/
+	border: 1px solid rgb(100, 100, 100);
+}
+
+.expander:focus {
+	background-position: 1px 1px;
+	background-color: rgb(230, 230, 230);
+/*	border: 1px solid rgb(100, 100, 100);*/
+	border: none;
+}
+
+.remover {
+	width: 21px;
+	height: 21px;
+	background: transparent url("../resources/themes/polished/remover.png") no-repeat;
+	background-position: 0px 0px;
+	border: none;
+	border-bottom-style: solid;
+	border-right-style: solid;
+	border-width: 1px;
+	border-color: rgb(100, 100, 100);
+	border-radius: 2px;
+}
+
+.remover:hover {
+	background-position: -1px -1px;
+	border: 1px solid rgb(100, 100, 100);
+}
+
+.remover:focus {
+	background-position: 0px 0px;
+	background-color: rgb(230, 230, 230);
+	border: none;
+}
