@@ -82,10 +82,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\mlp.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\algorithm.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_filter.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_filter.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\stream_io.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\string_constants.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\coordinator.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\layout.cpp" />
@@ -100,6 +104,8 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\access_options.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_functions.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_functions_concept.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_range.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\algorithm.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\basic_types.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\connection.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\connection_access.h" />
@@ -107,6 +113,8 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\internal_state_access.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layers.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_access.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_filter.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\modifiable.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuralnet.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_access.h" />
@@ -116,9 +124,11 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\neuron_type.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\nnet_fwd.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\output.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\stream_io.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\stdafx.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\targetver.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\coordinator.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\display_options.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\layout.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\text_output.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_controlpanel.h" />

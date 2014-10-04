@@ -235,6 +235,25 @@ public:
 	{
 		return std::fmod(orient + delta, 2 * boost::math::double_constants::pi);
 	}
+
+	//////////////////////
+	// NOTE: This is clockwise bearing. Maybe for consistency with rotations should be anti-cw??
+	static inline direction_t bearing_to_vector(orientation_t theta)
+	{
+		return direction_t(std::sin(theta), std::cos(theta));
+			//std::cos(theta), std::sin(theta));
+	}
+
+	static inline orientation_t vector_to_bearing(direction_t dir)
+	{
+		return std::copysign(std::acos(dir[1] / dir.norm()), dir[0]);
+	}
+
+	static inline orientation_t unitvector_to_bearing(direction_t dir)
+	{
+		return std::copysign(std::acos(dir[1]), dir[0]);
+	}
+	//////////////////////
 };
 
 template <>

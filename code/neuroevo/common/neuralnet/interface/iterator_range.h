@@ -15,6 +15,11 @@ namespace nnet {
 		typedef IteratorType iterator_type;
 
 	public:
+		inline size_t size() const
+		{
+			return m_size;
+		}
+
 		inline iterator_type begin() const
 		{
 			return m_first;
@@ -26,10 +31,11 @@ namespace nnet {
 		}
 
 	public:
-		iterator_range(iterator_type first, iterator_type last): m_first(first), m_last(last)
+		iterator_range(iterator_type first, iterator_type last, size_t size): m_first(first), m_last(last), m_size(size)
 		{}
 
 	private:
+		size_t m_size;
 		iterator_type m_first, m_last;
 	};
 

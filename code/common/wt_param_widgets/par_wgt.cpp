@@ -16,7 +16,9 @@
 #include "par_wgt_holder.h"
 
 #include "pw_yaml.h"
-#include "param_accessor.h"
+
+#include "params/param_yaml.h"
+#include "params/param_accessor.h"
 
 #include <Wt/WText>
 #include <Wt/WContainerWidget>
@@ -512,8 +514,8 @@ namespace prm
 
 	void replace_param_subtree(param param_vals, qualified_path path, param sub_param)
 	{
-		auto node = find_value(param_vals, path);
-		node = sub_param[ParamNode::Value];
+		auto node = find_node(param_vals, path);
+		node[ParamNode::Value] = sub_param[ParamNode::Value];
 	}
 	/********/
 

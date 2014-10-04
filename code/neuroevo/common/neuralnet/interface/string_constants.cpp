@@ -13,14 +13,22 @@ namespace nnet {
 		"Bias",
 	};
 
-	const char* const ActivationFnNames[(int)ActivationFn::Count] = {
+	const char* const NeuronTypeAbbreviations[(int)NeuronType::Count] = {
+		"i",
+		"h",
+		"o",
+		"b",
+	};
+
+	const char* const ActivationFnNames[(int)ActivationFnType::Count] = {
 		"Sigmoid",
 		"Gaussian",
-		"Threshold",
-		"Linear",
 		"Bounded Linear",
+		"Threshold",
 		"Symmetric Sigmoid",
 		"Symmetric Gaussian",
+		"Linear",
+		"Symmetric Bounded Linear",
 		"Symmetric Threshold",
 		"Sine",
 		"Cosine",

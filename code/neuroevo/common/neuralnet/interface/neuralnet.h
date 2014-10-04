@@ -4,6 +4,7 @@
 #define __WB_NN_NEURALNET_H
 
 #include "basic_types.h"
+#include "input.h"
 #include "access_options.h"
 
 #include <memory>
@@ -11,14 +12,13 @@
 
 namespace nnet {
 
-	class input;
 	class output;
 	struct activity_state;
 
 	class i_neuron_access;
 	class i_connection_access;
 	class i_layers;
-	//class i_internal_state;
+	class i_modifiable;
 
 	class i_neuralnet
 	{
@@ -40,6 +40,8 @@ namespace nnet {
 
 		//virtual std::unique_ptr< i_internal_state > internal_state_access() const = 0;
 		virtual activity_state current_activity_state() const = 0;
+
+		virtual std::unique_ptr< i_modifiable > modifiable() = 0;
 
 	public:
 		virtual ~i_neuralnet()

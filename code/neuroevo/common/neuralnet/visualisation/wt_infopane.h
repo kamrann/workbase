@@ -18,7 +18,8 @@ namespace nnet {
 	namespace vis {
 
 		class coordinator;
-		struct feedback_event;
+//		struct feedback_event;
+		struct changed_event;
 
 		namespace wt {
 
@@ -29,12 +30,14 @@ namespace nnet {
 				WNNInfoPane(std::shared_ptr< coordinator > crd);
 
 			protected:
-				void process_feedback(feedback_event const& evt);
-				void on_hover_start(feedback_event const& evt);
-				void on_hover_end(feedback_event const& evt);
+//				void process_feedback(feedback_event const& evt);
+//				void on_hover_start(feedback_event const& evt);
+//				void on_hover_end(feedback_event const& evt);
 
 				void add_network_summary(Wt::WTable* table);
 				void add_neuron_summary(neuron_id id, Wt::WTable* table);
+
+				void on_status_changed(changed_event const& evt);
 
 			protected:
 				Wt::WTable* m_info_table;

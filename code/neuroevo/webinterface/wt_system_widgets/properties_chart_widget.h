@@ -3,7 +3,7 @@
 #ifndef __PROPERTIES_CHART_WIDGET_H
 #define __PROPERTIES_CHART_WIDGET_H
 
-#include "../rtp_interface/rtp_properties.h"
+#include "properties_widget.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/WStandardItemModel>
@@ -18,14 +18,10 @@
 #include <boost/math/constants/constants.hpp>
 
 
-class properties_chart_widget: public Wt::WContainerWidget
+class properties_chart_widget:
+	public i_properties_widget,
+	public Wt::WContainerWidget
 {
-public:
-/*	struct series_cfg
-	{
-		Wt::WCheckBox* enabled_box;
-	};
-*/
 public:
 	properties_chart_widget(): model(nullptr)
 	{
@@ -67,12 +63,12 @@ public:
 	}
 
 public:
-	void clear_content()
+	virtual void clear_content() override
 	{
 		model->removeRows(0, model->rowCount());
 	}
 
-	void reset(std::shared_ptr< rtp::i_properties const > props = nullptr)
+	virtual void reset(std::shared_ptr< rtp::i_properties const > props = nullptr) override
 	{
 		model->clear();
 		//cfg_table->clear();
@@ -110,7 +106,7 @@ public:
 		m_props = props;
 	}
 	
-	void append_data(std::shared_ptr< rtp::i_property_values const > vals)
+	virtual void register_data(std::shared_ptr< rtp::i_property_values const > vals) override
 	{
 		model->appendRow(create_data_row(m_props, vals));
 		chart->update();

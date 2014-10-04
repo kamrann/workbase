@@ -4,7 +4,7 @@
 #include "webinterfaceapp.h"
 #include "wt_system_widgets/properties_chart_widget.h"
 #include "generic_system_coordinator.h"
-#include "evo_db/evo_db.h"
+#include "evo_database/evo_db.h"
 
 #include "rtp_interface/rtp_sim.h"
 #include "rtp_interface/rtp_genome.h"
@@ -634,49 +634,6 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app,
 			{
 				on_generation_batch(GenerationBatchSize);
 			}
-/*
-#ifndef _DEBUG
-			std::cout << "Batching new generation records..." << std::endl;
-#endif
-
-			dbo::Transaction t(db_s);
-			for(size_t i = 0; i < GenerationBatchSize; ++i)
-			{
-				dbo::ptr< generation > gen_ptr = db_s.add(new generation(gen_data[i]));
-				bool const last_gen = gen_ptr->index == sim->total_generations;
-
-				for(size_t j = sim->population_size * i; j < sim->population_size * (i + 1); ++j)
-				{
-					ind_data[j].generation = gen_ptr;
-					auto gn_ptr = db_s.add(new genome(ind_data[j]));
-
-					bool const top_ranked = ind_data[j].gen_obj_rank == 0;
-					if(last_gen && top_ranked)
-					{
-						dbo::ptr< named_genome > named = new named_genome;
-						named.modify()->gn = gn_ptr;
-						std::stringstream name;
-						name << SystemNames[sys_param["sys_type"][0].as< SystemType >()];
-						name << " ";
-						auto starttime = std::chrono::system_clock::to_time_t(ep->started);
-						std::tm tm;
-						::localtime_s(&tm, &starttime);
-						name << std::put_time(&tm, "%d/%m/%y - %H:%M");
-						if(true)	// TODO: if multiple top ranked
-						{
-							name << " [" << (j % sim->population_size + 1) << "]";
-						}
-						named.modify()->name = name.str();
-						db_s.add(named);
-					}
-				}
-			}
-			t.commit();
-
-#ifndef _DEBUG
-			std::cout << "...committed." << std::endl;
-#endif
-*/
 
 			//			WStandardItemModel* obs_model = observer_data_model< sim_t::observer_t >::generate(observations);
 
@@ -729,6 +686,16 @@ void SimulationsTab::run_simulation_threadmain(WebInterfaceApplication* app,
 	}
 */
 	WServer::instance()->post(session_id, boost::bind(&SimulationsTab::completion_cb, this, out.str()));
+
+	typedef std::chrono::duration< double > d_dur;
+	auto total_time = sim->m_ga_update_time + sim->m_trials_update_time;
+
+	std::cout << "\nSimulation performance data:\n";
+	auto denom = 0.01 * total_time.count();
+	std::cout << std::setprecision(2);
+	std::cout << "Genetic Algorithm" << ": " << sim->m_ga_update_time.count() / denom << "%" << std::endl;
+	std::cout << "System Trials" << ": " << sim->m_trials_update_time.count() / denom << "%" << std::endl;
+	std::cout << std::endl;
 }
 
 void SimulationsTab::evo_started_cb(dbo::ptr< evo_run > ep)
@@ -749,7 +716,7 @@ void SimulationsTab::generation_cb(std::vector< std::shared_ptr< rtp::i_property
 
 	for(size_t i = 0; i < per_gen_prop_vals.size(); ++i)
 	{
-		evo_chart->append_data(per_gen_prop_vals[i]);
+		evo_chart->register_data(per_gen_prop_vals[i]);
 	}
 
 	WebInterfaceApplication* app = (WebInterfaceApplication*)WApplication::instance();

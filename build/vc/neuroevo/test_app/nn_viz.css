@@ -13,7 +13,7 @@
 
 .feedbacktable th,
 .feedbacktable td {
-	padding: 2px 5px;
+	padding: 2px 2px;
 }
 
 .outerfeedbacktable {
@@ -21,33 +21,48 @@
 	border-spacing: 0px 8px;
 }
 
+.controlpanelbase {
+      background-color: rgb(230, 230, 230);
+}
 
 .controlpanel {
-      width: 100%;
-      float: left;
-      margin: 0 0 3em 0;
-      padding: 0;
-      list-style: none;
-      background-color: #f2f2f2;
-      border-bottom: 5px solid #ccc; 
-      border-top: 1px solid #ccc;
+	/*width: 100%;*/
+	float: left;
+	margin: 0 0 0 0;
+	padding: 0;
+	list-style: none;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
 }
-
+/*
 .controlpanel li {
-      float: left;
+	float: left;
+}
+*/
+.controlpanelitem {
+	display: block;
+	min-width: 90px;
+	text-align: center;
+	padding: 8px 12px;
+	text-decoration: none;
+	font-weight: bold;
+	color: rgb(100, 100, 100);
+	border-right: 1px solid #ccc;
+	cursor: pointer;
 }
 
-.controlpanel li a {
-      display: block;
-      padding: 8px 15px;
-      text-decoration: none;
-      font-weight: bold;
-      color: #069;
-      border-right: 1px solid #ccc;
+.controlpanelitem.active {
+/*	color: rgb(255, 255, 255);*/
+	background-color: rgb(200, 200, 200);
 }
 
-.controlpanel li a:hover {
-      color: #c00;
-      background-color: #fff;
+.controlpanelitem:hover {
 }
 
+.cp_modebox {
+	line-height: 200%;
+}
+
+.nn_display {
+	border: 1px solid red;
+}

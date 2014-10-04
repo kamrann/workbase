@@ -123,6 +123,7 @@ namespace rtp {
 		void release_body_user_data();
 
 	public:
+		virtual bool is_instantaneous() const override;
 		virtual update_info get_update_info() const override;
 
 //		virtual boost::any generate_initial_state() const;

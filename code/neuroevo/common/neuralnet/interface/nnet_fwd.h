@@ -1,4 +1,4 @@
-// basic_types.h
+// nnet_fwd.h
 
 #ifndef __WB_NN_FWD_DECL_H
 #define __WB_NN_FWD_DECL_H
@@ -9,6 +9,8 @@
 #include "neuron_type.h"
 #include "activation_functions.h"
 
+#include "input.h"	// annoying
+
 
 namespace nnet {
 
@@ -18,7 +20,7 @@ namespace nnet {
 	class i_layers;
 	class i_internal_state;
 
-	class input;
+	// class input;	
 	class output;
 	
 }

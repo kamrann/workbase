@@ -1,6 +1,7 @@
 // layout.cpp
 
 #include "layout.h"
+#include "display_options.h"
 #include "../interface/neuralnet.h"
 #include "../interface/neuron_access.h"
 #include "../interface/iterator.h"
@@ -20,6 +21,12 @@ namespace nnet {
 		auto const MinimumScale = 10;
 		auto const MaximumScale = 50;
 
+		auto const MinimumNeuronSpacing = 5;
+		auto const MaximumNeuronSpacing = 50;
+
+		auto const MinimumLayerSpacing = 10;
+		auto const MaximumLayerSpacing = 100;
+
 		typedef std::ratio< 1, 1 > NeuronCoreSizeRatio;
 		typedef std::ratio< 1, 1 > NeuronActivationSizeRatio;
 		typedef std::ratio< 1, 5 > NeuronComponentGapRatio;
@@ -30,14 +37,14 @@ namespace nnet {
 		typedef std::ratio< 1, 2 > NeuronHGapRatio;
 		typedef std::ratio< 1, 2 > NeuronVGapRatio;
 		typedef std::ratio< 10, 1 > BiasGapRatio;
-		typedef std::ratio< 10, 1 > InputHiddenGapRatio;
-		typedef std::ratio< 10, 1 > HiddenOutputGapRatio;
+		typedef std::ratio< 1, 1 > InputHiddenGapRatio;
+		typedef std::ratio< 1, 1 > HiddenOutputGapRatio;
 		//
 
 
-		std::map< ActivationFn, path > generate_activation_fn_symbols(size_t sz)
+		std::map< ActivationFnType, path > generate_activation_fn_symbols(size_t sz)
 		{
-			std::map< ActivationFn, path > mp;
+			std::map< ActivationFnType, path > mp;
 
 			int const adj_sz = sz - 1;
 			
@@ -45,7 +52,7 @@ namespace nnet {
 			{
 				path p;
 				p.subpaths.emplace_back(path::subpath{ point{ 0, adj_sz }, point{ adj_sz, 0 } });
-				mp[ActivationFn::Linear] = p;
+				mp[ActivationFnType::Linear] = p;
 			}
 
 			// Bounded Linear
@@ -57,7 +64,8 @@ namespace nnet {
 					point{ adj_sz * 5 / 6, adj_sz / 6 },
 					point{ adj_sz, adj_sz / 6 },
 				});
-				mp[ActivationFn::LinearBounded] = p;
+				mp[ActivationFnType::LinearBounded] = p;
+				mp[ActivationFnType::LinearBoundedSymmetric] = p;
 			}
 
 			// Thresholds
@@ -69,8 +77,8 @@ namespace nnet {
 					point{ adj_sz / 2, 0 },
 					point{ adj_sz, 0 },
 				});
-				mp[ActivationFn::Threshold] = p;
-				mp[ActivationFn::ThresholdSymmetric] = p;
+				mp[ActivationFnType::Threshold] = p;
+				mp[ActivationFnType::ThresholdSymmetric] = p;
 			}
 
 			// Sigmoids
@@ -89,8 +97,8 @@ namespace nnet {
 				}
 				path p;
 				p.subpaths.emplace_back(s);
-				mp[ActivationFn::Sigmoid] = p;
-				mp[ActivationFn::SigmoidSymmetric] = p;
+				mp[ActivationFnType::Sigmoid] = p;
+				mp[ActivationFnType::SigmoidSymmetric] = p;
 			}
 
 			// Gaussians
@@ -109,8 +117,8 @@ namespace nnet {
 				}
 				path p;
 				p.subpaths.emplace_back(s);
-				mp[ActivationFn::Gaussian] = p;
-				mp[ActivationFn::GaussianSymmetric] = p;
+				mp[ActivationFnType::Gaussian] = p;
+				mp[ActivationFnType::GaussianSymmetric] = p;
 			}
 
 			// Sine
@@ -128,7 +136,7 @@ namespace nnet {
 				}
 				path p;
 				p.subpaths.emplace_back(s);
-				mp[ActivationFn::Sine] = p;
+				mp[ActivationFnType::Sine] = p;
 			}
 
 			// Cosine
@@ -146,7 +154,7 @@ namespace nnet {
 				}
 				path p;
 				p.subpaths.emplace_back(s);
-				mp[ActivationFn::Cosine] = p;
+				mp[ActivationFnType::Cosine] = p;
 			}
 
 			return mp;
@@ -180,6 +188,7 @@ namespace nnet {
 			size_t n_width,
 			size_t n_height,
 			size_t core_size,
+			size_t fn_size,
 			size_t act_size,
 			size_t component_gap,
 			size_t h_gap,
@@ -187,6 +196,7 @@ namespace nnet {
 			)
 		{
 			auto core_x_off = (n_width - core_size) / 2;
+			auto fn_x_off = (n_width - fn_size) / 2;
 			auto act_x_off = (n_width - act_size) / 2;
 
 			size_t x_index = 0;
@@ -224,13 +234,16 @@ namespace nnet {
 						core_size
 						);
 					y_base += core_size + component_gap;
-					nr_layout.rc_function = rect(
-						x_base + core_x_off,
-						y_base,
-						core_size,
-						core_size
-						);
-					y_base += core_size + component_gap;
+					if(fn_size > 0)
+					{
+						nr_layout.rc_function = rect(
+							x_base + fn_x_off,
+							y_base,
+							fn_size,
+							fn_size
+							);
+						y_base += fn_size + component_gap;
+					}
 				}
 
 				nr_layout.rc_activation = rect(
@@ -253,28 +266,48 @@ namespace nnet {
 			return y_index * (n_height + v_gap) + n_height;
 		}
 
-		network_layout generate_layout(i_neuralnet const* net, rect& rc, double scale)
+		network_layout generate_layout(
+			i_neuralnet const* net,
+			rect& rc,
+			double scale,
+			double neuron_spacing,
+			double layer_spacing,
+			DisplayOptions display_options
+			)
 		{
 			auto const width = rc.width;
 			auto const pixel_scale = MinimumScale + (size_t)((MaximumScale - MinimumScale) * scale);
+			auto const pixel_neuron_spacing = MinimumNeuronSpacing + (size_t)((MaximumNeuronSpacing - MinimumNeuronSpacing) * neuron_spacing);
+			auto const pixel_layer_spacing = MinimumLayerSpacing + (size_t)((MaximumLayerSpacing - MinimumLayerSpacing) * layer_spacing);
 
 			auto const neuron_core_sz = std::ratio_product< NeuronCoreSizeRatio >(pixel_scale);
+			auto show_function = display_options.test(DisplayFlags::ActivationFunction);
+			auto const neuron_fn_size = show_function ? neuron_core_sz : 0;
 			auto const neuron_activation_sz = std::ratio_product< NeuronActivationSizeRatio >(pixel_scale);
 			auto const component_gap = std::ratio_product< NeuronComponentGapRatio >(pixel_scale);
-			auto const neuron_width = std::ratio_product< NeuronWidthRatio >(pixel_scale);
+			auto const neuron_width = std::ratio_product< NeuronWidthRatio >(pixel_scale) + 4;	// TODO:
 			auto const bias_gap = std::ratio_product< BiasGapRatio >(pixel_scale);
-			auto const neuron_h_gap = std::ratio_product< NeuronHGapRatio >(pixel_scale);
-			auto const neuron_v_gap = std::ratio_product< NeuronVGapRatio >(pixel_scale);
-			auto const input_hidden_gap = std::ratio_product< InputHiddenGapRatio >(pixel_scale);
-			auto const hidden_output_gap = std::ratio_product< HiddenOutputGapRatio >(pixel_scale);
-
-			auto const non_bias_width = width - neuron_width - bias_gap;
-			auto const max_neurons_across = (size_t)((non_bias_width + neuron_h_gap) / (neuron_width + neuron_h_gap));
+			auto const neuron_h_gap = std::ratio_product< NeuronHGapRatio >(pixel_neuron_spacing);
+				//std::ratio_product< NeuronHGapRatio >(pixel_scale);
+			auto const neuron_v_gap = std::ratio_product< NeuronVGapRatio >(pixel_neuron_spacing);
+				//std::ratio_product< NeuronVGapRatio >(pixel_scale);
+			auto const input_hidden_gap = std::ratio_product< InputHiddenGapRatio >(pixel_layer_spacing);
+				//std::ratio_product< InputHiddenGapRatio >(pixel_scale);
+			auto const hidden_output_gap = std::ratio_product< HiddenOutputGapRatio >(pixel_layer_spacing);
+				//std::ratio_product< HiddenOutputGapRatio >(pixel_scale);
 
 			auto neuron_access = net->neuron_access();
 			auto input_neurons = neuron_access->get_range(neuron_filter::Input);
 			auto hidden_neurons = neuron_access->get_range(neuron_filter::Hidden);
 			auto output_neurons = neuron_access->get_range(neuron_filter::Output);
+			auto hidden_bias_neurons = neuron_access->get_range(layer_filter::Input, neuron_filter::Bias);
+			auto output_bias_neurons = neuron_access->get_range(layer_filter::Hidden, neuron_filter::Bias);
+
+			auto const max_bias_count = std::max(hidden_bias_neurons.size(), output_bias_neurons.size());
+			// NOTE: This is assuming not too many bias neurons, as not allowing any wrapping
+			auto const bias_area_width = max_bias_count * neuron_width + (max_bias_count - 1) * neuron_h_gap;
+			auto const non_bias_width = width - bias_area_width - bias_gap;
+			auto const max_neurons_across = (size_t)((non_bias_width + neuron_h_gap) / (neuron_width + neuron_h_gap));
 
 			auto x_pos = rc.left;
 			auto y_pos = rc.top;
@@ -293,16 +326,38 @@ namespace nnet {
 				neuron_width,
 				n_height,
 				neuron_core_sz,
+				neuron_fn_size,
 				neuron_activation_sz,
 				component_gap,
 				neuron_h_gap,
 				neuron_v_gap
 				);
-			y_pos += input_height;
 
+			// With biases for the hidden neurons to the right
+			layout_standard_layer(
+				hidden_bias_neurons,
+				layout,
+				x_pos + non_bias_width + bias_gap,
+				y_pos,
+				hidden_bias_neurons.size(),
+				neuron_width,
+				n_height,
+				neuron_core_sz,
+				neuron_fn_size,
+				neuron_activation_sz,
+				component_gap,
+				neuron_h_gap,
+				neuron_v_gap
+				);
+
+			y_pos += input_height;
 			y_pos += input_hidden_gap;
 
-			n_height = neuron_core_sz * 2 + neuron_activation_sz + component_gap * 2;
+			n_height =
+				neuron_core_sz +
+				component_gap +
+				(show_function ? (neuron_fn_size + component_gap) : 0) +
+				neuron_activation_sz;
 
 			// Hidden neurons
 			auto hidden_height = layout_standard_layer(
@@ -314,13 +369,31 @@ namespace nnet {
 				neuron_width,
 				n_height,
 				neuron_core_sz,
+				neuron_fn_size,
 				neuron_activation_sz,
 				component_gap,
 				neuron_h_gap,
 				neuron_v_gap
 				);
-			y_pos += hidden_height;
 
+			// With biases for the output neurons to the right
+			layout_standard_layer(
+				output_bias_neurons,
+				layout,
+				x_pos + non_bias_width + bias_gap,
+				y_pos + n_height - neuron_activation_sz,
+				output_bias_neurons.size(),
+				neuron_width,
+				neuron_activation_sz,
+				neuron_core_sz,
+				neuron_fn_size,
+				neuron_activation_sz,
+				component_gap,
+				neuron_h_gap,
+				neuron_v_gap
+				);
+
+			y_pos += hidden_height;
 			y_pos += hidden_output_gap;
 
 			// Output neurons
@@ -333,6 +406,7 @@ namespace nnet {
 				neuron_width,
 				n_height,
 				neuron_core_sz,
+				neuron_fn_size,
 				neuron_activation_sz,
 				component_gap,
 				neuron_h_gap,

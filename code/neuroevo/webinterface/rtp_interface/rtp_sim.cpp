@@ -81,6 +81,8 @@ namespace rtp {
 		sb::label(sb::last(schema), "Num Generations");
 		sb::append(schema, sb::integer("num_trials", 1, 1));
 		sb::label(sb::last(schema), "Trials/Generation");
+		sb::append(schema, sb::boolean("static_training_set", true));
+		sb::label(sb::last(schema), "Static Training Set");
 		sb::append(schema, sb::integer("rand_seed", 0, 0));
 		sb::label(sb::last(schema), "Random Seed");
 		sb::append(schema, sb::enum_selection("procreation_type", std::vector < std::string > { begin(rtp_procreation_selection::Names), end(rtp_procreation_selection::Names) }));
@@ -112,6 +114,13 @@ namespace rtp {
 		{
 			auto s = sb::integer("num_trials", 1, 1);
 			sb::label(s, "Trials/Generation");
+			return s;
+		};
+
+		(*provider)[path + std::string("static_training_set")] = [](prm::param_accessor)
+		{
+			auto s = sb::boolean("static_training_set", true);
+			sb::label(s, "Static Training Set");
 			return s;
 		};
 
@@ -177,6 +186,7 @@ namespace rtp {
 			sb::append(s, provider->at(path + std::string("pop_size"))(param_vals));
 			sb::append(s, provider->at(path + std::string("num_generations"))(param_vals));
 			sb::append(s, provider->at(path + std::string("num_trials"))(param_vals));
+			sb::append(s, provider->at(path + std::string("static_training_set"))(param_vals));
 			sb::append(s, provider->at(path + std::string("rand_seed"))(param_vals));
 			sb::append(s, provider->at(path + std::string("procreation_type"))(param_vals));
 			sb::append(s, provider->at(path + std::string("debug_options"))(param_vals));
@@ -201,6 +211,7 @@ namespace rtp {
 		population_size = evo_param["pop_size"].as< int >();
 		total_generations = evo_param["num_generations"].as< int >();
 		trials_per_generation = evo_param["num_trials"].as< int >();
+		static_training_set = evo_param["static_training_set"].as< bool >();
 		int seed = evo_param["rand_seed"].as< int >();	// TODO: uint version of param?
 		if(seed == 0)
 		{
@@ -312,6 +323,8 @@ namespace rtp {
 		}
 		else if(procreation_enabled)
 		{
+			auto start_ = std::chrono::high_resolution_clock::now();
+
 			//proc_sel_t proc_sel(rgen);
 			rtp_crossover_t cx_ftr = get_genome_mapping()->get_crossover_fn(rgen);
 			//(gn_mapping->get_genome_length(), rgen);
@@ -339,6 +352,9 @@ namespace rtp {
 			{
 				population[idv].gn = std::move(ga.population[idv].genome.get());
 			}
+
+			auto end_ = std::chrono::high_resolution_clock::now();
+			m_ga_update_time += end_ - start_;
 		}
 
 		// Recreate the ga rand seed so that ga code will get different random numbers in next generation
@@ -349,6 +365,8 @@ namespace rtp {
 		if(trials_enabled)
 		{
 			std::cout << "Commencing trials" << std::endl;
+
+			auto start_ = std::chrono::high_resolution_clock::now();
 
 			// Seed for trials
 			rgen.seed(trials_rseed);
@@ -474,18 +492,20 @@ namespace rtp {
 				population[idv].fitness = avg_fitnesses[idv].value;
 			}
 
-			// Is training data (ie. system initial state) the same for every generation?
-			bool const StaticTrainingSet = true;
-			// Regardless of this setting, data will be the same for all agents within a given generation.
-
 			// If we don't want a static training set, recreate the trials rand seed 
-			if(!StaticTrainingSet)
+			if(!static_training_set)
 			{
 				trials_rseed = boost::random::uniform_int_distribution< uint32_t >()(rgen);
 			}
 
+			auto end_ = std::chrono::high_resolution_clock::now();
+			m_trials_update_time += end_ - start_;
 
-			i_system::output_performance_data(perf_data, std::cout);
+			std::stringstream perf_ss;
+			std::fixed(perf_ss);
+			perf_ss.precision(2);
+			i_system::output_performance_data(perf_data, perf_ss, trials_per_generation);
+			std::cout << perf_ss.str();
 		}
 
 		++generation;

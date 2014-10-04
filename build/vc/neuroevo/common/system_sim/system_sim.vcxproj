@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CD95CA33-3886-4CC3-9F42-F32B2B2DA3F7}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>system_sim</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\neuroevo.props" />
+    <Import Project="..\..\..\yaml_cpp_dbg.props" />
+    <Import Project="..\..\..\eigen.props" />
+    <Import Project="..\..\..\Wt_dbg.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\neuroevo.props" />
+    <Import Project="..\..\..\yaml_cpp_rls.props" />
+    <Import Project="..\..\..\eigen.props" />
+    <Import Project="..\..\..\Wt_rls.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\basic_system_defn.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\interactive.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\mlp.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_controller.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_interactive_controller.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_mlp_controller.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system_agents_data.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\basic_animated_system_defn.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\basic_system_defn.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\controller_defn.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\interactive.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\mlp.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\passive.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_agent.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_controller.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_defs.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_interactive_controller.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_interactive_input.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_mlp_controller.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_observer.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system_agents_data.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system_agent_specification.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system_drawer.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\rtp_system_state_values.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\stdafx.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\system_defn.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\system_sim_fwd.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\system_update_info.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\targetver.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

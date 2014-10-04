@@ -54,6 +54,11 @@ namespace nnet {
 			return m_values.end();
 		}
 
+		inline output_array_t& data()
+		{
+			return m_values;
+		}
+
 	private:
 		output_array_t m_values;
 	};

@@ -5,7 +5,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(SolutionDir)\..\..\..\code\neuroevo\common;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Coding Projects\workbase\code\neuroevo\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />

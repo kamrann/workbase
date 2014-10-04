@@ -28,7 +28,7 @@ namespace Wt {
 	class WComboBox;
 }
 
-namespace rtp {
+namespace sys {
 
 	struct _SystemType
 	{
@@ -36,6 +36,7 @@ namespace rtp {
 			//	NoughtsAndCrosses,
 			//	ShipAndThrusters2D,
 			Physics2D,
+			Detection2D,
 			Elevator,
 
 			Count,
@@ -99,6 +100,8 @@ namespace rtp {
 		virtual void initialize() = 0;
 		virtual void clear_agents() = 0;
 
+		// TODO: probably want to combine these two
+		virtual bool is_instantaneous() const = 0;
 		virtual update_info get_update_info() const = 0;
 
 		typedef unsigned int agent_id;
@@ -124,7 +127,7 @@ namespace rtp {
 //#ifdef PERF_LOGGING
 		typedef std::map< std::string, std::chrono::duration< double > > perf_data_t;
 		virtual void concatenate_performance_data(perf_data_t& pd) const = 0;
-		static void output_performance_data(perf_data_t const& pd, std::ostream& strm);
+		static void output_performance_data(perf_data_t const& pd, std::ostream& strm, size_t samples);
 //#endif
 
 	public:

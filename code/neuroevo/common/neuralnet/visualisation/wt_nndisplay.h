@@ -18,6 +18,9 @@ namespace Wt {
 }
 
 namespace nnet {
+
+	struct activation_function;
+
 	namespace vis {
 
 		class coordinator;
@@ -33,7 +36,7 @@ namespace nnet {
 				public Wt::WPaintedWidget
 			{
 			public:
-				WNNFunctionWidget(ActivationFn fn, size_t width);
+				WNNFunctionWidget(activation_function fn, size_t width);
 
 			protected:
 				void paintEvent(Wt::WPaintDevice* device);
@@ -50,7 +53,7 @@ namespace nnet {
 				WNNDisplay(std::shared_ptr< coordinator > crd);
 
 			protected:
-				void update_layout();
+				void update_layout(int width, int height);
 
 			protected:
 				void layoutSizeChanged(int width, int height);

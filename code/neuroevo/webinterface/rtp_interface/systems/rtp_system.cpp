@@ -7,6 +7,7 @@
 #include "../rtp_genome_mapping.h"
 
 #include "phys/rtp_phys_system.h"
+#include "radial_detection/rtp_radial_detection_system.h"
 #include "elevator/rtp_elevator_system.h"
 
 #include "wt_param_widgets/pw_yaml.h"
@@ -24,6 +25,7 @@
 namespace YAML {
 	std::map< std::string, rtp::SystemType > const convert< rtp::SystemType >::mapping_ = {
 			{ "Physics 2D", rtp::SystemType::Physics2D },
+			{ "Detection 2D", rtp::SystemType::Detection2D },
 			{ "Elevator", rtp::SystemType::Elevator },
 	};
 }
@@ -34,6 +36,7 @@ namespace rtp {
 		//	"Noughts & Crosses",
 		//	"Ship & Thrusters 2D",
 		"Physics 2D",
+		"Detection 2D",
 		"Elevator",
 	};
 
@@ -58,6 +61,7 @@ namespace rtp {
 		path += std::string("type_specific_sys_params");
 
 		auto phys2d_rel = rtp::phys_system::update_schema_providor(provider, path, evolvable);
+		auto detection2d_rel = rtp::rd_system::update_schema_providor(provider, path, evolvable);
 		auto elevator_rel = rtp::elevator_system::update_schema_providor(provider, path, evolvable);
 
 		(*provider)[path] = [=](prm::param_accessor param_vals)
@@ -69,6 +73,9 @@ namespace rtp {
 			{
 				case SystemType::Physics2D:
 				sb::append(s, provider->at(path + phys2d_rel)(param_vals));
+				break;
+				case SystemType::Detection2D:
+				sb::append(s, provider->at(path + detection2d_rel)(param_vals));
 				break;
 				case SystemType::Elevator:
 				sb::append(s, provider->at(path + elevator_rel)(param_vals));
@@ -131,6 +138,9 @@ namespace rtp {
 			case SystemType::Physics2D:
 			result = rtp::phys_system::generate_factory(param_vals);
 			break;
+			case SystemType::Detection2D:
+			result = rtp::rd_system::generate_factory(param_vals);
+			break;
 			case SystemType::Elevator:
 			result = rtp::elevator_system::generate_factory(param_vals);
 			break;
@@ -173,6 +183,9 @@ namespace rtp {
 			case SystemType::Physics2D:
 			result = rtp::phys_system::generate_agents_data(param_vals, evolvable);
 			break;
+			case SystemType::Detection2D:
+			result = rtp::rd_system::generate_agents_data(param_vals, evolvable);
+			break;
 			case SystemType::Elevator:
 			result = rtp::elevator_system::generate_agents_data(param_vals, evolvable);
 			break;
@@ -190,6 +203,8 @@ namespace rtp {
 		{
 			case SystemType::Physics2D:
 			return phys_system::get_agent_type_names();
+			case SystemType::Detection2D:
+			return rd_system::get_agent_type_names();
 			case SystemType::Elevator:
 			return elevator_system::get_agent_type_names();
 
@@ -204,6 +219,8 @@ namespace rtp {
 		{
 			case SystemType::Physics2D:
 			return phys_system::get_agent_sensor_names(agent_type, param_vals);
+			case SystemType::Detection2D:
+			return rd_system::get_agent_sensor_names(agent_type, param_vals);
 			case SystemType::Elevator:
 			return elevator_system::get_agent_sensor_names(agent_type, param_vals);
 
@@ -218,6 +235,8 @@ namespace rtp {
 		{
 			case SystemType::Physics2D:
 			return phys_system::get_agent_num_effectors(agent_type);
+			case SystemType::Detection2D:
+			return rd_system::get_agent_num_effectors(agent_type);
 			case SystemType::Elevator:
 			return elevator_system::get_agent_num_effectors(agent_type);
 
@@ -233,6 +252,8 @@ namespace rtp {
 		{
 			case SystemType::Physics2D:
 			return phys_system::get_state_values(param_vals);
+			case SystemType::Detection2D:
+			return rd_system::get_state_values(param_vals);
 			case SystemType::Elevator:
 			return elevator_system::get_state_values(param_vals);
 
@@ -247,7 +268,7 @@ namespace rtp {
 		m_rgen.seed(rseed);
 	}
 
-	void i_system::output_performance_data(perf_data_t const& pd, std::ostream& strm)
+	void i_system::output_performance_data(perf_data_t const& pd, std::ostream& strm, size_t samples)
 	{
 		typedef std::chrono::duration< double > d_dur;
 		auto total_time = d_dur{};
@@ -261,7 +282,8 @@ namespace rtp {
 		strm << std::setprecision(2);
 		for(auto const& entry : pd)
 		{
-			strm << entry.first << ": " << entry.second.count() / denom << "%" << std::endl;
+			strm << entry.first << ": " << entry.second.count() / denom << "%" <<
+				" [" << (entry.second.count() / samples) << "s/trial]" << std::endl;
 		}
 		strm << std::endl;
 	}

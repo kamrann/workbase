@@ -1,0 +1,26 @@
+>name : move to unambiguous descendent 'name'
+< : move to parent
+<name : move to ancester 'name'
+
+name value : set value of child 'name' (value may be 'nil')
+import import-name : sets import subtree at current level
+
+? : list children (names and values)
+?>n : as above but list recursively n levels (or all the way if n unspecified)
+?>name : list children of unambiguous descendent 'name'
+?>name>n : see above
+?? : list with types/constraints
+?+ : list with imports expanded
+! : list only elements that are required and unspecified
+
+
+element-name: alpha then {alpha/num/_}
+
+nav_up: '<' [<element-name>]
+nav_down: '>' <element-name>
+nav: nav_up | nav_down
+
+depth: ':' {positive_integer | 'all'}
+list: {?|!} [?] [+] [nav] [depth]
+
+set value: <element-name> <value>

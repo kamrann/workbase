@@ -52,8 +52,8 @@ namespace nnet {
 
 		bool operator== (const iterator& rhs)
 		{
-			auto const this_end = (m_pos._Getcont() == nullptr || m_pos == m_data->end());
-			auto const rhs_end = (rhs.m_pos._Getcont() == nullptr || rhs.m_pos == m_data->end());
+			auto const this_end = (!m_data/*m_pos._Getcont() == nullptr*/ || m_pos == m_data->end());
+			auto const rhs_end = (!rhs.m_data/*rhs.m_pos._Getcont() == nullptr*/ || rhs.m_pos == m_data->end());
 			return
 				this_end && rhs_end ||
 				!this_end && !rhs_end && m_pos == rhs.m_pos;

@@ -17,6 +17,8 @@ public:
 	virtual void cancel() = 0;
 	virtual void restart() = 0;
 
+	virtual void register_system_finish_callback(std::function< void() > cb) = 0;
+
 	virtual ~system_coordinator() = default;
 };
 

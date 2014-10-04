@@ -15,7 +15,7 @@ namespace nnet {
 	public:
 		neuron_id id;
 		NeuronType type;
-		ActivationFn activation_fn;	// TODO: more info of activation function, which may be specific to the type
+		activation_function activation_fn;
 	};
 
 /*
@@ -25,7 +25,7 @@ namespace nnet {
 		virtual size_t in_connection_count() const = 0;
 		virtual size_t out_connection_count() const = 0;
 		// TODO: weights, and input/output connection iterators
-		virtual ActivationFn activation_function_type() const = 0;
+		virtual ActivationFnType activation_function_type() const = 0;
 		// TODO: more info of activation function, which may be specific to the type
 
 	public:

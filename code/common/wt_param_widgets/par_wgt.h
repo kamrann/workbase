@@ -5,8 +5,8 @@
 
 #include "params/param.h"
 #include "params/param_constraints.h"
-#include "qualified_path.h"
-#include "pw_schema.h"
+#include "params/qualified_path.h"
+#include "params/schema.h"
 
 #include "pw_exceptions.h"	// For convenience of includer
 

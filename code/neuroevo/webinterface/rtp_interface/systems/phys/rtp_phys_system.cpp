@@ -398,6 +398,11 @@ namespace rtp {
 		}
 	}
 
+	bool phys_system::is_instantaneous() const
+	{
+		return false;
+	}
+
 	i_system::update_info phys_system::get_update_info() const
 	{
 		update_info uinf;

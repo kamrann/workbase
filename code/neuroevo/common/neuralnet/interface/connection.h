@@ -11,6 +11,7 @@ namespace nnet {
 	class connection_data
 	{
 	public:
+		connection_id id;
 		neuron_id src;
 		neuron_id dst;
 		weight_t weight;

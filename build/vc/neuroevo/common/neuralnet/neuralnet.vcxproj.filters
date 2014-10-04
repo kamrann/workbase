@@ -69,6 +69,15 @@
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_infopane.cpp">
       <Filter>visualisation\wt</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_filter.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\algorithm.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\stream_io.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\stdafx.h">
@@ -156,6 +165,24 @@
       <Filter>visualisation\wt</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_functions_concept.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\display_options.h">
+      <Filter>visualisation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_filter.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\algorithm.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_range.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\stream_io.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\modifiable.h">
       <Filter>interface</Filter>
     </ClInclude>
   </ItemGroup>

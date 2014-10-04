@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "peerwork", "peerwork\peerwork.vcxproj", "{C9B3D7CB-772B-4D98-BE13-CB0810B53EDF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pwork_client", "pwork_client\pwork_client.vcxproj", "{D0CED049-6F77-41D6-BB8C-9BF5BCB1D150}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shared", "shared\shared\shared.vcxproj", "{914F1079-F72D-4BAF-B853-99EA00952201}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workbase_common", "..\workbase_common.vcxproj", "{78D223D2-D266-4DA3-89C6-73100A132FD1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_client", "test_client\test_client.vcxproj", "{F379CD3F-6052-4F38-B19B-5782D44A8C61}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "triangular", "executors\triangular\triangular.vcxproj", "{0FE053AB-FA59-439C-9F28-B1238CB118FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9B3D7CB-772B-4D98-BE13-CB0810B53EDF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C9B3D7CB-772B-4D98-BE13-CB0810B53EDF}.Debug|Win32.Build.0 = Debug|Win32
+		{C9B3D7CB-772B-4D98-BE13-CB0810B53EDF}.Release|Win32.ActiveCfg = Release|Win32
+		{C9B3D7CB-772B-4D98-BE13-CB0810B53EDF}.Release|Win32.Build.0 = Release|Win32
+		{D0CED049-6F77-41D6-BB8C-9BF5BCB1D150}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D0CED049-6F77-41D6-BB8C-9BF5BCB1D150}.Debug|Win32.Build.0 = Debug|Win32
+		{D0CED049-6F77-41D6-BB8C-9BF5BCB1D150}.Release|Win32.ActiveCfg = Release|Win32
+		{D0CED049-6F77-41D6-BB8C-9BF5BCB1D150}.Release|Win32.Build.0 = Release|Win32
+		{914F1079-F72D-4BAF-B853-99EA00952201}.Debug|Win32.ActiveCfg = Debug|Win32
+		{914F1079-F72D-4BAF-B853-99EA00952201}.Debug|Win32.Build.0 = Debug|Win32
+		{914F1079-F72D-4BAF-B853-99EA00952201}.Release|Win32.ActiveCfg = Release|Win32
+		{914F1079-F72D-4BAF-B853-99EA00952201}.Release|Win32.Build.0 = Release|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Debug|Win32.Build.0 = Debug|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Release|Win32.ActiveCfg = Release|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Release|Win32.Build.0 = Release|Win32
+		{F379CD3F-6052-4F38-B19B-5782D44A8C61}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F379CD3F-6052-4F38-B19B-5782D44A8C61}.Debug|Win32.Build.0 = Debug|Win32
+		{F379CD3F-6052-4F38-B19B-5782D44A8C61}.Release|Win32.ActiveCfg = Release|Win32
+		{F379CD3F-6052-4F38-B19B-5782D44A8C61}.Release|Win32.Build.0 = Release|Win32
+		{0FE053AB-FA59-439C-9F28-B1238CB118FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0FE053AB-FA59-439C-9F28-B1238CB118FB}.Debug|Win32.Build.0 = Debug|Win32
+		{0FE053AB-FA59-439C-9F28-B1238CB118FB}.Release|Win32.ActiveCfg = Release|Win32
+		{0FE053AB-FA59-439C-9F28-B1238CB118FB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

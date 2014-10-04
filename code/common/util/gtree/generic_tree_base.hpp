@@ -169,6 +169,10 @@ namespace detail {
 		inline bool
 			are_ancestor_descendent(node_descriptor a, node_descriptor n) const;
 
+		// Returns the common ancestor node of a and b
+		inline node_descriptor
+			common_ancestor(node_descriptor a, node_descriptor b);
+
 		// Returns the nth (0-based) child of p, if it exists
 		inline t_vert_bool
 			get_nth_child(node_descriptor p, size_t n) const
@@ -232,11 +236,10 @@ namespace detail {
 			return target(e)->parent;
 		}
 
-		// Returns the path from node m to node n, if it exists
-		/*		TODO:
-		std::pair< path, bool >
-		path_to_node(node_descriptor m, node_descriptor n) const;
-		*/
+		// Returns the path from node src to node dst, if it exists
+		inline std::pair< path, bool >
+			path_to_node(node_descriptor src, node_descriptor dst) const;
+
 		// Return the path from root to node n
 		inline path
 			path_to_node(node_descriptor n) const;

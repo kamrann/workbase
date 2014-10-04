@@ -39,10 +39,12 @@ namespace nnet {
 
 	public:
 		static const neuron_filter Any;
-		static const neuron_filter Input;	// Excludes bias
+		static const neuron_filter Input;	// Bias neurons nominally in the input layer are not included
 		static const neuron_filter Output;
 		static const neuron_filter Hidden;
+		static const neuron_filter Bias;
 		static const neuron_filter NonBias;
+		static const neuron_filter HasActivation;	// All neurons with activation functions, ie. no Inputs or Biases
 	};
 
 }

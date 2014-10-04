@@ -26,6 +26,32 @@ namespace detail {
 		return false;
 	}
 
+	// Returns the common ancestor node of a and b
+	generic_tree_base::node_descriptor
+	generic_tree_base::common_ancestor(node_descriptor a, node_descriptor b)
+	{
+		auto path_a = path_to_node(a);
+		auto path_b = path_to_node(b);
+
+		auto ancestor = null_vertex();
+		for(
+			auto it_a = std::begin(path_a), it_b = std::begin(path_b);
+			it_a != std::end(path_a) && it_b != std::end(path_b);
+			++it_a, ++it_b
+			)
+		{
+			// Break out of loop as soon as the paths diverge
+			if(*it_a != *it_b)
+			{
+				break;
+			}
+
+			ancestor = *it_a;
+		}
+
+		return ancestor;
+	}
+
 	// Returns the left adjacent sibling of n, if it exists
 	generic_tree_base::t_vert_bool
 	generic_tree_base::get_left_sibling(node_descriptor n) const
@@ -130,14 +156,28 @@ namespace detail {
 	}
 
 	// Returns the path from node m to node n, if it exists
-	/* todo:		std::pair< path_t, bool >
-	path_to_node(node_descriptor m, node_descriptor n) const
+	std::pair< generic_tree_base::path, bool >
+	generic_tree_base::path_to_node(node_descriptor src, node_descriptor dst) const
 	{
-	std::pair< path, bool > res;
-	res.
-	return res;
+		path p;
+		bool has_parent;
+
+		auto n = dst;
+		do
+		{
+			p.push_front(n);
+			if(n == src)
+			{
+				return{ std::move(p), true };
+			}
+
+			std::tie(n, has_parent) = get_parent(n);
+
+		} while(has_parent);
+
+		return std::pair< path, bool > { path{}, false };
+		//return{ path{}, false };
 	}
-	*/
 
 	// Return the path from root to node n
 	generic_tree_base::path

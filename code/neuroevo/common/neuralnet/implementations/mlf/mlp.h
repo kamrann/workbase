@@ -7,7 +7,13 @@
 #include "../../interface/neuron_type.h"
 #include "../../interface/activation_functions.h"
 #include "../../interface/neuron_filter.h"
+#include "../../interface/layer_filter.h"
 #include "../../interface/iterator_range.h"
+
+#include <vector>
+#include <map>
+#include <utility>
+#include <memory>
 
 
 namespace nnet {
@@ -23,11 +29,14 @@ namespace nnet {
 	public:
 		typedef std::vector< size_t > layer_counts_t;
 
+		struct IncludeBias{};
+		struct ExcludeBias{};
+
 	private:
 		struct neuron
 		{
 			NeuronType type;
-			ActivationFn activation_fn;
+			activation_function activation_fn;
 			value_t sum;
 			value_t activation;
 		};
@@ -42,10 +51,20 @@ namespace nnet {
 
 		typedef std::vector< neuron > neuron_list_t;
 		typedef std::vector< connection > connection_list_t;
+		typedef std::map< std::pair< neuron_id, neuron_id >, connection_id > connection_map_t;
 
 	public:
 		size_t neuron_count(neuron_filter const& filter = neuron_filter()) const;
-		neuron_range get_neurons(neuron_filter const& filter = neuron_filter()) const;
+		neuron_range get_neurons(layer_filter const& lfilter = layer_filter::Any, neuron_filter const& nfilter = neuron_filter::Any) const;
+		layer_data neuron_layer(neuron_id id) const;
+
+		connection_id get_connection_id(neuron_id src, neuron_id dst) const;
+		connection_range get_connections(
+			layer_filter const& src_lfilter = layer_filter::Any,
+			layer_filter const& dst_lfilter = layer_filter::Any,
+			neuron_filter const& src_nfilter = neuron_filter::Any,
+			neuron_filter const& dst_nfilter = neuron_filter::Any
+			) const;
 
 		inline size_t num_inputs() const
 		{
@@ -55,6 +74,16 @@ namespace nnet {
 		inline size_t num_outputs() const
 		{
 			return m_layer_counts.back();	// No bias node at output layer
+		}
+
+		inline size_t num_hidden_layers() const
+		{
+			return m_num_layers - 2;
+		}
+
+		inline size_t num_hidden() const
+		{
+			return total_hidden_count() - num_hidden_layers();	// Exclude biases
 		}
 
 		// Neuron counts include bias neurons
@@ -85,19 +114,39 @@ namespace nnet {
 
 		void reset();
 		void create(layer_counts_t const& layer_counts);
-		void set_activation_function(size_t layer, ActivationFn fn);
+		void set_activation_function(neuron_id neuron, activation_function fn);
+		// TODO: Maybe better to just overload on layer_data, instead of integer index?
+		// That way can set function for all hidden layer neurons in a single call.
+		void set_activation_function_layer(size_t layer, activation_function fn);
+		void set_weight(connection_id neuron, value_t weight);
 		bool load_weights(weight_array_t const& weights);
 		output execute(input const& in);
 
 	private:
 		neuron_data as_neuron_data(neuron_id id) const;
-		connection_data as_connection_data(connection const& conn) const;
+		connection_data as_connection_data(connection_id id) const;
 		size_t num_bias(size_t layer) const;
 		size_t input_start() const;
 		size_t hidden_start(size_t hidden_layer = 0) const;	// 0 = first hidden layer
 		size_t output_start() const;
-		size_t layer_start(size_t layer) const;	// 0 = input layer, 1 = first hidden layer
+
+		// 0 = input layer, 1 = first hidden layer
+		size_t layer_start(size_t layer) const;
+
+		template < typename >
 		size_t layer_count(size_t layer) const;
+
+		template <>
+		size_t layer_count< IncludeBias >(size_t layer) const
+		{
+			return m_layer_counts[layer];
+		}
+
+		template <>
+		size_t layer_count< ExcludeBias >(size_t layer) const
+		{
+			return m_layer_counts[layer] - num_bias(layer);
+		}
 
 		void create_neurons();
 		void initialize_input_neurons();
@@ -109,6 +158,7 @@ namespace nnet {
 	private:
 		neuron_list_t m_neurons;
 		connection_list_t m_connections;
+		connection_map_t m_conn_mp;
 		size_t m_num_layers;
 		layer_counts_t m_layer_counts;
 
@@ -124,16 +174,15 @@ namespace nnet {
 		virtual bool provides_access(AccessOptions opt) const override;
 
 		virtual std::unique_ptr< i_neuron_access > neuron_access() const override;
-
 		virtual std::unique_ptr< i_connection_access > connection_access() const override;
-
 		virtual std::unique_ptr< i_layers > layer_access() const override;
-
 		virtual activity_state current_activity_state() const override;
+		virtual std::unique_ptr< i_modifiable > modifiable() override;
 
 	private:
 		class neuron_accessor;
 		class connection_accessor;
+		class modifier;
 	};
 
 }

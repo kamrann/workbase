@@ -93,6 +93,10 @@ namespace rtp {
 		size_t total_generations;
 		size_t trials_per_generation;
 
+		// Is training data (ie. system initial state) the same for every generation?
+		// Regardless of this setting, data will be the same for all agents within a given generation.
+		bool static_training_set;
+
 		size_t generation;
 
 		struct indiv
@@ -126,6 +130,10 @@ namespace rtp {
 		unsigned int base_seed;
 		unsigned int ga_rseed;
 		unsigned int trials_rseed;
+
+		std::chrono::high_resolution_clock::duration
+			m_ga_update_time,
+			m_trials_update_time;
 	};
 
 }

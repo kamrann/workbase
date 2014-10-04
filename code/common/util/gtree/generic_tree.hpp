@@ -314,15 +314,33 @@ namespace gtree {
 
 		/*! The following methods provide overloaded access to the attributes for a given node/edge descriptor
 		*/
+		inline node_attribs_t& node_attribs(node_descriptor n)
+		{
+			return static_cast< node_t* >(n)->attribs;
+		}
+		inline const node_attribs_t& node_attribs(node_descriptor n) const
+		{
+			return static_cast< node_t* >(n)->attribs;
+		}
+
+		inline edge_attribs_t& edge_attribs(edge_descriptor e)
+		{
+			return static_cast< node_t* >(e)->in_edge_attribs;
+		}
+		inline const edge_attribs_t& edge_attribs(edge_descriptor e) const
+		{
+			return static_cast< node_t* >(e)->in_edge_attribs;
+		}
+
 		inline node_attribs_t& operator[] (node_descriptor n)
-		{ return static_cast< node_t* >(n)->attribs; }
+		{ return node_attribs(n); }
 		inline const node_attribs_t& operator[] (node_descriptor n) const
-		{ return static_cast< node_t* >(n)->attribs; }
+		{ return node_attribs(n); }
 
 		inline edge_attribs_t& operator[] (edge_descriptor e)
-		{ return static_cast< node_t* >(e)->in_edge_attribs; }
+		{ return edge_attribs(e); }
 		inline const edge_attribs_t& operator[] (edge_descriptor e) const
-		{ return static_cast< node_t* >(e)->in_edge_attribs; }
+		{ return edge_attribs(e); }
 	};
 
 }

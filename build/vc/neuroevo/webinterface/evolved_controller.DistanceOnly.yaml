@@ -1,0 +1,107 @@
+- evolved
+- container
+-
+  -
+    - name
+    - string
+    - evolved 1
+  -
+    - compatible_agent_types
+    - enum
+    -
+      - RD Agent
+  -
+    - evolvable_controller
+    - container
+    -
+      -
+        - ev_controller_type
+        - enum
+        -
+          - MLP
+      -
+        - ev_controller_type_specific_params
+        - container
+        -
+          -
+            - mlp_controller
+            - container
+            -
+              -
+                - mlp_inputs
+                - enum
+                -
+                  - "S1: Positive"
+                  - "S1: Distance"
+                  - "S2: Positive"
+                  - "S2: Distance"
+                  - "S3: Positive"
+                  - "S3: Distance"
+                  - "S4: Positive"
+                  - "S4: Distance"
+                  - "S5: Positive"
+                  - "S5: Distance"
+                  - "S6: Positive"
+                  - "S6: Distance"
+                  - "S7: Positive"
+                  - "S7: Distance"
+                  - "S8: Positive"
+                  - "S8: Distance"
+                  - "S9: Positive"
+                  - "S9: Distance"
+                  - "S10: Positive"
+                  - "S10: Distance"
+                  - "S11: Positive"
+                  - "S11: Distance"
+                  - "S12: Positive"
+                  - "S12: Distance"
+              -
+                - mlp_num_layers
+                - int
+                - 3
+  -
+    - objective
+    - container
+    -
+      -
+        - obj_type
+        - enum
+        -
+          - Single Objective
+      -
+        - objective_components
+        - container
+        -
+          -
+            - manual_objective
+            - container
+            -
+              -
+                - direction_type
+                - enum
+                -
+                  - Minimise
+              -
+                - state_val
+                - enum
+                -
+                  - ::agent::3
+              -
+                - value_type
+                - enum
+                -
+                  - Value
+              -
+                - objective_timespan
+                - container
+                -
+                  -
+                    - timepoint_type
+                    - enum
+                    -
+                      - End
+          -
+            - trial_merging
+            - enum
+            -
+              - Worst

@@ -101,25 +101,27 @@ SystemTestTab::SystemTestTab(WContainerWidget* parent): WContainerWidget(parent)
 
 void SystemTestTab::set_system_widget(WWidget* w)
 {
+	w->setMinimumSize(300, 300);
 	int index = 0;
 	hlayout->insertWidget(index, w, 1);
 
 	if(system_widget != nullptr)
 	{
 		removeWidget(system_widget);
+		delete system_widget;
 	}
 	system_widget = w;
-	//
-	//((WPaintedWidget*)system_widget)->update();
-	//system_widget->setWidth(400);
-	system_widget->setHeight(400);
-	//
+//	system_widget->setHeight(400);
 }
 
 void SystemTestTab::set_history_widget(WWidget* w)
 {
 	if(w != nullptr)
 	{
+		w->setMinimumSize(Wt::WLength::Auto, 200);
+		// TODO: How to set size agnostic? (Take whatever is available, but don't ask for anything more than
+		// minimum, since we don't want to be the cause of adding scroll bars).
+		w->setMaximumSize(Wt::WLength::Auto, 300);
 		int index = 1;
 		hlayout->insertWidget(index, w, 0);
 	}
@@ -127,6 +129,7 @@ void SystemTestTab::set_history_widget(WWidget* w)
 	if(history_widget != nullptr)
 	{
 		removeWidget(history_widget);
+		delete history_widget;
 	}
 	history_widget = w;
 }
@@ -142,6 +145,11 @@ void SystemTestTab::on_system_changed()
 		coordinator = std::make_unique< generic_sys_coordinator >(
 			std::move(sys_factory),
 			std::move(agents_data));
+		coordinator->register_system_finish_callback([this]
+		{
+			stop_button->setHidden(true);
+			restart_button->setHidden(false);
+		});
 		std::pair< WWidget*, WWidget* > sys_widgets = coordinator->initialize();
 		set_system_widget(sys_widgets.first);
 		set_history_widget(sys_widgets.second);

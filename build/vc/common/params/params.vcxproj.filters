@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{8d0605f1-7b09-4032-9690-52f3c0e8dfbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io\parsers">
+      <UniqueIdentifier>{997806e3-e06d-4785-8aec-1bdae75348a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io\emitters">
+      <UniqueIdentifier>{42de1da1-6282-4100-b0dd-acdc6e6d9c67}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\common\params\param.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\param_constraints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\param_yaml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\unspecified.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\param_accessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\qualified_path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\schema_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\schema.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\param_fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\cmdline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\value_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\vector_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\value_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\string_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\realnum_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\random_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\integer_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\boolean_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\cmd_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\value_parsing_ast.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\enum_parser.h">
+      <Filter>io\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\param_tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\boolean_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\enum_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\integer_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\random_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\realnum_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\string_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\vector_emitter.h">
+      <Filter>io\emitters</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\common\params\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\qualified_path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\schema_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\cmdline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\schema.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\param.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\param_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\param_accessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

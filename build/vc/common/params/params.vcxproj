@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E98F782B-E701-44B7-97BD-8057A11F6EC4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>params</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\workbase.props" />
+    <Import Project="..\..\yaml_cpp_dbg.props" />
+    <Import Project="..\..\eigen.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\workbase.props" />
+    <Import Project="..\..\yaml_cpp_rls.props" />
+    <Import Project="..\..\eigen.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\common\params\boolean_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\boolean_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\cmdline.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\enum_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\enum_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\integer_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\integer_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\param.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\param_accessor.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\param_constraints.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\param_fwd.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\param_tree.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\param_yaml.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\qualified_path.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\random_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\random_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\realnum_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\realnum_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\schema.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\schema_builder.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\stdafx.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\string_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\string_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\targetver.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\unspecified.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\value_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\value_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\value_parsing_ast.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\vector_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\vector_parser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\common\params\cmdline.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\param.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\param_accessor.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\param_tree.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\qualified_path.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\schema.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\schema_builder.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

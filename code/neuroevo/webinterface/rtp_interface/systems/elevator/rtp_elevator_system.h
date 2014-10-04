@@ -319,6 +319,7 @@ namespace rtp {
 		~elevator_system();
 
 	public:
+		virtual bool is_instantaneous() const override;
 		virtual update_info get_update_info() const override;
 
 		virtual void initialize() override;

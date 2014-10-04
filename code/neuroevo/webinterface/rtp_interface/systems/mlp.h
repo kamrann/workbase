@@ -7,6 +7,8 @@
 #include "rtp_agent.h"
 #include "../rtp_mlp_controller.h"
 
+#include "neuralnet/interface/activation_functions.h"
+
 #include "wt_param_widgets/pw_fwd.h"
 
 
@@ -26,19 +28,19 @@ namespace rtp
 		> create_instance_evolvable(prm::param_accessor param);
 
 	public:
-		mlp_controller(agent_sensor_list const& _inputs, size_t num_layers, size_t per_hidden, size_t num_outputs);
+		mlp_controller(
+			nnet::mlp::layer_counts_t const& _layer_counts,
+			nnet::activation_function const& _hidden_fn,
+			nnet::activation_function const& _output_fn,
+			agent_sensor_list const& _inputs
+			);
 
 	public:
 		virtual input_id_list_t get_input_ids() const;
 		virtual output_list_t process(input_list_t const& inputs);
 
-//		virtual std::vector< double > map_nn_inputs(state_t const& st);
-//		virtual void update(phys_system::state& st, phys_system::scenario_data sdata);
-
 	protected:
-		size_t const num_nn_layers;
-		size_t const num_per_hidden;
-		size_t const num_nn_outputs;
+//		nnet::mlp::layer_counts_t const layer_counts;
 
 		agent_sensor_list inputs;
 	};
@@ -48,9 +50,13 @@ namespace rtp
 	{
 	public:
 		mlp_controller_factory(
-//			agent_sensor_list const& inputs,
-			std::vector< std::string > const& inputs,
-			size_t num_layers, size_t num_per_hidden, size_t num_outputs);
+			nnet::mlp::layer_counts_t const& layer_counts,
+			nnet::ActivationFnType hidden_fn,
+			double hidden_steepness,
+			nnet::ActivationFnType output_fn,
+			double output_steepness,
+			std::vector< std::string > const& inputs
+			);
 
 	public:
 		virtual std::unique_ptr< i_controller > create(i_agent const* attached_agent) const override;
@@ -60,10 +66,10 @@ namespace rtp
 		}
 
 	private:
+		nnet::mlp::layer_counts_t const m_layer_counts;
+		nnet::activation_function const m_hidden_fn;
+		nnet::activation_function const m_output_fn;
 		std::vector< std::string > const m_inputs;
-		size_t const m_num_nn_layers;
-		size_t const m_num_per_hidden;
-		size_t const m_num_nn_outputs;
 	};
 
 }

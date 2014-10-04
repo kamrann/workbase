@@ -53,9 +53,19 @@ namespace nnet {
 		};
 
 
-		std::map< ActivationFn, path > generate_activation_fn_symbols(size_t sz);
+		struct DisplayOptions;
+
+
+		std::map< ActivationFnType, path > generate_activation_fn_symbols(size_t sz);
 		std::map< bool, path > generate_fn_axis_symbols(size_t sz);
-		network_layout generate_layout(i_neuralnet const* net, rect& rc, double scale);
+		network_layout generate_layout(
+			i_neuralnet const* net,
+			rect& rc,
+			double scale,
+			double neuron_spacing,
+			double layer_spacing,
+			DisplayOptions display_options
+			);
 
 	}
 }

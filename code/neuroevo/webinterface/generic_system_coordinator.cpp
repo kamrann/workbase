@@ -1,6 +1,8 @@
 // generic_system_coordinator.cpp
 
 #include "generic_system_coordinator.h"
+#include "wt_system_widgets/properties_table_widget.h"
+#include "wt_system_widgets/properties_chart_widget.h"
 
 #include <Wt/WServer>
 
@@ -36,8 +38,6 @@ std::pair< Wt::WWidget*, Wt::WWidget* > generic_sys_coordinator::initialize()
 	//m_widget->set_drawer(m_sys->get_drawer());
 	m_widget->interactive_input_sig().connect(this, &generic_sys_coordinator::on_widget_interaction);
 
-	m_chart_widget = new chart_widget_t();
-
 	// TODO: This seems hacky, but don't want the selected series to be reset on restart,
 	// since the system type is unchanged and therefore so are the properties
 	auto temp_sys = m_sys_factory->create_system();
@@ -50,9 +50,23 @@ std::pair< Wt::WWidget*, Wt::WWidget* > generic_sys_coordinator::initialize()
 			);
 		temp_sys->register_agent_controller(agent_id, std::move(controller));
 	}
-	m_chart_widget->reset(temp_sys->get_state_properties());
 
-	return std::pair< Wt::WWidget*, Wt::WWidget* >(m_widget, m_chart_widget);
+	Wt::WWidget* props_wt_wgt = nullptr;
+	if(temp_sys->is_instantaneous())
+	{
+		auto wgt = new properties_table_widget{};
+		m_props_widget = wgt;
+		props_wt_wgt = wgt;
+	}
+	else
+	{
+		auto wgt = new properties_chart_widget{};
+		m_props_widget = wgt;
+		props_wt_wgt = wgt;
+	}
+	m_props_widget->reset(temp_sys->get_state_properties());
+
+	return std::pair< Wt::WWidget*, Wt::WWidget* >(m_widget, props_wt_wgt);
 }
 
 void generic_sys_coordinator::cancel()
@@ -90,8 +104,8 @@ void generic_sys_coordinator::restart()
 	m_widget->set_drawer(m_sys->get_drawer());
 	m_widget->enable_interaction(all_inputs);
 
-	m_chart_widget->clear_content();
-	//m_chart_widget->reset(m_sys->get_state_properties());
+	m_props_widget->clear_content();
+	//m_props_widget->reset(m_sys->get_state_properties());
 
 	m_system_st = SystemState::Active;
 	m_step = 0;
@@ -101,14 +115,19 @@ void generic_sys_coordinator::restart()
 
 	auto uinf = m_sys->get_update_info();
 
+	bool instant = m_sys->is_instantaneous();
 	bool realtime = uinf.type == rtp::i_system::update_info::Type::Realtime;
 	bool animated = !realtime && m_widget->get_drawer()->is_animated();
-	auto delay = realtime ?
+	auto delay = instant ?
+		0.0 :
+		(
+		realtime ?
 		(1.0 / uinf.frequency) :
 		(
 		animated ?
 		(1.0 / AnimationFreq) :
 		(1.0 / NonRealtimeFreq)
+		)
 		);
 
 	m_io.reset();
@@ -127,18 +146,36 @@ void generic_sys_coordinator::restart()
 	std::thread t(boost::bind(&boost::asio::io_service::run, &m_io));
 	m_update_thread.swap(t);
 
-	update_widgets();// true);
+	m_ready_to_display = !instant;
+	update_widgets();
+}
+
+void generic_sys_coordinator::register_system_finish_callback(std::function< void() > cb)
+{
+	m_finish_cb = [this, cb]
+	{
+		Wt::WServer::instance()->post(m_app->sessionId(), cb);
+	};
 }
 
 void generic_sys_coordinator::update_widgets()//bool force_update)
 {
-	Wt::WServer::instance()->post(m_app->sessionId(), [this]()
+	bool ready = m_ready_to_display;	// Make a copy for the lambda
+	Wt::WServer::instance()->post(m_app->sessionId(), [this, ready]()
 	{
+		m_widget->set_ready(ready);
 		m_widget->update();
+
+		if(ready)
 		{
 			std::lock_guard< std::mutex > guard(m_sys_mutex);
-			m_chart_widget->append_data(m_sys->get_state_property_values());
+			m_props_widget->register_data(m_sys->get_state_property_values());
 		}
+		else
+		{
+			m_props_widget->clear_content();
+		}
+
 		m_app->triggerUpdate();
 	});
 
@@ -210,6 +247,10 @@ void generic_sys_coordinator::on_animation_update()
 
 				case SystemState::Completed:
 				// All done
+				if(m_finish_cb)
+				{
+					m_finish_cb();
+				}
 				break;
 			}
 		}
@@ -245,6 +286,8 @@ void generic_sys_coordinator::on_system_update()
 	}
 	++m_step;
 
+	m_ready_to_display = true;
+
 	auto uinf = m_sys->get_update_info();
 	if(uinf.type == rtp::i_system::update_info::Type::Realtime)
 	{
@@ -257,6 +300,10 @@ void generic_sys_coordinator::on_system_update()
 		{
 			m_timer.expires_at(m_timer.expires_at() + boost::posix_time::milliseconds(1000.0f / uinf.frequency));
 			m_timer.async_wait(boost::bind(&generic_sys_coordinator::on_system_update, this));
+		}
+		else if(m_finish_cb)
+		{
+			m_finish_cb();
 		}
 	}
 	else
@@ -274,6 +321,10 @@ void generic_sys_coordinator::on_system_update()
 		{
 			m_timer.expires_at(m_timer.expires_at() + boost::posix_time::milliseconds(1000.0f / NonRealtimeFreq));
 			m_timer.async_wait(boost::bind(&generic_sys_coordinator::on_system_update, this));
+		}
+		else if(m_finish_cb)
+		{
+			m_finish_cb();
 		}
 
 		// Draw

@@ -159,10 +159,16 @@ namespace rtp {
 		virtual size_t get_genome_length() const
 		{
 			// TODO: Should be calcuable directly from m_layer_neuron_counts, assuming fully connected mlp
+			nnet::mlp nn_temp;
+			nn_temp.create(m_layer_neuron_counts);
+			auto connections = nn_temp.num_connections();
+			return connections;
+			/*
 			FANN::neural_net nn_temp;
 			nn_temp.create_standard_array(m_layer_neuron_counts.size(), &m_layer_neuron_counts[0]);
 			auto connections = nn_temp.get_total_connections();
 			return connections;
+			*/
 		}
 
 		virtual std::unique_ptr< i_genome > load_genome_from_binary(std::vector< unsigned char > const& data)

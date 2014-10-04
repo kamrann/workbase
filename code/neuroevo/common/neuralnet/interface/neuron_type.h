@@ -18,6 +18,7 @@ namespace nnet {
 	};
 
 	extern const char* const NeuronTypeNames[(int)NeuronType::Count];
+	extern const char* const NeuronTypeAbbreviations[(int)NeuronType::Count];
 
 	typedef std::set< NeuronType > neuron_type_set;
 

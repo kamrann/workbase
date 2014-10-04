@@ -10,6 +10,7 @@ namespace nnet {
 		Neurons,
 		Layers,
 		State,
+		Modification,
 	};
 
 }

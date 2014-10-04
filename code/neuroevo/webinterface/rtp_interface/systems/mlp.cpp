@@ -4,6 +4,8 @@
 #include "rtp_system.h"
 #include "../rtp_fixednn_genome_mapping.h"
 
+#include "neuralnet/interface/output.h"
+
 #include "wt_param_widgets/pw_yaml.h"
 #include "wt_param_widgets/schema_builder.h"
 #include "wt_param_widgets/param_accessor.h"
@@ -13,7 +15,7 @@
 #include <Box2D/Box2D.h>
 
 
-namespace rtp {
+namespace sys {
 
 	namespace sb = prm::schema;
 
@@ -64,10 +66,66 @@ namespace rtp {
 			return s;
 		};
 
-		(*provider)[path + std::string("mlp_num_layers")] = [](prm::param_accessor)
+/*		(*provider)[path + std::string("mlp_num_layers")] = [](prm::param_accessor)
 		{
 			auto s = sb::integer("mlp_num_layers", 3, 2, 5);
 			sb::label(s, "Num Layers");
+			return s;
+		};
+*/
+		path += std::string("hidden_layer_list");
+
+		(*provider)[path + std::string("hl_neuron_count")] = [=](prm::param_accessor param_vals)
+		{
+			auto const num_inputs = param_vals["mlp_inputs"].size();
+			auto s = sb::integer("hl_neuron_count", std::max(num_inputs / 2, 1u), 1);
+			sb::label(s, "# Neurons");
+			return s;
+		};
+
+		(*provider)[path] = [=](prm::param_accessor param_vals)
+		{
+			auto s = sb::repeating_list("hidden_layer_list", "hl_neuron_count");
+			sb::label(s, "Hidden Layers");
+			return s;
+		};
+		
+		path.pop();
+
+		std::vector< std::pair< std::string, std::string > > fn_enum_values;
+		for(size_t fn = 0; fn < (size_t)nnet::ActivationFnType::Count; ++fn)
+		{
+			fn_enum_values.emplace_back(std::make_pair(
+				std::to_string(fn),
+				std::string{ nnet::ActivationFnNames[fn] }
+				));
+		}
+
+		(*provider)[path + std::string("hidden_activation_fn")] = [fn_enum_values](prm::param_accessor)
+		{
+			auto s = sb::enum_selection("hidden_activation_fn", fn_enum_values, 1, 1);
+			sb::label(s, "Hidden Activation");
+			return s;
+		};
+
+		(*provider)[path + std::string("hidden_steepness")] = [](prm::param_accessor)
+		{
+			auto s = sb::real("hidden_steepness", 0.5, 0.0);
+			sb::label(s, "Hidden Steepness");
+			return s;
+		};
+
+		(*provider)[path + std::string("output_activation_fn")] = [fn_enum_values](prm::param_accessor)
+		{
+			auto s = sb::enum_selection("output_activation_fn", fn_enum_values, 1, 1);
+			sb::label(s, "Output Activation");
+			return s;
+		};
+
+		(*provider)[path + std::string("output_steepness")] = [](prm::param_accessor)
+		{
+			auto s = sb::real("output_steepness", 0.5, 0.0);
+			sb::label(s, "Output Steepness");
 			return s;
 		};
 
@@ -76,7 +134,14 @@ namespace rtp {
 		{
 			auto s = sb::list(relative);
 			sb::append(s, provider->at(path + std::string("mlp_inputs"))(param_vals));
-			sb::append(s, provider->at(path + std::string("mlp_num_layers"))(param_vals));
+//			sb::append(s, provider->at(path + std::string("mlp_num_layers"))(param_vals));
+			sb::append(s, provider->at(path + std::string("hidden_layer_list"))(param_vals));
+			// TODO: if(num hidden layers > 0)
+			sb::append(s, provider->at(path + std::string("hidden_activation_fn"))(param_vals));
+			sb::append(s, provider->at(path + std::string("hidden_steepness"))(param_vals));
+			//
+			sb::append(s, provider->at(path + std::string("output_activation_fn"))(param_vals));
+			sb::append(s, provider->at(path + std::string("output_steepness"))(param_vals));
 			return s;
 		};
 
@@ -102,28 +167,66 @@ namespace rtp {
 		auto ep = param["mlp_inputs"].as< prm::enum_param_val >();
 		auto inputs = boost::any_cast<std::vector< std::string >>(ep.contents);
 
-		int num_layers = param["mlp_num_layers"].as< int >();
+		// NOTE: Since YAML map nodes do not retain order, need to use a map here keyed on repeat instance number
+		// to ensure that hidden layers are extracted in the correct order.
+		std::map< unsigned int, size_t > hidden_layer_sizes;
+		auto hidden_list_node = param["hidden_layer_list"];
+		for(auto const& node : hidden_list_node)
+		{
+			auto inst_num = node.first.as< unsigned int >();
+			auto rel = prm::qualified_path{ "hidden_layer_list" };
+			rel.leaf().set_index(inst_num);
+			param.push_relative_path(rel);
+
+			hidden_layer_sizes[inst_num] = param["hl_neuron_count"].as< size_t >();
+
+			param.pop_relative_path();
+		}
+		//		int num_layers = param["mlp_num_layers"].as< int >();
+		auto const num_layers = 2 + hidden_layer_sizes.size();
+
+		// TODO: convert template
+		nnet::ActivationFnType hidden_fn = (nnet::ActivationFnType)std::stoi(
+			param["hidden_activation_fn"][0].as< std::string >());
+		auto hidden_steepness = param["hidden_steepness"].as< double >();
+		nnet::ActivationFnType output_fn = (nnet::ActivationFnType)std::stoi(
+			param["output_activation_fn"][0].as< std::string >());
+		auto output_steepness = param["output_steepness"].as< double >();
 
 		size_t const NumNNInputs = inputs.size();
 
 		auto sys_type = param["sys_type"][0].as< SystemType >();
 		auto spec_type = compatible_node[0];
-		size_t const NumNNOutputs = //agent_body_spec::num_effectors(spec_type);
-			i_system::get_agent_num_effectors(sys_type, spec_type);
+		size_t const NumNNOutputs = i_system::get_agent_num_effectors(sys_type, spec_type);
 
-		size_t const NumPerHidden = (NumNNInputs + NumNNOutputs + 1) / 2;
+		//size_t const NumPerHidden = (NumNNInputs + NumNNOutputs + 1) / 2;
 
+		nnet::mlp::layer_counts_t layer_counts;
+		layer_counts.push_back(NumNNInputs);
+		for(auto const& hl : hidden_layer_sizes)
+		{
+			layer_counts.push_back(hl.second);
+		}
+		layer_counts.push_back(NumNNOutputs);
+
+		// TODO: activation function and steepness
 		std::get< 0 >(result) = std::make_unique< fixednn_genome_mapping >(
-			num_layers,
+/*			num_layers,
 			NumNNInputs,
 			NumNNOutputs,
-			NumPerHidden);
+			NumPerHidden
+*/
+			layer_counts
+			);
 
 		std::get< 1 >(result) = std::make_unique< mlp_controller_factory >(
-			inputs,
-			num_layers,
-			NumPerHidden,
-			NumNNOutputs);
+			layer_counts,
+			hidden_fn,
+			hidden_steepness,
+			output_fn,
+			output_steepness,
+			inputs
+			);
 
 		param.pop_relative_path();
 
@@ -131,28 +234,25 @@ namespace rtp {
 	}
 
 
-	mlp_controller::mlp_controller(agent_sensor_list const& _inputs,
-		size_t num_layers, size_t per_hidden, size_t num_outputs):
-		inputs(_inputs),
-		num_nn_layers(num_layers), num_per_hidden(per_hidden), num_nn_outputs(num_outputs)
+	mlp_controller::mlp_controller(
+		nnet::mlp::layer_counts_t const& _layer_counts,
+		nnet::activation_function const& _hidden_fn,
+		nnet::activation_function const& _output_fn,
+		agent_sensor_list const& _inputs
+		):
+//		layer_counts(_layer_counts),
+		inputs(_inputs)
 	{
 		assert(!inputs.empty());
-		assert(num_nn_layers >= 2);
-		assert(num_per_hidden >= 1);
-		assert(num_nn_outputs >= 1);
+		assert(_layer_counts.size() >= 2);
 
-		std::vector< unsigned int > layer_neurons(num_nn_layers, num_per_hidden);
-		layer_neurons[0] = inputs.size();
-		layer_neurons[num_nn_layers - 1] = num_nn_outputs;
-		nn.create_standard_array(num_nn_layers, &layer_neurons[0]);
+		nn.create(_layer_counts);
 
-		nn.set_activation_steepness_hidden(1.0);
-		nn.set_activation_steepness_output(1.0);
-
-		nn.set_activation_function_hidden(FANN::SIGMOID_SYMMETRIC_STEPWISE);
-		// TODO: variable by constructor arg - eg. THRESHOLD for spaceship thrusters
-		// of course, could just perform this manually in the body::activate_effectors() method
-		nn.set_activation_function_output(FANN::SIGMOID_SYMMETRIC_STEPWISE);
+		for(size_t layer = 1; layer < _layer_counts.size() - 1; ++layer)
+		{
+			nn.set_activation_function_layer(layer, _hidden_fn);
+		}
+		nn.set_activation_function_layer(_layer_counts.size() - 1, _output_fn);
 	}
 
 	auto mlp_controller::get_input_ids() const -> input_id_list_t
@@ -162,8 +262,8 @@ namespace rtp {
 	
 	auto mlp_controller::process(input_list_t const& inputs) -> output_list_t
 	{
-		double* nn_outputs = nn.run((double*)&inputs[0]);
-		return{ nn_outputs, nn_outputs + num_nn_outputs };
+		// TODO: Does this actually result in a move?
+		return nn.execute(inputs).data();
 	}
 
 /*
@@ -194,23 +294,28 @@ namespace rtp {
 	}
 */	
 	mlp_controller_factory::mlp_controller_factory(
-//		agent_sensor_list const& inputs, 
-		std::vector< std::string > const& inputs,
-		size_t num_layers, size_t num_per_hidden, size_t num_outputs):
-		m_inputs(inputs),
-		m_num_nn_layers(num_layers),
-		m_num_per_hidden(num_per_hidden),
-		m_num_nn_outputs(num_outputs)
+		nnet::mlp::layer_counts_t const& layer_counts,
+		nnet::ActivationFnType hidden_fn,
+		double hidden_steepness,
+		nnet::ActivationFnType output_fn,
+		double output_steepness,
+		std::vector< std::string > const& inputs
+		):
+		m_layer_counts{ layer_counts },
+		m_hidden_fn{ hidden_fn, hidden_steepness },
+		m_output_fn{ output_fn, output_steepness },
+		m_inputs{ inputs }
 	{}
 
 	std::unique_ptr< i_controller > mlp_controller_factory::create(i_agent const* attached_agent) const
 	{
 		auto m_mapped_inputs = attached_agent->get_mapped_inputs(m_inputs);
 		return std::make_unique< mlp_controller >(
-			m_mapped_inputs,
-			m_num_nn_layers,
-			m_num_per_hidden,
-			m_num_nn_outputs);
+			m_layer_counts,
+			m_hidden_fn,
+			m_output_fn,
+			m_mapped_inputs
+			);
 	}
 }
 

@@ -10,20 +10,32 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 
 
-#include <string>
-#include <sstream>
-#include <vector>
-#include <list>
-#include <set>
-#include <map>
-#include <iterator>
 #include <algorithm>
-#include <functional>
-#include <memory>
-#include <cmath>
-#include <ratio>
+#include <array>
+#include <cctype>
 #include <chrono>
+#include <cmath>
+#include <deque>
+#include <fstream>
+#include <functional>
+#include <initializer_list>
+#include <iomanip>
+#include <istream>
+#include <iterator>
 #include <limits>
-
+#include <list>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <random>
+#include <ratio>
+#include <regex>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 

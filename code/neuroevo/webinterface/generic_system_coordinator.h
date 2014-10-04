@@ -10,7 +10,7 @@
 
 #include "system_coordinator.h"
 #include "wt_system_widgets/system_display_widget.h"
-#include "wt_system_widgets/properties_chart_widget.h"
+#include "wt_system_widgets/properties_widget.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -32,7 +32,7 @@ public:
 	};
 
 	typedef sys_display_widget						widget_t;
-	typedef properties_chart_widget					chart_widget_t;
+//	typedef properties_chart_widget					chart_widget_t;
 
 public:
 	generic_sys_coordinator(
@@ -43,6 +43,8 @@ public:
 	virtual std::pair< Wt::WWidget*, Wt::WWidget* > initialize() override;
 	virtual void cancel() override;
 	virtual void restart() override;
+
+	virtual void register_system_finish_callback(std::function< void() > cb) override;
 
 	void update_widgets();// bool force_update);
 
@@ -60,7 +62,7 @@ private:
 	std::unique_ptr< rtp::i_system > m_sys;
 
 	widget_t* m_widget;
-	chart_widget_t* m_chart_widget;
+	i_properties_widget* m_props_widget;
 	unsigned int m_step;
 	
 	enum class SystemState {
@@ -76,6 +78,8 @@ private:
 	std::mutex m_sys_mutex;
 	Wt::WApplication* m_app;
 	bool m_request_termination;
+	bool m_ready_to_display;
+	std::function< void() > m_finish_cb;
 
 	//
 	std::chrono::high_resolution_clock::time_point m_last_update_tm;

@@ -12,7 +12,12 @@ namespace nnet {
 
 	namespace vis {
 
-		std::string neuron_name(i_neuralnet* net, neuron_id id);
+		enum class NeuronNameStyle {
+			Normal,
+			Short,
+		};
+
+		std::string neuron_name(i_neuralnet* net, neuron_id id, NeuronNameStyle style = NeuronNameStyle::Normal);
 		
 	}
 }

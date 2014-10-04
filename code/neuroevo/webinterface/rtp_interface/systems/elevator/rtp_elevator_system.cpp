@@ -18,7 +18,7 @@
 #include <Wt/WComboBox>
 
 
-namespace rtp {
+namespace sys {
 
 	std::vector< std::string > elevator_system::generate_state_value_names(floor_count_t num_floors)
 	{
@@ -254,6 +254,11 @@ namespace rtp {
 	elevator_system::~elevator_system()
 	{
 
+	}
+
+	bool elevator_system::is_instantaneous() const
+	{
+		return false;
 	}
 
 	i_system::update_info elevator_system::get_update_info() const

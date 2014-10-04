@@ -9,7 +9,7 @@ namespace rtp {
 
 	void generic_mlp_controller::set_weights(std::vector< double > const& weights)
 	{
-		size_t const NumWeights = weights.size();
+/*		size_t const NumWeights = weights.size();
 		size_t const NumConnections = nn.get_total_connections();
 		assert(NumWeights == NumConnections);
 
@@ -20,6 +20,13 @@ namespace rtp {
 			conns[c].weight = weights[c];
 		}
 		nn.set_weight_array(&conns[0], NumWeights);
+		*/
+
+		size_t const NumWeights = weights.size();
+		size_t const NumConnections = nn.num_connections();
+		assert(NumWeights == NumConnections);
+		
+		nn.load_weights(weights);
 	}
 
 }

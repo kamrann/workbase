@@ -11,6 +11,7 @@
 #include "../../interface/connection_access.h"
 #include "../../interface/layer_access.h"
 #include "../../interface/internal_state_access.h"
+#include "../../interface/modifiable.h"
 
 
 namespace nnet {
@@ -24,6 +25,7 @@ namespace nnet {
 	{
 		m_neurons.clear();
 		m_connections.clear();
+		m_conn_mp.clear();
 		m_num_layers = 0;
 		m_layer_counts.clear();
 	}
@@ -41,14 +43,24 @@ namespace nnet {
 		create_connections();
 	}
 
-	void mlp::set_activation_function(size_t layer, ActivationFn fn)
+	void mlp::set_activation_function(neuron_id neuron, activation_function fn)
+	{
+		m_neurons[neuron].activation_fn = fn;
+	}
+
+	void mlp::set_activation_function_layer(size_t layer, activation_function fn)
 	{
 		auto const start = layer_start(layer);
-		auto const count = layer_count(layer);
+		auto const count = layer_count< ExcludeBias >(layer);
 		for(size_t n = start; n < start + count; ++n)
 		{
 			m_neurons[n].activation_fn = fn;
 		}
+	}
+
+	void mlp::set_weight(connection_id conn, value_t weight)
+	{
+		m_connections[conn].weight = weight;
 	}
 
 	size_t mlp::neuron_count(neuron_filter const& filter) const
@@ -66,22 +78,149 @@ namespace nnet {
 		return pass;
 	}
 	
-	neuron_range mlp::get_neurons(neuron_filter const& filter) const
+	neuron_range mlp::get_neurons(layer_filter const& lfilter, neuron_filter const& nfilter) const
 	{
-		// TODO: Unnecessarily slow, since we know layer information
+		// TODO: Optimize by considering lfilter and nfilter together.
+		// -> eg. only look for Input neurons within Input layer.
+
 		neuron_iterator::data_array_t data;
-		size_t const count = m_neurons.size();
-		for(size_t id = 0; id < count; ++id)
+
+		// Iterate over our layers
+		for(size_t ly = 0; ly < m_num_layers; ++ly)
 		{
-			auto nd = as_neuron_data(id);
-			if(filter.test(nd))
+			// Construct layer data
+			layer_data ld{
+				ly == 0 ? LayerType::Input : ((ly == m_num_layers - 1) ? LayerType::Output : LayerType::Hidden)
+			};
+			if(ld.type == LayerType::Hidden)
 			{
-				data.emplace_back(std::move(nd));
+				ld.subindex = ly - 1;
+			}
+
+			// And skip if doesn't pass layer filter
+			if(!lfilter.test(ld))
+			{
+				continue;
+			}
+
+			// Now iterate over neurons in the layer
+			auto const start = layer_start(ly);
+			auto const end = start + layer_count< IncludeBias >(ly);
+			for(auto id = start; id < end; ++id)
+			{
+				// And test against neuron filter
+				auto nd = as_neuron_data(id);
+				if(nfilter.test(nd))
+				{
+					data.emplace_back(std::move(nd));
+				}
 			}
 		}
 		return neuron_range(
 			neuron_iterator(std::move(data)),
-			neuron_iterator()
+			neuron_iterator(),
+			data.size()
+			);
+	}
+
+	layer_data mlp::neuron_layer(neuron_id id) const
+	{
+		for(size_t layer = 0; layer < m_num_layers; ++layer)
+		{
+			if(id < layer_start(layer) + layer_count< IncludeBias >(layer))
+			{
+				// TODO: encapsulate: layer_data_from_index(size_t idx)
+				if(layer == 0)
+				{
+					return layer_data{ LayerType::Input };
+				}
+				else if(layer == m_num_layers - 1)
+				{
+					return layer_data{ LayerType::Output };
+				}
+				else
+				{
+					return layer_data{ LayerType::Hidden, layer - 1 };
+				}
+			}
+		}
+
+		throw std::exception("Problem");
+	}
+
+	connection_id mlp::get_connection_id(neuron_id src, neuron_id dst) const
+	{
+		return m_conn_mp.at(std::make_pair(src, dst));
+	}
+
+	connection_range mlp::get_connections(
+		layer_filter const& src_lfilter,
+		layer_filter const& dst_lfilter,
+		neuron_filter const& src_nfilter,
+		neuron_filter const& dst_nfilter
+		) const
+	{
+		connection_iterator::data_array_t data;
+
+		// Iterate over possible source layers
+		for(size_t ly_src = 0; ly_src < m_num_layers - 1; ++ly_src)
+		{
+			auto const ly_dst = ly_src + 1;
+
+			// Construct layer data
+			layer_data ld_src{
+				ly_src == 0 ? LayerType::Input : ((ly_src == m_num_layers - 1) ? LayerType::Output : LayerType::Hidden)
+			};
+			if(ld_src.type == LayerType::Hidden)
+			{
+				ld_src.subindex = ly_src - 1;
+			}
+
+			layer_data ld_dst{
+				ly_dst == 0 ? LayerType::Input : ((ly_dst == m_num_layers - 1) ? LayerType::Output : LayerType::Hidden)
+			};
+			if(ld_src.type == LayerType::Hidden)
+			{
+				ld_src.subindex = ly_dst - 1;
+			}
+
+			// And skip if don't pass layer filters
+			if(!src_lfilter.test(ld_src) || !dst_lfilter.test(ld_dst))
+			{
+				continue;
+			}
+
+			// Now iterate over neurons in src layer
+			auto const src_start = layer_start(ly_src);
+			auto const src_end = src_start + layer_count< IncludeBias >(ly_src);
+			for(auto src_id = src_start; src_id < src_end; ++src_id)
+			{
+				// And test against src neuron filter
+				auto src_nd = as_neuron_data(src_id);
+				if(!src_nfilter.test(src_nd))
+				{
+					continue;
+				}
+
+				// Neuron passed source filter, so iterate over dst neurons
+				// TODO: should just test each neuron against src/dest filters once at most!!
+				auto const dst_start = layer_start(ly_dst);
+				auto const dst_end = dst_start + layer_count< ExcludeBias >(ly_dst);
+				for(auto dst_id = dst_start; dst_id < dst_end; ++dst_id)
+				{
+					auto dst_nd = as_neuron_data(dst_id);
+					if(dst_nfilter.test(dst_nd))
+					{
+						auto const id = get_connection_id(src_id, dst_id);
+						data.emplace_back(as_connection_data(id));
+					}
+				}
+			}
+		}
+		return connection_range(
+			connection_iterator(std::move(data)),
+			connection_iterator(),
+			data.size()
 			);
 	}
 
@@ -96,9 +235,11 @@ namespace nnet {
 		};
 	}
 
-	connection_data mlp::as_connection_data(connection const& conn) const
+	connection_data mlp::as_connection_data(connection_id id) const
 	{
+		auto const& conn = m_connections[id];
 		return connection_data{
+			id,
 			conn.src,
 			conn.dst,
 			conn.weight
@@ -130,16 +271,10 @@ namespace nnet {
 		size_t count = 0;
 		for(size_t i = 0; i < layer; ++i)
 		{
-			count += m_layer_counts[i];
+			count += layer_count< IncludeBias >(i);
 		}
 		return count;
 	}
-
-	size_t mlp::layer_count(size_t layer) const
-	{
-		return m_layer_counts[layer] - num_bias(layer);
-	}
-
 
 	void mlp::create_neurons()
 	{
@@ -163,7 +298,7 @@ namespace nnet {
 		for(size_t n = start; n < start + count; ++n)
 		{
 			m_neurons[n].type = NeuronType::Input;
-			m_neurons[n].activation_fn = ActivationFn::None;
+			m_neurons[n].activation_fn = ActivationFnType::None;
 		}
 	}
 
@@ -174,7 +309,7 @@ namespace nnet {
 		for(size_t n = start; n < start + count; ++n)
 		{
 			m_neurons[n].type = NeuronType::Hidden;
-			m_neurons[n].activation_fn = ActivationFn::Linear;
+			m_neurons[n].activation_fn = ActivationFnType::Linear;
 		}
 	}
 
@@ -185,7 +320,7 @@ namespace nnet {
 		for(size_t n = start; n < start + count; ++n)
 		{
 			m_neurons[n].type = NeuronType::Output;
-			m_neurons[n].activation_fn = ActivationFn::Linear;
+			m_neurons[n].activation_fn = ActivationFnType::Linear;
 		}
 	}
 
@@ -197,7 +332,7 @@ namespace nnet {
 		size_t idx = 0;
 		for(size_t layer = 0; layer < m_num_layers - 1; ++layer)
 		{
-			idx += m_layer_counts[layer];
+			idx += layer_count< IncludeBias >(layer);
 			size_t bias = idx - 1;
 			m_neurons[bias].type = NeuronType::Bias;
 			m_neurons[bias].activation = BiasActivation;
@@ -210,32 +345,36 @@ namespace nnet {
 		for(size_t l_src = 0; l_src < m_num_layers - 1; ++l_src)
 		{
 			auto const l_dest = l_src + 1;
-			auto const src_count = m_layer_counts[l_src];
-			auto const dst_count = m_layer_counts[l_dest] - num_bias(l_dest);
+			auto const src_count = layer_count< IncludeBias >(l_src);
+			auto const dst_count = layer_count< ExcludeBias >(l_dest);
 			count += src_count * dst_count;
 		}
 		
 		m_connections.resize(count, connection{ 0, 0, 0.0 });
 
+		// Order the connections by their destination first, so that the first n connections are from
+		// every neuron in the input layer to the first neuron in the next layer (not every outgoing connection
+		// from the first input).
+		// This makes sense since when we sum up connection signals, we are doing so over incoming connections,
+		// not outgoing ones.
 		size_t c = 0;
 		for(size_t l_src = 0; l_src < m_num_layers - 1; ++l_src)
 		{
 			auto const l_dest = l_src + 1;
-			auto const src_count = m_layer_counts[l_src];
-			auto const dst_count = m_layer_counts[l_dest] - num_bias(l_dest);
+			auto const src_count = layer_count< IncludeBias >(l_src);
+			auto const dst_count = layer_count< ExcludeBias >(l_dest);
 
-			auto src_start = layer_start(l_src);
-			auto dst_start = layer_start(l_dest);
-			for(size_t src = src_start; src < src_start + src_count; ++src)
+			auto const src_start = layer_start(l_src);
+			auto const dst_start = layer_start(l_dest);
+			for(size_t dst = dst_start; dst < dst_start + dst_count; ++dst)
 			{
-				for(size_t dst = dst_start; dst < dst_start + dst_count; ++dst, ++c)
+				for(size_t src = src_start; src < src_start + src_count; ++src, ++c)
 				{
 					m_connections[c].src = src;
 					m_connections[c].dst = dst;
+					m_conn_mp[std::make_pair(src, dst)] = c;
 				}
 			}
-
-			count += m_layer_counts[l_src] * (m_layer_counts[l_dest] - num_bias(l_dest));
 		}
 	}
 
@@ -263,15 +402,15 @@ namespace nnet {
 		}
 
 		// Loop over all subsequent layers
-		size_t n = m_layer_counts[0];
+		size_t n = layer_count< IncludeBias >(0);
 		size_t n_prev_base = 0;
 		size_t c = 0;
 		for(size_t layer = 1; layer < m_num_layers; ++layer)
 		{
-			auto const prev_count = m_layer_counts[layer - 1];
-			auto const count = m_layer_counts[layer];
+			auto const prev_count = layer_count< IncludeBias >(layer - 1);
+			auto const count = layer_count< IncludeBias >(layer);
 			// Ignore bias node
-			auto const non_bias_count = is_output_layer(layer) ? count : (count - 1);
+			auto const non_bias_count = count - num_bias(layer);
 
 			// For every neuron in the layer (except the bias)...
 			for(size_t n_local = 0; n_local < non_bias_count; ++n_local, ++n)
@@ -286,8 +425,7 @@ namespace nnet {
 				}
 
 				// Activation function
-				// TODO:
-				m_neurons[n].activation = m_neurons[n].sum;
+				m_neurons[n].activation = evaluate(m_neurons[n].activation_fn, m_neurons[n].sum);
 			}
 
 			// Skip over bias
@@ -318,8 +456,9 @@ namespace nnet {
 
 	public:
 		virtual neuron_data get_neuron_data(neuron_id id) const override;
+		virtual layer_data get_neuron_layer(neuron_id id) const override;
 		virtual connection_range get_incoming_connections(neuron_id id) const override;
-		virtual neuron_range get_range(neuron_filter const& filter) const override;
+		virtual neuron_range get_range(layer_filter const& lfilter, neuron_filter const& nfilter) const override;
 
 	private:
 		mlp const& m_nn;
@@ -330,26 +469,34 @@ namespace nnet {
 		return m_nn.as_neuron_data(id);
 	}
 	
+	layer_data mlp::neuron_accessor::get_neuron_layer(neuron_id id) const
+	{
+		return m_nn.neuron_layer(id);
+	}
+
 	connection_range mlp::neuron_accessor::get_incoming_connections(neuron_id id) const
 	{
 		connection_iterator::data_array_t data;
 		// TODO: Either store within neuron, or calculate from neuron layer, which can deduce from id
+		connection_id cn_id = 0;
 		for(auto const& conn : m_nn.m_connections)
 		{
 			if(conn.dst == id)
 			{
-				data.emplace_back(m_nn.as_connection_data(conn));
+				data.emplace_back(m_nn.as_connection_data(cn_id));
 			}
+			++cn_id;
 		}
 		return connection_range(
 			connection_iterator(std::move(data)),
-			connection_iterator()
+			connection_iterator(),
+			data.size()
 			);
 	}
 
-	neuron_range mlp::neuron_accessor::get_range(neuron_filter const& filter) const
+	neuron_range mlp::neuron_accessor::get_range(layer_filter const& lfilter, neuron_filter const& nfilter) const
 	{
-		return m_nn.get_neurons(filter);
+		return m_nn.get_neurons(lfilter, nfilter);
 	}
 
 
@@ -357,50 +504,63 @@ namespace nnet {
 		public i_connection_access
 	{
 	public:
-		connection_accessor(
-			connection_list_t::const_iterator start,
-			connection_list_t::const_iterator end
-			);
+		connection_accessor(mlp const& nn): m_nn(nn)
+		{}
 
 	public:
-		virtual size_t count() const override;
-
-		virtual connection_iterator begin() override;
-		virtual connection_iterator end() override;
+		virtual connection_data get_connection_data(connection_id id) const override;
+		virtual connection_range get_range(
+			layer_filter const& src_lfilter,
+			layer_filter const& dst_lfilter,
+			neuron_filter const& src_nfilter,
+			neuron_filter const& dst_nfilter
+			) const override;
 
 	private:
-		connection_list_t::const_iterator m_start, m_end;
+		mlp const& m_nn;
 	};
 
-	mlp::connection_accessor::connection_accessor(
-		connection_list_t::const_iterator start,
-		connection_list_t::const_iterator end
-		):
-		m_start(start),
-		m_end(end)
+	connection_data mlp::connection_accessor::get_connection_data(connection_id id) const
+	{
+		return m_nn.as_connection_data(id);
+	}
+
+	connection_range mlp::connection_accessor::get_range(
+		layer_filter const& src_lfilter,
+		layer_filter const& dst_lfilter,
+		neuron_filter const& src_nfilter,
+		neuron_filter const& dst_nfilter
+		) const
+	{
+		return m_nn.get_connections(src_lfilter, dst_lfilter, src_nfilter, dst_nfilter);
+	}
+
+
+	class mlp::modifier:
+		public i_modifiable
+	{
+	public:
+		modifier(mlp& nn);
+
+	public:
+		virtual void set_activation_fn(neuron_id neuron, activation_function fn) override;
+		virtual void set_weight(connection_id conn, value_t weight) override;
+
+	private:
+		mlp& m_nn;
+	};
+
+	mlp::modifier::modifier(mlp& nn): m_nn(nn)
 	{}
 
-	size_t mlp::connection_accessor::count() const
+	void mlp::modifier::set_activation_fn(neuron_id neuron, activation_function fn)
 	{
-		return m_end - m_start;
+		m_nn.set_activation_function(neuron, fn);
 	}
 
-	connection_iterator mlp::connection_accessor::begin()
+	void mlp::modifier::set_weight(connection_id conn, value_t weight)
 	{
-		connection_iterator::data_array_t data(count());
-		size_t n = 0;
-		for(auto it = m_start; it != m_end; ++it, ++n)
-		{
-			data[n].src = it->src;
-			data[n].dst = it->dst;
-			data[n].weight = it->weight;
-		}
-		return connection_iterator(std::move(data));
-	}
-
-	connection_iterator mlp::connection_accessor::end()
-	{
-		return connection_iterator();
+		m_nn.set_weight(conn, weight);
 	}
 
 
@@ -421,7 +581,7 @@ namespace nnet {
 
 	size_t mlp::hidden_count() const
 	{
-		return total_hidden_count();
+		return num_hidden();
 	}
 		
 	output mlp::run(input const& in)
@@ -436,6 +596,7 @@ namespace nnet {
 			case AccessOptions::Neurons:
 			case AccessOptions::Layers:
 			case AccessOptions::State:
+			case AccessOptions::Modification:
 			return true;
 
 			default:
@@ -450,10 +611,7 @@ namespace nnet {
 		
 	std::unique_ptr< i_connection_access > mlp::connection_access() const
 	{
-		return std::make_unique< connection_accessor >(
-			std::begin(m_connections),
-			std::end(m_connections)
-			);
+		return std::make_unique< connection_accessor >(*this);
 	}
 
 	std::unique_ptr< i_layers > mlp::layer_access() const
@@ -475,6 +633,11 @@ namespace nnet {
 			state.connections[conn].signal = m_connections[c].signal;
 		}
 		return state;
+	}
+
+	std::unique_ptr< i_modifiable > mlp::modifiable()
+	{
+		return std::make_unique< modifier >(*this);
 	}
 
 }

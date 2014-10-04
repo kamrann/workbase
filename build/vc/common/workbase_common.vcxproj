@@ -70,11 +70,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\code\common\params\param.h" />
-    <ClInclude Include="..\..\..\code\common\params\param_constraints.h" />
     <ClInclude Include="..\..\..\code\common\thrusters\ship_state.h" />
     <ClInclude Include="..\..\..\code\common\thrusters\thruster.h" />
     <ClInclude Include="..\..\..\code\common\thrusters\thruster_presets.h" />
+    <ClInclude Include="..\..\..\code\common\util\bimap.h" />
     <ClInclude Include="..\..\..\code\common\util\camera.h" />
     <ClInclude Include="..\..\..\code\common\util\combinatorics.hpp" />
     <ClInclude Include="..\..\..\code\common\util\cubic_spline.h" />
@@ -88,6 +87,10 @@
     <ClInclude Include="..\..\..\code\common\util\graphics3d\primitives.h" />
     <ClInclude Include="..\..\..\code\common\util\graphics3d\random.h" />
     <ClInclude Include="..\..\..\code\common\util\graphics3d\transform_hierarchy.h" />
+    <ClInclude Include="..\..\..\code\common\util\gtree\generic_tree_depthfirst.hpp" />
+    <ClInclude Include="..\..\..\code\common\util\interval_io.h" />
+    <ClInclude Include="..\..\..\code\common\util\multi_interval.h" />
+    <ClInclude Include="..\..\..\code\common\util\open_url.h" />
     <ClInclude Include="..\..\..\code\common\util\wb_string.hpp" />
     <ClInclude Include="..\..\..\code\common\util\wb_math.hpp" />
     <ClInclude Include="..\..\..\code\common\util\stl_util.hpp" />

@@ -24,6 +24,8 @@ public:
 public:
 	sys_display_widget(std::mutex& mtx): m_sys_drawer(), m_mtx(mtx), m_zoom(1.0)
 	{
+		m_ready = false;
+
 		setLayoutSizeAware(true);
 
 		setAttributeValue("tabindex", "0");
@@ -84,6 +86,11 @@ public:
 		return m_sys_drawer.get();
 	}
 
+	void set_ready(bool ready)
+	{
+		m_ready = ready;
+	}
+
 	void enable_interaction(rtp::interactive_input_set const& required)
 	{
 		//m_required_inputs = required;
@@ -111,19 +118,30 @@ protected:
 
 	void paintEvent(Wt::WPaintDevice* device)
 	{
-		if(m_sys_drawer != nullptr)
-		{
-			// TODO: Not currently threadsafe with asio implementation of system updating!!!!!!!!!!!!!!!!
-			Wt::WPainter painter(device);
+		// TODO: Not currently threadsafe with asio implementation of system updating!!!!!!!!!!!!!!!!
+		Wt::WPainter painter(device);
 
+		if(m_ready && m_sys_drawer != nullptr)
+		{
 			std::lock_guard< std::mutex > guard(m_mtx);
 			rtp::i_system_drawer::options_t options;
 			options.zoom = m_zoom;
 			m_sys_drawer->draw_system(painter, options);
 		}
+		else
+		{
+			painter.setBrush(Wt::WBrush{ Wt::gray });
+			painter.drawRect(Wt::WRectF{
+				0.0,
+				0.0,
+				device->width().toPixels(),
+				device->height().toPixels()
+			});
+		}
 	}
 
 private:
+	bool m_ready;
 	std::unique_ptr< rtp::i_system_drawer > m_sys_drawer;
 	//rtp::interactive_input_set m_required_inputs;
 	std::map< unsigned long, bool > m_input_states;

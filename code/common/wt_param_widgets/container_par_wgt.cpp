@@ -3,6 +3,8 @@
 #include "container_par_wgt.h"
 #include "pw_yaml.h"
 
+#include "params/param_yaml.h"
+
 #include <Wt/WContainerWidget>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>

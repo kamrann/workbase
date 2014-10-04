@@ -2,8 +2,10 @@
 
 #include "random_par_wgt.h"
 #include "pw_yaml.h"
-#include "schema_builder.h"
-#include "param_accessor.h"
+#include "pw_schema_builder.h"
+
+#include "params/param_yaml.h"
+#include "params/param_accessor.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/WComboBox>

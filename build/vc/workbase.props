@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>D:\Coding Projects\External Libraries\boost_1_55_0;$(SolutionDir)\..\..\..\code\common;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Coding Projects\External Libraries\boost_1_55_0;D:\Coding Projects\workbase\code\common;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)\intermediate\$(ProjectName)\$(Configuration)\</IntDir>
     <LibraryPath>D:\Coding Projects\External Libraries\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -21,7 +21,7 @@
   </Choose>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>NOMINMAX;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_DYN_LINK;BOOST_AUTO_LINK_TAGGED;BOOST_ASIO_HAS_MOVE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>

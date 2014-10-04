@@ -58,7 +58,6 @@
     <Import Project="..\..\yaml_cpp_dbg.props" />
     <Import Project="..\..\box2d_dbg.props" />
     <Import Project="..\..\Wt_dbg.props" />
-    <Import Project="..\..\fann_dbg.props" />
     <Import Project="..\neuroevo.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -74,7 +73,6 @@
     <Import Project="..\..\yaml_cpp_rls.props" />
     <Import Project="..\..\box2d_rls.props" />
     <Import Project="..\..\Wt_rls.props" />
-    <Import Project="..\..\fann_rls.props" />
     <Import Project="..\neuroevo.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -167,8 +165,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\table_traits.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\generic_system_coordinator.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_boundvalue_consumer.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\rtp_boundvalue_provider.cpp" />
@@ -210,6 +206,8 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\obstacles.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\space_based.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\target.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_radial_detection_system.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_rd_system_drawer.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_controller.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_interactive_controller.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_system.cpp" />
@@ -223,15 +221,6 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\database_tab.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\db_params.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evorun_params.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\custom_fields.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_db.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_run_tbl.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\generation_tbl.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genetic_language_tbl.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genome_tbl.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\named_genome_tbl.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\table_traits.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\genalg_params.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\generation_params.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\genome_params.h" />
@@ -307,6 +296,8 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\obstacles.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\space_based.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\scenarios\target.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_radial_detection_system.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_rd_system_drawer.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_agent.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_controller.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\rtp_decision.h" />
@@ -328,6 +319,8 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\sys_params_hierarchy.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\webinterfaceapp.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\nac_widget.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_table_widget.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_widget.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\ship_history_widget.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\system_display_widget.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_chart_widget.h" />
@@ -335,6 +328,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\wt_param_widgets\wt_param_widgets.vcxproj">
       <Project>{51b32241-2a77-4223-9d29-87cf3ee53997}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\evo_database\evo_database.vcxproj">
+      <Project>{0db7562c-4f2d-405f-b5ce-826dc483461e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\neuralnet\neuralnet.vcxproj">
+      <Project>{5e3419dc-727f-44da-a09f-27e8c6ea016d}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

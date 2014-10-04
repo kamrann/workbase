@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="evo_db">
-      <UniqueIdentifier>{f45e7214-2b4e-46af-a9bd-a88c07c613d7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="wt_system_widgets">
       <UniqueIdentifier>{2770755d-84b6-41bf-a38e-6945a32e96fd}</UniqueIdentifier>
     </Filter>
@@ -46,11 +43,11 @@
     <Filter Include="rtp_interface\systems\elevator">
       <UniqueIdentifier>{11a1bb9c-56c3-4def-8295-b09a30cad33e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rtp_interface\systems\radial_detection">
+      <UniqueIdentifier>{2e81ce0d-4463-4b8d-8c8f-523396900b56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.cpp">
-      <Filter>evo_db</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\bodies\simple_rigid_body.cpp">
       <Filter>rtp_interface\systems\phys\bodies</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\evo_db\table_traits.cpp">
-      <Filter>evo_db</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_phys_agent_body.cpp">
       <Filter>rtp_interface\systems\phys</Filter>
     </ClCompile>
@@ -201,22 +195,16 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\interactive.cpp">
       <Filter>rtp_interface\systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_radial_detection_system.cpp">
+      <Filter>rtp_interface\systems\radial_detection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_rd_system_drawer.cpp">
+      <Filter>rtp_interface\systems\radial_detection</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evodb_session.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\agent_test_display.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\generation_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genetic_language_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\genome_tbl.h">
-      <Filter>evo_db</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\sim.h">
       <Filter>Header Files</Filter>
@@ -392,15 +380,6 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\objectives\maintain_altitude_objective.h">
       <Filter>rtp_interface\systems\phys\objectives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_run_tbl.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\table_traits.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\evo_db.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\system_params.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -448,12 +427,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\genome_params.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\custom_fields.h">
-      <Filter>evo_db</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\evo_db\named_genome_tbl.h">
-      <Filter>evo_db</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\objectives\min_nonfoot_contacts_objective.h">
       <Filter>rtp_interface\systems\phys\objectives</Filter>
@@ -538,6 +511,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\passive.h">
       <Filter>rtp_interface\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_radial_detection_system.h">
+      <Filter>rtp_interface\systems\radial_detection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\radial_detection\rtp_rd_system_drawer.h">
+      <Filter>rtp_interface\systems\radial_detection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_table_widget.h">
+      <Filter>wt_system_widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\wt_system_widgets\properties_widget.h">
+      <Filter>wt_system_widgets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\..\code\neuroevo\test_app\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,18 +30,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\test_app\test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\test_app\params.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\test_app\house.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\test_app\yaml_test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\webinterface\rtp_interface\systems\phys\rtp_manual_objective.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
