@@ -21,23 +21,38 @@ namespace prm
 	class param_tree
 	{
 	public:
-		static param_tree generate_from_schema(schema::schema_node s, param_accessor acc);
-		static param_tree generate_from_schema(schema::schema_node s);
+		// TODO: Suspect having adding schema provider, should get rid of schema node parameter
+		static param_tree generate_from_schema(schema::schema_node s, param_accessor acc, schema::schema_provider_map_handle sch_mp);
+		static param_tree generate_from_schema(schema::schema_node s, schema::schema_provider_map_handle sch_mp);
 		
 		static param_tree generate_from_yaml(YAML::Node const& node);
 		YAML::Node convert_to_yaml() const;
 
 		std::string rootname() const;
 
+		void dump(std::ostream& os) const;
+
 	public:
+		struct repeat_extra
+		{
+			std::string contents_name;
+/*			size_t next_instance_num;
+
+			repeat_extra():
+				next_instance_num{ 0 }
+			{}
+			*/
+		};
+
 		struct param_data
 		{
 			ParamType type;
 			std::string name;
 			boost::optional< param > value;
+			boost::any extra;
 		};
 
-	private:
+	public:
 		struct edge_data
 		{
 			boost::optional< int > repeat_idx;
@@ -52,16 +67,23 @@ namespace prm
 			static const int Value = 2;
 		};
 
-	private:
-		static param generate_default_terminal(schema::schema_node s);
-		void generate_from_schema(schema::schema_node s, tree_t::node_descriptor node, param_accessor acc);
-		static param generate_terminal_from_yaml(YAML::Node yaml, ParamType type);
+	public:
+		bool add_repeat_instance(tree_t::node_descriptor rpt_node, param_accessor acc, schema::schema_provider_map_handle sch_mp);
+		bool remove_repeat_instance(tree_t::node_descriptor rpt_node, unsigned int index);
+		qualified_path node_qpath(tree_t::node_descriptor node) const;
+
+		YAML::Node convert_to_yaml(tree_t::node_descriptor node) const;
 		void generate_from_yaml(YAML::Node yaml, tree_t::node_descriptor node);
 
 		inline tree_t& tree()
 		{
 			return m_tree;
 		}
+
+	private:
+		static param generate_default_terminal(schema::schema_node s);
+		void generate_from_schema(schema::schema_node s, tree_t::node_descriptor node, param_accessor acc, schema::schema_provider_map_handle sch_mp);
+		static param generate_terminal_from_yaml(YAML::Node yaml, ParamType type);
 
 	private:
 		tree_t m_tree;

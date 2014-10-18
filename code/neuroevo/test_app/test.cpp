@@ -1,6 +1,9 @@
 
 #include "systems/elevator/elevator_system_defn.h"
+#include "systems/elevator/elevator_agent_defn.h"
 #include "systems/elevator/dumb_elevator_controller.h"
+
+#include "system_sim/system.h"
 
 #include "params/param.h"
 #include "params/param_accessor.h"
@@ -166,7 +169,7 @@ namespace sb = prm::schema;
 
 int main(int argc, char* argv[])
 {
-
+#if 0
 	sb::schema_provider_map_handle sch_mp = std::make_shared< sb::schema_provider_map >();
 	prm::qualified_path path;
 
@@ -232,82 +235,39 @@ int main(int argc, char* argv[])
 	};
 
 	auto root = path;
+#endif
 
-#if 0
-	auto defn = std::make_shared< sys::elev::elevator_system_defn >();
+	std::shared_ptr< sys::i_system_defn > defn = std::make_shared< sys::elev::elevator_system_defn >();
+	defn->add_agent_defn("Default", std::make_unique< sys::elev::elevator_agent_defn >());
 	defn->add_controller_defn("Preset", std::make_unique< sys::elev::dumb_elevator_controller_defn >());
 
 	auto sch_mp = std::make_shared< sb::schema_provider_map >();
-	auto root = defn->update_schema_providor(sch_mp, prm::qualified_path{});
-#endif
+	auto root = defn->update_schema_provider(sch_mp, prm::qualified_path{ "the_root" });
+
 
 	auto dummy_acc = prm::param_accessor{};
 	auto sch = (*sch_mp)[root](dummy_acc);
-	auto pt = prm::param_tree::generate_from_schema(sch);
+	auto pt = prm::param_tree::generate_from_schema(sch, sch_mp);
 
 	auto as_yaml = pt.convert_to_yaml();
 	std::cout << YAML::Dump(as_yaml) << std::endl;
 
-	pt = prm::param_tree::generate_from_yaml(as_yaml);
+	//pt = prm::param_tree::generate_from_yaml(as_yaml);
 
 	prm::cmdline_processor cmdln{ sch_mp, pt };
 	cmdln.enter_cmd_loop(std::cin, std::cout);
 
+	auto system = defn->create_system(prm::param_accessor{ &pt });
+	system->initialize();
 
-#if 0
-	///////////////
-	karma::rule< karma::ostream_iterator< char >, double() > val_rule =
-		karma::double_;
+	bool active = true;
+	while(active)
+	{
+		active = system->update(nullptr);
+	}
 
-	karma::rule< karma::ostream_iterator< char >, std::pair< double, double >() > range_rule =
-		karma::double_ << karma::double_;
-	/*
-	karma::_1 = phx::construct< boost::fusion::tuple< double, double > >(
-	phx::bind(&std::pair< double, double >::first, karma::_val),
-	phx::bind(&std::pair< double, double >::second, karma::_val)
-*/
-	karma::rule< karma::ostream_iterator< char >, prm::random() > test_rule =
-		(range_rule
-		| val_rule)
-		[
-			karma::_1 = phx::bind(&prm::random::range, karma::_val)
-		]
-
-//		(val_rule | range_rule)
-/*		[
-			karma::_1 = phx::construct< boost::variant< double, boost::fusion::tuple< double, double > > >(
-			phx::construct< boost::fusion::tuple< double, double > >(
-			phx::val(5.5),
-			phx::val(-1.1)
-			)
-			)
-		]
-		*/
-		;
-
-	test_rule.name("test_rule");
-	val_rule.name("val_rule");
-	range_rule.name("range_rule");
-
-	karma::debug(test_rule);
-	karma::debug(val_rule);
-	karma::debug(range_rule);
-
-	auto val = prm::random{
-		std::make_pair(5.5, -1.1)
-//		boost::fusion::make_tuple(5.5, -1.1)
-	};
-
-	std::cout << karma::format(
-		test_rule,
-		val
-
-		//		range_rule,
-		//		std::make_pair(5.5, -1.1)
-		)
-		<< std::endl;
-	///////////////////
-#endif
+	std::cout << "Time: " << system->get_state_value("Time") << std::endl;
+	std::cout << "# Waiting: " << system->get_state_value("# Waiting") << std::endl;
 
 
 #if 0

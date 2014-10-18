@@ -16,11 +16,17 @@
     <Filter Include="io">
       <UniqueIdentifier>{8d0605f1-7b09-4032-9690-52f3c0e8dfbd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="io\parsers">
-      <UniqueIdentifier>{997806e3-e06d-4785-8aec-1bdae75348a1}</UniqueIdentifier>
+    <Filter Include="io\commands">
+      <UniqueIdentifier>{325a5599-73d3-42be-a4a7-c0d4f458d54c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="io\emitters">
+    <Filter Include="io\terminals">
+      <UniqueIdentifier>{0442719a-2fcb-42d8-8799-b576a13eddbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io\terminals\emitters">
       <UniqueIdentifier>{42de1da1-6282-4100-b0dd-acdc6e6d9c67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io\terminals\parsers">
+      <UniqueIdentifier>{997806e3-e06d-4785-8aec-1bdae75348a1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -64,61 +70,88 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\value_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\vector_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\value_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\string_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\realnum_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\random_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\integer_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\boolean_parser.h">
-      <Filter>io\parsers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\common\params\cmd_parser.h">
-      <Filter>io\parsers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\common\params\value_parsing_ast.h">
-      <Filter>io</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\enum_parser.h">
-      <Filter>io\parsers</Filter>
+      <Filter>io\terminals\parsers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\param_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\boolean_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\enum_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\integer_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\random_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\realnum_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\string_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\common\params\vector_emitter.h">
-      <Filter>io\emitters</Filter>
+      <Filter>io\terminals\emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\value_parsing_ast.h">
+      <Filter>io\terminals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\nav_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\list_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\setvalue_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\repeat_add_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\debug_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\nav_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\repeat_remove_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\load_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\save_cmd_parser.h">
+      <Filter>io\commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +178,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\common\params\param_accessor.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\nav_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\setvalue_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\repeat_add_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\nav_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\list_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\debug_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\repeat_remove_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\load_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\save_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

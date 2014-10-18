@@ -6,8 +6,15 @@
 
 #include "value_emitter.h"
 
+#include "util/gtree/generic_tree_depthfirst.hpp"
+
 #include <boost/variant/static_visitor.hpp>
 
+#include <fstream>
+//#include <filesystem>
+
+
+//namespace fs = std::tr2::sys;
 
 namespace prm {
 
@@ -29,44 +36,80 @@ namespace prm {
 
 		inline qualified_path nav_cmd_path(nav_cmd const& cmd) const
 		{
-			qualified_path path{};
-			switch(cmd.dir)
+			auto acc = prc.m_accessor;
+			acc.set_match_method(param_accessor::Match::Anywhere, param_accessor::MatchComparison::PreferBeginningOrExact);
+
+			if(cmd.nav_index)
 			{
-				case nav_cmd::Direction::Up:
-				if(cmd.elem)
+				if(is_leaf_type(prc.m_accessor.param_here().type))
 				{
-					path = prc.m_accessor.find_path_ancestor(*cmd.elem);
-					if(!path)
-					{
-						os << "no ancestor \'" << *cmd.elem << "\'" << std::endl;
-					}
+					os << "cannot use index navigation at terminal node" << std::endl;
+					return{};
 				}
-				else
+
+				unsigned int index = *cmd.nav_index - 1;
+				auto children = prc.m_accessor.children();
+				if(index >= children.size())
 				{
-					path = prc.m_accessor.where();
-					if(path.size() == 1)
+					os << "invalid nav index" << std::endl;
+					return{};
+				}
+
+				auto it = std::next(std::begin(children), index);
+				return *it;
+			}
+			else if(cmd.dir)
+			{
+				switch(*cmd.dir)
+				{
+					case nav_cmd::Direction::Up:
+					if(cmd.search_element)
 					{
-						os << "no parent" << std::endl;
+						auto path = acc.find_path_ancestor(cmd.search_element->term);
+						if(!path)
+						{
+							os << "no ancestor \'" << cmd.search_element->term << "\'" << std::endl;
+							return{};
+						}
+						return path;
 					}
 					else
 					{
+						auto path = acc.where();
+						if(path.size() == 1)
+						{
+							os << "no parent" << std::endl;
+							return{};
+						}
 						path.pop();
+						return path;
 					}
-				}
-				break;
+					break;
 
-				case nav_cmd::Direction::Down:
-				{
-					path = prc.m_accessor.find_path_descendent(*cmd.elem);
-					if(!path)
+					case nav_cmd::Direction::Down:
 					{
-						os << "no descendent \'" << *cmd.elem << "\', or ambiguous" << std::endl;
+						auto path = acc.find_path_descendent(cmd.search_element->term, cmd.search_element->rpt_indices);
+						if(!path)
+						{
+							os << "no descendent \'" << cmd.search_element->term << "\', or ambiguous" << std::endl;
+							return{};
+						}
+						return path;
 					}
+					break;
 				}
-				break;
 			}
-
-			return path;
+			else
+			{
+				// Undirected nav
+				auto path = acc.find_path(cmd.search_element->term, cmd.search_element->rpt_indices);
+				if(!path)
+				{
+					os << "no node \'" << cmd.search_element->term << "\', or ambiguous" << std::endl;
+					return{};
+				}
+				return path;
+			}
 		}
 
 		inline std::ostream& output_value(param val)
@@ -110,7 +153,6 @@ namespace prm {
 
 		inline std::ostream& output_type_info(param_tree::param_data const& pd)
 		{
-			// todo: constraints
 			os << "[" << ParamTypeNameMap.left.at(pd.type) << "]";
 			return os;
 		}
@@ -148,66 +190,103 @@ namespace prm {
 				pd = prc.m_accessor.param_here();
 			}
 
-			switch(pd.type)
+			auto node = prc.m_accessor.node_at(path);
+
+			unsigned int depth = 0;
+			unsigned int max_depth = cmd.depth ? cmd.depth->value : 1u;
+			unsigned int indent = 0;
+
+			auto pre_op = [this, &depth, &indent, &cmd, max_depth](param_tree::tree_t::node_descriptor n)
 			{
-				case ParamType::List:
+				if(depth <= max_depth)
 				{
-					os << "..." << std::endl;
-					auto child_list = prc.m_accessor.children();
-					for(auto c_path : child_list)
+					auto& pt = prc.m_pt;
+					auto& tree = pt.tree();
+
+					for(unsigned int i = 0; i < indent; ++i)
 					{
-						auto c_pd = prc.m_accessor.find_param(c_path);
-						os << c_pd.name << ": ";
-						switch(c_pd.type)
-						{
-							case ParamType::List:
-							case ParamType::Repeat:
-							os << "...";
-							break;
-
-							default:
-							output_value(*c_pd.value);
-							if(cmd.type_info)
-							{
-								os << " ";
-								output_type_info(c_pd);
-								os << " ";
-								output_constraints((*prc.m_provider)[c_path](prc.m_accessor));
-							}
-							break;
-						}
-						os << std::endl;
+						std::cout << " ";
 					}
-				}
-				break;
 
-				case ParamType::Repeat:
-				{
-					os << "..." << std::endl;
-				}
-				break;
+					auto sibling_idx = tree.position_in_siblings(n);
+					if(depth == 1)
+					{
+						// Index immediate children
+						std::cout << (sibling_idx + 1) << ". ";
 
-				default:
-				output_value(*pd.value);
-				if(cmd.type_info)
-				{
-					os << " ";
-					output_type_info(pd);
-					os << " ";
-					output_constraints((*prc.m_provider)[path](prc.m_accessor));
+						indent += 3;
+					}
+					
+					std::cout << tree[n].name;
+
+					auto in = tree.in_edge(n).first;
+					if(tree[in].repeat_idx)
+					{
+						std::cout << " /" << (sibling_idx + 1);
+					}
+
+					std::cout << ": ";
+					if(is_leaf_type(tree[n].type))
+					{
+						output_value(*tree[n].value);
+					}
+
+					if(cmd.type_info)
+					{
+						os << " ";
+						output_type_info(tree[n]);
+						os << " ";
+						auto path = pt.node_qpath(n);
+						auto acc = prc.m_accessor;
+						acc.move_to(path);
+						output_constraints((*prc.m_provider)[path.unindexed()](acc));
+					}
+
+					std::cout << std::endl;
 				}
-				os << std::endl;
-				break;
-			}
+				++depth;
+				indent += 2;
+			};
+
+			auto post_op = [&](param_tree::tree_t::node_descriptor n)
+			{
+				--depth;
+				indent -= 2;
+				if(depth == 1)
+				{
+					indent -= 3;
+				}
+			};
+
+			wb::gtree::depth_first_traversal(
+				prc.m_pt.tree(),
+				node,
+				pre_op,
+				wb::gtree::null_op{},
+				post_op
+				);
 			return true;
 		}
 
 		inline result_type operator() (setvalue_cmd const& cmd)
 		{
-			auto path = cmd.elem ? prc.m_accessor.find_path(*cmd.elem) : prc.m_accessor.where();
-			auto pd = prc.m_accessor.find_param(path);
+			qualified_path path;
+			if(cmd.nav)
+			{
+				path = nav_cmd_path(*cmd.nav);
+				if(!path)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				path = prc.m_accessor.where();
+			}
+
+			auto& pd = prc.m_accessor.find_param(path);
 			// TODO: Perhaps current schema should be stored, maybe within the tree?
-			auto sch = (*prc.m_provider)[path](prc.m_accessor);
+			auto sch = (*prc.m_provider)[path.unindexed()](prc.m_accessor);
 
 			bool ok = schema::validate_param(cmd.val, sch);
 			if(!ok)
@@ -217,23 +296,135 @@ namespace prm {
 			}
 
 			// TODO: shouldn't need to repeat lookup
-			if(cmd.elem)
+			pd.value = cmd.val;
+
+			// TODO: Overkill
+			prc.reload_pt_schema();
+
+			return true;
+		}
+
+		inline result_type operator() (repeat_add_cmd const& cmd)
+		{
+			auto& pr = prc.m_accessor.param_here();
+			if(pr.type != ParamType::Repeat)
 			{
-				prc.m_accessor[*cmd.elem] = cmd.val;
+				os << "cannot add here, not repeat param" << std::endl;
+				return false;
+			}
+
+			// Make a copy of the accessor/param tree
+			auto pt_copy = param_tree{ prc.m_pt };
+			auto acc_copy = param_accessor{ &pt_copy };
+			acc_copy.move_to(prc.m_accessor.where());
+
+			prc.m_pt.add_repeat_instance(prc.m_accessor.node_here(), acc_copy, prc.m_provider);
+
+			// TODO: Overkill
+			prc.reload_pt_schema();
+
+			return true;
+		}
+
+		inline result_type operator() (repeat_remove_cmd const& cmd)
+		{
+			auto& pr = prc.m_accessor.param_here();
+			if(pr.type != ParamType::Repeat)
+			{
+				os << "cannot remove here, not repeat param" << std::endl;
+				return false;
+			}
+
+			return prc.m_pt.remove_repeat_instance(prc.m_accessor.node_here(), cmd.index);
+		}
+
+		inline result_type operator() (save_cmd const& cmd)
+		{
+			qualified_path path;
+			if(cmd.nav)
+			{
+				path = nav_cmd_path(*cmd.nav);
+				if(!path)
+				{
+					return false;
+				}
 			}
 			else
 			{
-				prc.m_accessor.value_here() = cmd.val;
+				path = prc.m_accessor.where();
 			}
 
-			// TODO: Overkill
-			auto prev_pos = prc.m_accessor.where();
-			auto rootname = prc.m_pt.rootname();
-			sch = (*prc.m_provider)[rootname](prc.m_accessor);
-			prc.m_pt = param_tree::generate_from_schema(sch, prc.m_accessor);
-			prc.m_accessor = param_accessor{ &prc.m_pt };
-			prc.m_accessor.move_to(prev_pos);
+//			fs::path filepath{ cmd.filename };
+			std::ofstream file{ cmd.filename };
+			if(!file.is_open())
+			{
+				std::cout << "invalid filename" << std::endl;
+				return false;
+			}
 
+			auto subtree_root = prc.m_accessor.node_at(path);
+			auto as_yaml = prc.m_pt.convert_to_yaml(subtree_root);
+
+			file << YAML::Dump(as_yaml);
+
+			return true;
+		}
+
+		inline result_type operator() (load_cmd const& cmd)
+		{
+			qualified_path path;
+			if(cmd.nav)
+			{
+				path = nav_cmd_path(*cmd.nav);
+				if(!path)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				path = prc.m_accessor.where();
+			}
+
+			//			fs::path filepath{ cmd.filename };
+/*			std::ifstream file{ cmd.filename };
+			if(!file.is_open())
+			{
+				std::cout << "invalid filename" << std::endl;
+				return false;
+			}
+*/
+			auto as_yaml = YAML::LoadFile(cmd.filename);
+			if(as_yaml.IsNull())
+			{
+				std::cout << "invalid filename/file" << std::endl;
+				return false;
+			}
+
+			auto subtree_root = prc.m_accessor.node_at(path);
+			auto& tree = prc.m_pt.tree();
+			tree.clear_children(subtree_root);
+
+			prc.m_pt.generate_from_yaml(as_yaml, subtree_root);
+
+/* TODO: generate from yaml does not validate loaded params against schema...
+
+			bool ok = schema::validate_param(cmd.val, sch);
+			if(!ok)
+			{
+				os << "invalid value" << std::endl;
+				return false;
+			}
+*/
+			// TODO: Overkill
+			prc.reload_pt_schema();
+
+			return true;
+		}
+
+		inline result_type operator() (debug_cmd const& cmd)
+		{
+			prc.m_pt.dump(std::cout);
 			return true;
 		}
 
@@ -248,12 +439,12 @@ namespace prm {
 
 	bool cmdline_processor::process_cmd(std::string const& cmd_str, std::ostream& out)
 	{
-		cmd_parser< std::string::const_iterator > parser;
+		auto location_type = m_accessor.param_here().type;
+		cmd_parser< std::string::const_iterator > parser{ is_leaf_type(location_type) };
 		
 		auto it = std::begin(cmd_str);
 		command cmd;
 		auto result = qi::phrase_parse(it, std::end(cmd_str), parser, qi::space_type{}, cmd);
-		//result = result && it == std::end(cmd_str);
 
 		if(!result)
 		{
@@ -261,7 +452,7 @@ namespace prm {
 			return false;
 		}
 
-		cmd_visitor vis{ *this, std::cout };
+		cmd_visitor vis{ *this, out };
 		return boost::apply_visitor(vis, cmd);
 	}
 
@@ -281,6 +472,23 @@ namespace prm {
 
 			process_cmd(input, out);
 		}
+	}
+
+	void cmdline_processor::reload_pt_schema()
+	{
+		auto pos = m_accessor.where();
+		auto rootname = m_pt.rootname();
+		auto sch = (*m_provider)[rootname](m_accessor);
+		
+		// Make a deep copy of the accessor/param tree
+		param_tree pt_copy{ m_pt };
+		param_accessor acc_copy{ &pt_copy };
+		acc_copy.move_to(pos);
+
+		m_pt = param_tree::generate_from_schema(sch, acc_copy, m_provider);
+
+		m_accessor = param_accessor{ &m_pt };
+		m_accessor.move_to(pos);
 	}
 
 }

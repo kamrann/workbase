@@ -291,6 +291,18 @@ namespace gtree {
 			}
 		}
 
+		// Removes all children (and their subtrees) from a node
+		void
+		clear_children(node_descriptor n)
+		{
+			auto node = static_cast< node_t* >(n);
+			for(auto c : node->children)
+			{
+				delete static_cast< node_t* >(c);
+			}
+			node->children.clear();
+		}
+
 		/*! Returns a post order iterator range for the subtree starting at n_start, or for the whole tree if n_start == null_vertex()
 		*/
 		inline post_order_iterator_range post_order_traversal(node_descriptor n_start = null_vertex()) const

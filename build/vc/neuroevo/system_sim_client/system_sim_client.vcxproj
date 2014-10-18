@@ -36,12 +36,16 @@
     <Import Project="..\neuroevo.props" />
     <Import Project="..\..\eigen.props" />
     <Import Project="..\..\yaml_cpp_dbg.props" />
+    <Import Project="..\..\box2d_dbg.props" />
+    <Import Project="..\..\Wt_dbg.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="..\neuroevo.props" />
     <Import Project="..\..\eigen.props" />
     <Import Project="..\..\yaml_cpp_rls.props" />
+    <Import Project="..\..\box2d_rls.props" />
+    <Import Project="..\..\Wt_rls.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -85,18 +89,48 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\chart_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_interface.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\drawer_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\get_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\reset_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\run_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\step_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\stop_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\system_sim_client.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\sys_cmd_interface.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\sys_controller.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\chart.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\drawer.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\wt_server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\chart_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_interface.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\drawer_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\get_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\reset_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\run_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\stdafx.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\step_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\stop_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\system_sim_client.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\sys_cmd_interface.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\sys_controller.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\targetver.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\display_base.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\display_types.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\chart.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\drawer.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\wt_server.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\params\params.vcxproj">
@@ -105,9 +139,15 @@
     <ProjectReference Include="..\common\systems\elevator\elevator.vcxproj">
       <Project>{04de12ba-9759-4abb-bd6f-dfecee19b0a9}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\common\systems\physics2d\physics2d.vcxproj">
+      <Project>{ea47b4b9-816f-41bf-a52d-cd519cd99fcd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\common\system_sim\system_sim.vcxproj">
       <Project>{cd95ca33-3886-4cc3-9f42-f32b2b2da3f7}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="state_machines.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

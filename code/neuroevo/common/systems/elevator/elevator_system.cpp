@@ -1,12 +1,11 @@
 // elevator_system.cpp
 
 #include "elevator_system.h"
-#include "system_sim/rtp_system_agents_data.h"
-#include "system_sim/rtp_controller.h"
-//#include "rtp_dumb_elevator_controller.h"
+#include "elevator_system_defn.h"
+#include "elevator_systemstatevalues.h"
 
-//#include "elevator_system_drawer.h"
-#include "system_sim/rtp_system_drawer.h"
+#include "system_sim/basic_agent.h"
+#include "system_sim/controller.h"
 
 #include "params/param_accessor.h"
 
@@ -34,10 +33,10 @@ namespace sys {
 			m_num_floors = prm::extract_as< int >(params["floor_count"]);
 			m_arrival_rate = prm::extract_as< arrival_rate_t >(params["arrival_rate"]);
 
-			m_state_value_names = elevator_system_defn::generate_state_value_names(m_num_floors);
-			m_state_value_ids = elevator_system_defn::generate_state_value_idmap(m_num_floors);
+			//m_state_value_names = elevator_system_defn::generate_state_value_names(m_num_floors);
+			//m_state_value_ids = elevator_system_defn::generate_state_value_idmap(m_num_floors);
 
-			initialize_state_value_accessors();
+			//initialize_state_value_accessors();
 
 			m_time = 0.0;
 			m_update_period = 1.0;
@@ -48,8 +47,13 @@ namespace sys {
 
 		}
 
-		void elevator_system::initialize()
+		bool elevator_system::initialize()
 		{
+			if(!basic_system::initialize())
+			{
+				return false;
+			}
+
 			m_state = system_state();
 			m_state.initialize(m_num_floors);
 
@@ -62,27 +66,30 @@ namespace sys {
 			{
 				m_arrival_dist = std::exponential_distribution<>(m_arrival_rate);
 			}
+
+			return true;
 		}
 
 		void elevator_system::clear_agents()
 		{
-
+			// TODO: needed?
 		}
 
 
-		i_system::agent_id elevator_system::register_agent(agent_specification const& spec)
+		i_system::agent_id elevator_system::register_agent(agent_ptr agent)
 		{
+			m_agent = std::move(agent);
 			return 0;
 		}
 
-		void elevator_system::register_agent_controller(agent_id agent, std::unique_ptr< i_controller > controller)
+		void elevator_system::register_agent_controller(agent_id agent, controller_ptr controller)
 		{
 			m_controller = std::move(controller);
 		}
 
 		i_agent const& elevator_system::get_agent(agent_id id) const
 		{
-			return *this;
+			return *m_agent;
 		}
 
 		i_controller const& elevator_system::get_agent_controller(agent_id id) const
@@ -235,7 +242,7 @@ namespace sys {
 			i_controller::input_list_t inputs;
 			for(auto const& input_id : required_inputs)
 			{
-				inputs.push_back(get_sensor_value(input_id));
+				inputs.push_back(m_agent->get_sensor_value(input_id));
 			}
 
 			auto outputs = m_controller->process(inputs);
@@ -380,12 +387,21 @@ namespace sys {
 			return obs->record_observations(i_observer::trial_data_t{});
 		}
 
-		void elevator_system::initialize_state_value_accessors()
+		size_t elevator_system::initialize_state_value_bindings(sv_bindings_t& bindings, sv_accessors_t& accessors)
 		{
-			m_state_value_accessors.emplace_back([this]{ return m_time; });
-			m_state_value_accessors.emplace_back([this]{ return m_state.location; });
+			typedef elevator_system_defn defn;
 
-			m_state_value_accessors.emplace_back([this]
+			auto bound_id = accessors.size();
+			auto initial_count = bindings.size();
+			
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::Time) }] = bound_id++;
+			accessors.push_back([this]{ return m_time; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::Location) }] = bound_id++;
+			accessors.push_back([this]{ return m_state.location; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::Direction) }] = bound_id++;
+			accessors.push_back([this]
 			{
 				int dir_value = 0;
 				switch(m_state.direction)
@@ -400,17 +416,35 @@ namespace sys {
 				return dir_value;
 			});
 
-			m_state_value_accessors.emplace_back([this]{ return m_state.occupancy; });
-			m_state_value_accessors.emplace_back([this]{ return m_state.get_num_waiting(); });
-			m_state_value_accessors.emplace_back([this]{ return m_transitions.num_got_off; });
-			m_state_value_accessors.emplace_back([this]{ return m_transitions.num_got_on; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.num_people_arrived; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.num_people_boarded; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.num_people_delivered; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.distance_moved; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.total_queuing_time; });
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::Occupancy) }] = bound_id++;
+			accessors.push_back([this]{ return m_state.occupancy; });
 
-			m_state_value_accessors.emplace_back([this]
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::NumWaiting) }] = bound_id++;
+			accessors.push_back([this]{ return m_state.get_num_waiting(); });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::NumGotOff) }] = bound_id++;
+			accessors.push_back([this]{ return m_transitions.num_got_off; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::NumGotOn) }] = bound_id++;
+			accessors.push_back([this]{ return m_transitions.num_got_on; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalArrivals) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.num_people_arrived; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalBoarded) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.num_people_boarded; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalDelivered) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.num_people_delivered; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::DistanceCovered) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.distance_moved; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalQueuingTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.total_queuing_time; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::AvgQueuingTime) }] = bound_id++;
+			accessors.push_back([this]
 			{
 				auto avg_q_time = m_history.total_queuing_time;
 				if(m_history.num_people_boarded > 0)
@@ -420,11 +454,17 @@ namespace sys {
 				return avg_q_time;
 			});
 
-			m_state_value_accessors.emplace_back([this]{ return m_history.max_queuing_time; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.total_inclusive_queuing_time; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.total_delivery_time; });
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::MaxQueuingTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.max_queuing_time; });
 
-			m_state_value_accessors.emplace_back([this]
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalInclusiveQueuingTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.total_inclusive_queuing_time; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalDeliveryTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.total_delivery_time; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::AvgDeliveryTime) }] = bound_id++;
+			accessors.push_back([this]
 			{
 				auto avg_d_time = m_history.total_delivery_time;
 				if(m_history.num_people_delivered > 0)
@@ -434,82 +474,50 @@ namespace sys {
 				return avg_d_time;
 			});
 
-			m_state_value_accessors.emplace_back([this]{ return m_history.max_delivery_time; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.total_inclusive_delivery_time; });
-			m_state_value_accessors.emplace_back([this]{ return m_history.idle_time; });
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::MaxDeliveryTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.max_delivery_time; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalInclusiveDeliveryTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.total_inclusive_delivery_time; });
+
+			bindings[state_value_id{ defn::s_core_state_values.left.at(defn::CoreStateValue::TotalIdleTime) }] = bound_id++;
+			accessors.push_back([this]{ return m_history.idle_time; });
 
 			for(floor_t f = 0; f < m_num_floors; ++f)
 			{
-				auto fname = elevator_system_defn::floor_name(f);
+				state_value_id base = elevator_system_defn::floor_name(f);
 
-				m_state_value_accessors.emplace_back([this, f]{ return m_state.floors[f].waiting(); });
-				m_state_value_accessors.emplace_back([this, f]{ return m_state.floors[f].waiting_up() > 0 ? 1.0 : 0.0; });
-				m_state_value_accessors.emplace_back([this, f]{ return m_time - m_state.floors[f].buttons[Direction::Up].pressed_time; });
-				m_state_value_accessors.emplace_back([this, f]{ return m_state.floors[f].waiting_up(); });
-				m_state_value_accessors.emplace_back([this, f]{ return m_state.floors[f].waiting_down() > 0 ? 1.0 : 0.0; });
-				m_state_value_accessors.emplace_back([this, f]{ return m_time - m_state.floors[f].buttons[Direction::Down].pressed_time; });
-				m_state_value_accessors.emplace_back([this, f]{ return m_state.floors[f].waiting_down(); });
-				m_state_value_accessors.emplace_back([this, f]{ return m_state.passengers_by_dest[f].count > 0 ? 1.0 : 0.0; });
-			}
-		}
-/*
-		std::shared_ptr< i_properties const > elevator_system::get_state_properties() const
-		{
-			auto props = std::make_shared< rtp_stored_properties >();
-
-			for(auto const& name : m_state_value_names)
-			{
-				props->add_property(name);
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::NumWaiting)] = bound_id++;
+				accessors.push_back([this, f]{ return m_state.floors[f].waiting(); });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::UpPressed)] = bound_id++;
+				accessors.push_back([this, f]{ return m_state.floors[f].waiting_up() > 0 ? 1.0 : 0.0; });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::UpPressedDuration)] = bound_id++;
+				accessors.push_back([this, f]{ return m_time - m_state.floors[f].buttons[Direction::Up].pressed_time; });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::NumWaitingUp)] = bound_id++;
+				accessors.push_back([this, f]{ return m_state.floors[f].waiting_up(); });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::DownPressed)] = bound_id++;
+				accessors.push_back([this, f]{ return m_state.floors[f].waiting_down() > 0 ? 1.0 : 0.0; });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::DownPressedDuration)] = bound_id++;
+				accessors.push_back([this, f]{ return m_time - m_state.floors[f].buttons[Direction::Down].pressed_time; });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::NumWaitingDown)] = bound_id++;
+				accessors.push_back([this, f]{ return m_state.floors[f].waiting_down(); });
+				bindings[base + defn::s_floor_state_values.left.at(defn::FloorStateValue::IsDestination)] = bound_id++;
+				accessors.push_back([this, f]{ return m_state.passengers_by_dest[f].count > 0 ? 1.0 : 0.0; });
 			}
 
-			return props;
+			// TODO: or leave to basic_system???
+			auto basic_ag = static_cast<basic_agent*>(m_agent.get());
+			basic_ag->initialize_state_value_bindings(bindings, accessors);
+
+			return bindings.size() - initial_count;
 		}
-
-		std::shared_ptr< i_property_values const > elevator_system::get_state_property_values() const
-		{
-			auto vals = std::make_shared< rtp_stored_property_values >();
-
-			for(size_t id = 0; id < m_state_value_names.size(); ++id)
-			{
-				vals->set_value(m_state_value_names[id], m_state_value_accessors[id]());
-			}
-
-			return vals;
-		}
-*/	
-		double elevator_system::get_state_value(state_value_id id) const
+	
+/*		double elevator_system::get_state_value(state_value_id id) const
 		{
 			auto idx = m_state_value_ids.at(id);
 			return m_state_value_accessors[idx]();
 		}
-
-		std::unique_ptr< i_system_drawer > elevator_system::get_drawer() const
-		{
-			return nullptr;
-			//return std::make_unique< elevator_system_drawer >(*this);
-		}
-
-
-		std::string elevator_system::get_name() const
-		{
-			return "Elevator 1";
-		}
-
-		agent_sensor_list elevator_system::get_mapped_inputs(std::vector< std::string > const& named_inputs) const
-		{
-			agent_sensor_list result;
-			for(auto const& name : named_inputs)
-			{
-				result.emplace_back(m_state_value_ids.at(name));
-			}
-			return result;
-		}
-
-		double elevator_system::get_sensor_value(agent_sensor_id const& sensor) const
-		{
-			return m_state_value_accessors[sensor]();
-		}
-
+*/
 
 		void elevator_system::concatenate_performance_data(perf_data_t& pd) const
 		{

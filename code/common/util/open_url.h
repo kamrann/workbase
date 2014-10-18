@@ -46,6 +46,10 @@ bool open_url(std::string const& url, int showcmd)
 	se_inf.cbSize = sizeof(se_inf);
 	se_inf.fMask = SEE_MASK_FLAG_NO_UI;
 	se_inf.lpVerb = "open";
+	// TODO: configurable by function arguments. also dependent on browser, currently just assuming chrome
+	auto params = std::string{ "--new-window --app=" };
+	params += url;
+	se_inf.lpParameters = params.c_str();
 	se_inf.lpFile = url.c_str();
 	se_inf.nShow = showcmd;
 
@@ -66,8 +70,12 @@ bool open_url(std::string const& url, int showcmd)
 				}
 
 				se_inf.lpFile = path.c_str();
+				auto parameters = std::string{};
+				// TODO: configurable by function arguments. also dependent on browser, currently just assuming chrome
+				parameters += "--new-window ";
 				auto quoted_url = '\"' + url + '\"';
-				se_inf.lpParameters = quoted_url.c_str();
+				parameters += quoted_url;
+				se_inf.lpParameters = parameters.c_str();
 				retflag = ShellExecuteExA(&se_inf);
 			}
 		}

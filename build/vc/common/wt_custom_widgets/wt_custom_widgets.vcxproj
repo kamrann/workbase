@@ -80,10 +80,19 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WCommandLine.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WCommandTerminal.h" />
     <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WMultiIntervalDisplay.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WOutputConsoleBase.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WPlainOutputConsole.h" />
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WXHTMLOutputConsole.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WCommandLine.cpp" />
     <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WMultiIntervalDisplay.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WOutputConsoleBase.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WPlainOutputConsole.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WXHTMLOutputConsole.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

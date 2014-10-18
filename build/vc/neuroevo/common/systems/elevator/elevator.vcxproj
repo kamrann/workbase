@@ -83,6 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\dumb_elevator_controller.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent_defn.cpp" />
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_system.cpp" />
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_system_defn.cpp" />
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\stdafx.cpp">
@@ -92,7 +94,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\dumb_elevator_controller.h" />
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent.h" />
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent_defn.h" />
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_system.h" />
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_systemstatevalues.h" />
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_system_defn.h" />
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\stdafx.h" />
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\targetver.h" />

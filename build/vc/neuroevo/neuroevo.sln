@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics2d", "common\systems
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "systems", "systems", "{62297676-0F8C-490B-9210-E6EC8D55C437}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "commands", "..\common\commands\commands.vcxproj", "{6FF13D62-015F-446A-803E-32C6EB72206F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -243,6 +245,16 @@ Global
 		{EA47B4B9-816F-41BF-A52D-CD519CD99FCD}.Release|Win32.ActiveCfg = Release|Win32
 		{EA47B4B9-816F-41BF-A52D-CD519CD99FCD}.Release|Win32.Build.0 = Release|Win32
 		{EA47B4B9-816F-41BF-A52D-CD519CD99FCD}.Release|x64.ActiveCfg = Release|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Debug|Win32.Build.0 = Debug|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Debug|x64.ActiveCfg = Debug|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Release|Win32.ActiveCfg = Release|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Release|Win32.Build.0 = Release|Win32
+		{6FF13D62-015F-446A-803E-32C6EB72206F}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

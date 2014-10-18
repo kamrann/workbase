@@ -3,7 +3,7 @@
 #ifndef __WB_NE_ELEVATOR_SYSTEM_DEFN_H
 #define __WB_NE_ELEVATOR_SYSTEM_DEFN_H
 
-#include "../../system_sim/basic_system_defn.h"
+#include "system_sim/basic_system_defn.h"
 
 
 namespace sys {
@@ -19,25 +19,33 @@ namespace sys {
 			public basic_system_defn
 		{
 		public:
+			static std::unique_ptr< elevator_system_defn > create_default();
+
+		public:
+			virtual std::string get_name() const override;
+
 			virtual bool is_instantaneous() const override;
 			virtual update_info get_update_info() const override;
 
-			virtual std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const override;
-			//static agents_data generate_agents_data(prm::param_accessor param_vals, bool evolvable);
+			virtual state_value_id_list get_system_core_state_values(prm::param_accessor acc) const override;
 
-			virtual std::vector< std::string > get_agent_type_names() const override;
-			virtual std::vector< std::string > get_agent_sensor_names(prm::param agent_type, prm::param_accessor param_vals) const override;
-			virtual size_t get_agent_num_effectors(prm::param agent_type) const override;
-			virtual std::vector< std::string > get_system_state_values(prm::param_accessor param_vals) const override;
-
-			virtual system_ptr create_system(prm::param_accessor acc) const override;
+			virtual system_ptr create_system_core(prm::param_accessor acc) const override;
 
 		public:
 			static std::string floor_name(floor_t flr);
 
+		protected:
+			virtual std::string update_schema_provider_for_system_core(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const override;
+
 		private:
-			static std::vector< std::string > generate_state_value_names(floor_count_t num_floors);
-			static std::map< std::string, int > generate_state_value_idmap(floor_count_t num_floors);
+//			static state_value_id_list generate_state_value_names(floor_count_t num_floors);
+//			static std::map< std::string, int > generate_state_value_idmap(floor_count_t num_floors);
+
+			enum class CoreStateValue: unsigned long;
+			static const bimap< CoreStateValue, std::string > s_core_state_values;
+
+			enum class FloorStateValue: unsigned long;
+			static const bimap< FloorStateValue, std::string > s_floor_state_values;
 
 			friend class elevator_system;
 		};

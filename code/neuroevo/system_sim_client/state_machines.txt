@@ -1,0 +1,22 @@
+System Controller
+
+States (Commands):
+
+Root (Quit) *	{ param tree }
+	Editing := Param Editor
+	Inactive (Modify->Editing) *
+		NotReady *[if param tree incomplete]
+		Ready (Init->Active) *[if param tree complete]
+	Active (Exit->Ready, Reset->Active)	{ i_system }
+		NotRunning (Get, Draw) *
+			Paused (Step, Run->Running, Chart) *
+			Completed
+		Running (Pause->Paused)
+
+
+
+
+Param Editor
+
+States:
+

@@ -30,6 +30,12 @@
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\dumb_elevator_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent_defn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\stdafx.h">
@@ -45,6 +51,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\dumb_elevator_controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent_defn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_agent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\elevator\elevator_systemstatevalues.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

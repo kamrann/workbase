@@ -4,7 +4,7 @@
 #define __NE_DUMB_ELEVATOR_CONTROLLER_H
 
 #include "system_sim/controller_defn.h"
-#include "system_sim/rtp_controller.h"
+#include "system_sim/controller.h"
 
 
 namespace sys {

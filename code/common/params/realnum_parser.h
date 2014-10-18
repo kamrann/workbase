@@ -14,7 +14,7 @@ namespace prm {
 
 	namespace detail {
 
-		double convert_double(std::string str)
+		inline double convert_double(std::string str)
 		{
 			return std::stod(str);
 		}

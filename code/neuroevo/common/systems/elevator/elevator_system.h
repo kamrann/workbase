@@ -5,8 +5,8 @@
 
 #include "elevator_system_defn.h"
 
-#include "system_sim/rtp_system.h"
-#include "system_sim/rtp_agent.h"
+#include "system_sim/basic_system.h"
+#include "system_sim/agent.h"
 
 #include "params/param_fwd.h"
 
@@ -20,12 +20,8 @@
 namespace sys {
 	namespace elev {
 
-		struct elevator_agent_specification
-		{};
-
 		class elevator_system:
-			public i_system,
-			public i_agent
+			public basic_system
 		{
 		protected:
 //			typedef unsigned int floor_count_t, floor_t;
@@ -304,10 +300,10 @@ namespace sys {
 			~elevator_system();
 
 		public:
-			virtual void initialize() override;
+			virtual bool initialize() override;
 			virtual void clear_agents() override;
-			virtual agent_id register_agent(agent_specification const& spec) override;
-			virtual void register_agent_controller(agent_id agent, std::unique_ptr< i_controller > controller) override;
+			virtual agent_id register_agent(agent_ptr agent) override;
+			virtual void register_agent_controller(agent_id agent, controller_ptr controller) override;
 
 			virtual i_agent const& get_agent(agent_id id) const override;
 			virtual i_controller const& get_agent_controller(agent_id id) const override;
@@ -318,13 +314,11 @@ namespace sys {
 
 //			virtual std::shared_ptr< i_properties const > get_state_properties() const override;
 //			virtual std::shared_ptr< i_property_values const > get_state_property_values() const override;
-			virtual double get_state_value(state_value_id id) const override;
-			virtual std::unique_ptr< i_system_drawer > get_drawer() const override;
+//			virtual double get_state_value(state_value_id id) const override;
+//			virtual std::unique_ptr< i_system_drawer > get_drawer() const override;
 
-			//
-			virtual std::string get_name() const override;
-			virtual agent_sensor_list get_mapped_inputs(std::vector< std::string > const& named_inputs) const override;
-			virtual double get_sensor_value(agent_sensor_id const& sensor) const override;
+		protected:
+			virtual size_t initialize_state_value_bindings(sv_bindings_t& bindings, sv_accessors_t& accessors) override;
 
 		protected:
 			void process_arrivals();
@@ -345,18 +339,17 @@ namespace sys {
 
 			std::exponential_distribution<> m_arrival_dist;
 
-			std::unique_ptr< i_controller > m_controller;
+			agent_ptr m_agent;
+			controller_ptr m_controller;
 
 //			static std::vector< std::string > generate_state_value_names(floor_count_t num_floors);
 //			static std::map< std::string, agent_sensor_id > generate_state_value_idmap(floor_count_t num_floors);
 
-			std::vector< std::string > m_state_value_names;
-			std::map< std::string, agent_sensor_id > m_state_value_ids;
+			//std::vector< std::string > m_state_value_names;
+			//std::map< std::string, agent_sensor_id > m_state_value_ids;
 
-			void initialize_state_value_accessors();
-
-			typedef std::function< double() > state_value_accessor_fn;
-			std::vector< state_value_accessor_fn > m_state_value_accessors;
+//			typedef std::function< double() > state_value_accessor_fn;
+//			std::vector< state_value_accessor_fn > m_state_value_accessors;
 
 		private:
 			/*
@@ -370,6 +363,7 @@ namespace sys {
 			virtual void concatenate_performance_data(perf_data_t& pd) const override;
 			//#endif
 
+			friend class elevator_agent;
 			friend class elevator_system_drawer;
 		};
 

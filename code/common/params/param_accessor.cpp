@@ -7,7 +7,11 @@
 namespace prm
 {
 	param_accessor::param_accessor(param_tree* pt):
-		m_pt{ pt }
+		m_pt{ pt },
+		m_locked{ false },
+		m_auto_lock{ false },
+		m_match_type{ Match::Exact },
+		m_comp_type{ MatchComparison::Equal }
 	{
 		if(has_pt())
 		{
@@ -56,6 +60,12 @@ namespace prm
 		return operator[] (std::string{ name });
 	}
 
+	param_accessor::param_data& param_accessor::find_param(qualified_path const& path)
+	{
+		auto n = node_from_path(path);
+		return node_attribs(n);
+	}
+
 	param_accessor::param_data param_accessor::find_param(qualified_path const& path) const
 	{
 		auto n = node_from_path(path);
@@ -77,6 +87,11 @@ namespace prm
 		return *node_attribs(find_node_unambiguous(name)).value;
 	}
 
+	param_accessor::param_data& param_accessor::param_here()
+	{
+		return node_attribs(m_location_stk.top());
+	}
+
 	param_accessor::param_data param_accessor::param_here() const
 	{
 		return node_attribs(m_location_stk.top());
@@ -92,17 +107,15 @@ namespace prm
 		return *node_attribs(m_location_stk.top()).value;
 	}
 
-	qualified_path param_accessor::find_path(std::string const& name) const
+	qualified_path param_accessor::find_path(std::string const& name, indices_t const& indices) const
 	{
-		auto n = find_node_unambiguous(name);
+		auto n = find_node_unambiguous(name, indices);
 		return n == ptree_t::null_vertex() ? qualified_path{} : path_from_node(n);
 	}
 
-	qualified_path param_accessor::find_path_descendent(std::string const& name) const
+	qualified_path param_accessor::find_path_descendent(std::string const& name, indices_t const& indices) const
 	{
-		// TODO: need to be able to deal with case where name matches both an ancestor and an unambiguous 
-		// descendent. currently this will fail if the ancestor comes first in the list of all paths
-		auto nodes = find_all_nodes(name);
+		auto nodes = find_all_nodes(name, indices);
 		for(auto it = std::begin(nodes); it != std::end(nodes);)
 		{
 			if(m_pt->tree().are_ancestor_descendent(m_location_stk.top(), *it))
@@ -116,15 +129,10 @@ namespace prm
 		}
 
 		return nodes.size() == 1 ? path_from_node(*nodes.begin()) : qualified_path{};
-
-//		auto path = find_path(name);
-//		return path.is_same_or_descendent_of(where()) ? path : qualified_path{};
 	}
 
 	qualified_path param_accessor::find_path_ancestor(std::string const& name) const
 	{
-		// TODO: need to be able to deal with case where name matches both an ancestor and an unambiguous 
-		// descendent. currently this will fail if the descendent comes first in the list of all paths
 		auto nodes = find_all_nodes(name);
 		for(auto it = std::begin(nodes); it != std::end(nodes);)
 		{
@@ -139,16 +147,22 @@ namespace prm
 		}
 
 		return nodes.size() == 1 ? path_from_node(*nodes.begin()) : qualified_path{};
-
-//		auto path = find_path(name);
-//		return where().is_same_or_descendent_of(path) ? path : qualified_path{};
 	}
 
 	bool param_accessor::move_to(qualified_path const& abs)
 	{
+		if(is_locked())
+		{
+			return false;
+		}
+
 		auto n = node_from_path(abs);
 		if(n == ptree_t::null_vertex())
 		{
+			if(m_auto_lock)
+			{
+				lock();
+			}
 			return false;
 		}
 		else
@@ -160,11 +174,21 @@ namespace prm
 
 	bool param_accessor::move_relative(qualified_path const& rel)
 	{
+		if(is_locked())
+		{
+			return false;
+		}
+
 		return move_to(where() + rel);
 	}
 
 	bool param_accessor::up()
 	{
+		if(is_locked())
+		{
+			return false;
+		}
+
 		auto parent = where();
 		parent.pop();
 		return move_to(parent);
@@ -172,6 +196,11 @@ namespace prm
 
 	bool param_accessor::revert()
 	{
+		if(is_locked())
+		{
+			return false;
+		}
+
 		if(m_location_stk.empty())
 		{
 			return false;
@@ -181,6 +210,32 @@ namespace prm
 			m_location_stk.pop();
 			return true;
 		}
+	}
+
+	void param_accessor::lock()
+	{
+		m_locked = true;
+	}
+		
+	void param_accessor::unlock()
+	{
+		m_locked = false;
+	}
+	
+	bool param_accessor::is_locked()
+	{
+		return m_locked;
+	}
+	
+	void param_accessor::set_lock_on_failed_move(bool autolock)
+	{
+		m_auto_lock = autolock;
+	}
+
+	void param_accessor::set_match_method(Match match_type, MatchComparison comp_type)
+	{
+		m_match_type = match_type;
+		m_comp_type = comp_type;
 	}
 
 	std::list< qualified_path > param_accessor::children() const
@@ -235,21 +290,7 @@ namespace prm
 
 	qualified_path param_accessor::path_from_node(node_t node) const
 	{
-		qualified_path qpath;
-		auto& tree = m_pt->tree();
-		ptree_t::path tree_path = tree.path_to_node(node);
-		for(auto n : tree_path)
-		{
-			auto attribs = tree[n];
-			qpath += attribs.name;
-
-			if(attribs.type == ParamType::Repeat)
-			{
-				auto e = tree.path_edge_from_node(tree_path, n).first;
-				qpath.leaf().set_index(*tree[e].repeat_idx);
-			}
-		}
-		return qpath;
+		return m_pt->node_qpath(node);
 	}
 
 	param_accessor::node_t param_accessor::node_from_path(qualified_path const& p) const
@@ -298,6 +339,11 @@ namespace prm
 
 				case ParamType::Repeat:
 				{
+					if(!comp.has_index())
+					{
+						return ptree_t::null_vertex();
+					}
+
 					auto out = tree.branches(n);
 					n = ptree_t::null_vertex();
 					for(auto e : out)
@@ -329,19 +375,52 @@ namespace prm
 		return tree[n];
 	}
 
-	bool param_accessor::match_name(std::string const& search, std::string const& node_name) const
+	param_accessor::Match param_accessor::match_name(std::string const& search, std::string const& node_name)
 	{
-		if(false)	// todo: exact
+		auto pos = node_name.find(search);
+		if(pos == 0)
 		{
-			return node_name == search;
+			if(search.length() == node_name.length())
+			{
+				return Match::Exact;
+			}
+			else
+			{
+				return Match::Beginning;
+			}
 		}
-		else // assuming left match
+		else if(pos != std::string::npos)
 		{
-			return node_name.find(search) == 0;
+			return Match::Anywhere;
+		}
+		else
+		{
+			return Match::None;
 		}
 	}
 
-	std::set< param_accessor::node_t > param_accessor::find_all_nodes(std::string const& name) const
+	bool param_accessor::match_qualifies(Match match, boost::optional< Match > existing, Match method, MatchComparison comp)
+	{
+		if(match > method)
+		{
+			return false;
+		}
+
+		switch(comp)
+		{
+			case MatchComparison::Equal:
+			return true;
+
+			case MatchComparison::PreferExact:
+			return !existing || *existing != Match::Exact || match == Match::Exact;
+
+			case MatchComparison::PreferBeginningOrExact:
+			return !existing || match <= *existing;
+		}
+		throw std::runtime_error{ "invalid matc comparison type" };
+	}
+
+	std::set< param_accessor::node_t > param_accessor::find_all_nodes(std::string const& name, indices_t const& indices) const
 	{
 		if(!has_pt())
 		{
@@ -349,23 +428,67 @@ namespace prm
 		}
 
 		std::set< node_t > result;
+		boost::optional< Match > current_match_type;
+
 		auto pos = m_location_stk.top();
 		auto& tree = m_pt->tree();
 		auto nodes = tree.nodes();
 		for(auto n : nodes)
 		{
 			// First, name must match
-			if(!match_name(name, tree[n].name))
+			auto match = match_name(name, tree[n].name);
+			if(!match_qualifies(match, current_match_type, m_match_type, m_comp_type))
 			{
 				continue;
 			}
+			current_match_type = current_match_type ? std::min(*current_match_type, match) : match;
 
 			// Now need to check for ambiguity
 			auto ancestor = tree.common_ancestor(pos, n);
 			auto down_path = tree.path_to_node(ancestor, n).first;
 			// Need to see if any node on this path (excluding the last node) is a repeat
-			down_path.pop_back();
-			auto repeat = std::find_if(
+			//down_path.pop_back();
+			auto end = std::prev(std::end(down_path));
+			auto ind_it = std::begin(indices);
+
+			auto ambiguous = false;
+			for(auto n_it = std::begin(down_path); n_it != end; ++n_it)
+			{
+				auto n = *n_it;
+
+				if(tree[n].type == ParamType::Repeat)
+				{
+					if(ind_it == std::end(indices))
+					{
+						// No index specified for this repeat, fail
+						ambiguous = true;
+						break;
+					}
+
+					// Check the index value
+					auto idx = *ind_it;
+					auto next = std::next(n_it);
+//					auto edge = tree.in_edge(*next).first;
+//					if(*tree[edge].repeat_idx != idx)
+					if(tree.position_in_siblings(*next) != idx - 1)
+					{
+						// Given index does not match on this path, fail
+						ambiguous = true;
+						break;
+					}
+
+					// Matched okay
+					++ind_it;
+				}
+			}
+
+			// Also ensure all given indices were matched
+			if(ambiguous || ind_it != std::end(indices))
+			{
+				continue;
+			}
+
+/*			auto repeat = std::find_if(
 				std::begin(down_path),
 				std::end(down_path),
 				[&tree](node_t n)
@@ -378,17 +501,27 @@ namespace prm
 				// Have to pass downwards through a repeat node, therefore ambiguous search
 				continue;
 			}
-
+*/
 			result.insert(n);
 		}
 
 		return result;
 	}
 
-	param_accessor::node_t param_accessor::find_node_unambiguous(std::string const& name) const
+	param_accessor::node_t param_accessor::find_node_unambiguous(std::string const& name, indices_t const& indices) const
 	{
-		auto nodes = find_all_nodes(name);
+		auto nodes = find_all_nodes(name, indices);
 		return nodes.size() == 1 ? *nodes.begin() : ptree_t::null_vertex();
+	}
+
+	param_accessor::node_t param_accessor::node_here() const
+	{
+		return m_location_stk.top();
+	}
+
+	param_accessor::node_t param_accessor::node_at(qualified_path const& path) const
+	{
+		return node_from_path(path);
 	}
 
 }

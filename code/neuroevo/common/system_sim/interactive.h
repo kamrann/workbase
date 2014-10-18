@@ -3,8 +3,8 @@
 #ifndef __NE_RTP_PHYS_INTERACTIVE_CONRTOLLER_H
 #define __NE_RTP_PHYS_INTERACTIVE_CONRTOLLER_H
 
-#include "rtp_interactive_controller.h"
-#include "rtp_interactive_input.h"
+#include "interactive_controller.h"
+#include "interactive_input.h"
 
 #include "params/param.h"
 

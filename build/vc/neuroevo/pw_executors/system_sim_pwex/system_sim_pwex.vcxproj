@@ -36,12 +36,14 @@
     <Import Project="..\..\neuroevo.props" />
     <Import Project="..\..\..\eigen.props" />
     <Import Project="..\..\..\yaml_cpp_dbg.props" />
+    <Import Project="..\..\..\box2d_dbg.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="..\..\neuroevo.props" />
     <Import Project="..\..\..\eigen.props" />
     <Import Project="..\..\..\yaml_cpp_rls.props" />
+    <Import Project="..\..\..\box2d_rls.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -107,6 +109,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\common\systems\elevator\elevator.vcxproj">
       <Project>{04de12ba-9759-4abb-bd6f-dfecee19b0a9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\common\systems\physics2d\physics2d.vcxproj">
+      <Project>{ea47b4b9-816f-41bf-a52d-cd519cd99fcd}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\common\system_sim\system_sim.vcxproj">
       <Project>{cd95ca33-3886-4cc3-9f42-f32b2b2da3f7}</Project>

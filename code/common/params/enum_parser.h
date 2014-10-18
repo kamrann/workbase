@@ -21,9 +21,10 @@ namespace prm {
 			using qi::char_;
 			using qi::lexeme;
 
-			enum_value %= lexeme[alpha >> *(alnum | char_('_'))];
+			enum_value = +(char_ - char_(" ,{}"));
+				//lexeme[alpha >> *(alnum | char_('_'))];
 			
-			start %= lit("{") >> (enum_value % ',') >> lit("}");
+			start = lit("{") >> -(enum_value % ',') >> lit("}");
 		}
 
 		qi::rule< Iterator, std::string(), qi::space_type > enum_value;

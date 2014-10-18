@@ -15,16 +15,28 @@ template <
 class fixed_or_random
 {
 public:
-	fixed_or_random(T const& fixed = T()): m_val(fixed)
+	fixed_or_random(T const& fixed = T()): m_val{ fixed }, m_multiplier{ 1.0 }
 	{}
 
-	fixed_or_random(T const& rand_range_start, T const& rand_range_end): m_val(std::make_pair(rand_range_start, rand_range_end))
+	fixed_or_random(T const& rand_range_start, T const& rand_range_end): m_val{ std::make_pair(rand_range_start, rand_range_end) }, m_multiplier{ 1.0 }
 	{}
 
 	inline T get(RGen& rgen) const
 	{
 		visitor vis(rgen);
-		return boost::apply_visitor(vis, m_val);
+		return boost::apply_visitor(vis, m_val) * m_multiplier;
+	}
+
+	fixed_or_random& operator*= (T multiplier)
+	{
+		m_multiplier *= multiplier;
+		return *this;
+	}
+
+	fixed_or_random operator* (T multiplier) const
+	{
+		fixed_or_random res{ *this };
+		return res *= multiplier;
 	}
 
 private:
@@ -56,6 +68,7 @@ private:
 
 private:
 	var_t m_val;
+	T m_multiplier;
 };
 
 

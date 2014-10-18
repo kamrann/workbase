@@ -79,7 +79,8 @@ namespace detail {
 		};
 
 	protected:
-		typedef std::vector< node_descriptor >			child_list_t;
+		typedef std::vector< node_descriptor >			child_list_t;	// TODO: perhaps this should be a list
+																		// with vector, iterators can become invalid on node removal
 
 		/*! This implementation detail a little unusual. Since for a tree all nodes have exactly 1 in-edge (with the exception of the root which has 0), the distinction
 		between a child and an edge is somewhat blurred, unlike for a generic graph. So rather than have each node reference N edges, each of which then references 1 child,

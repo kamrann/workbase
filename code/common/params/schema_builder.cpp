@@ -90,7 +90,8 @@ namespace prm {
 			auto default_val = std::vector < std::string > {};
 			if(max_sel == 1)
 			{
-				default_val.push_back(min_sel == 0 ? unspecified : values.front().first);
+				bool const autoselect_singleoption = true;	// TODO: Make parameter
+				default_val.push_back(min_sel == 0 && (!autoselect_singleoption || values.size() != 1) ? unspecified : values.front().first);
 			}
 			n["default"] = default_val;
 

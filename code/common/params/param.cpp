@@ -20,6 +20,50 @@ namespace prm {
 			{ ParamType::Repeat, "repeat" },
 	};
 
+
+	fixed_or_random<
+		double,
+		std::uniform_real_distribution< double >,
+		std::default_random_engine
+	> extract_fixed_or_random(
+	prm::param const& p,
+	double default_value	// TODO: this would be used if we allow 'unspecified' val for all types, not only enum
+	)
+	{
+		// Try random
+		try
+		{
+			auto rnd = boost::get< random >(p);
+			if(rnd.is_fixed())
+			{
+				return{ rnd.as_fixed() };
+			}
+			else
+			{
+				return{ rnd.as_range().first, rnd.as_range().second };
+			}
+		}
+		catch(...)
+		{
+		}
+
+		// Try double
+		try
+		{
+			auto val = boost::get< double >(p);
+			return{ val };
+		}
+		catch(...)
+		{
+		}
+
+		// Int ??
+
+		// Fail
+		throw std::runtime_error{ "param cannot be interpreted as fixed_or_random" };
+	}
+
+
 #if 0
 	param instantiate_includes(param const& node, bool recursive)
 	{

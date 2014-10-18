@@ -27,6 +27,9 @@ namespace prm {
 		void enter_cmd_loop(std::istream& in, std::ostream& out, std::string const& quit_str = ":q");
 
 	private:
+		void reload_pt_schema();
+
+	private:
 		schema::schema_provider_map_handle m_provider;
 		param_tree& m_pt;
 		param_accessor m_accessor;

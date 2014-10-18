@@ -22,6 +22,21 @@ namespace prm
 	{
 	public:
 		typedef param_tree::param_data param_data;
+		typedef std::vector< size_t > indices_t;
+
+		enum class Match {
+			Exact,			// Node name must be identical to search term
+			Beginning,		// Node name must begin with (or be identical to) search term
+			Anywhere,		// Node name must contain (or be identical to) search term
+
+			None,
+		};
+
+		enum class MatchComparison {
+			Equal,						// All matches are considered equal
+			PreferExact,				// Exact matches hide non-exact matches
+			PreferBeginningOrExact,		// Beginning matches hide non-beginning, while exact hide all non-exact
+		};
 
 	public:
 		param_accessor(param_tree* pt = nullptr);
@@ -35,21 +50,29 @@ namespace prm
 		param operator[] (std::string const& name) const;
 		param& operator[] (char const* const name);
 		param operator[] (char const* const name) const;
+		param_data& find_param(qualified_path const& path);
 		param_data find_param(qualified_path const& path) const;
 		param_data find_param(std::string const& name) const;
 		param find_value(qualified_path const& path) const;
 		param find_value(std::string const& name) const;
+		param_data& param_here();
 		param_data param_here() const;
 		param& value_here();
 		param value_here() const;
-		qualified_path find_path(std::string const& name) const;
-		qualified_path find_path_descendent(std::string const& name) const;
+		qualified_path find_path(std::string const& name, indices_t const& indices = {}) const;
+		qualified_path find_path_descendent(std::string const& name, indices_t const& indices = {}) const;
 		qualified_path find_path_ancestor(std::string const& name) const;
-		//param_accessor from_absolute(qualified_path const& path) const;
 		bool move_to(qualified_path const& abs);
 		bool move_relative(qualified_path const& rel);
 		bool up();
 		bool revert();
+
+		void lock();
+		void unlock();
+		bool is_locked();
+		void set_lock_on_failed_move(bool autolock);
+
+		void set_match_method(Match match_type, MatchComparison comp_type);
 
 		std::list< qualified_path > children() const;
 
@@ -59,82 +82,33 @@ namespace prm
 	private:
 		typedef param_tree::tree_t ptree_t;
 		typedef ptree_t::node_descriptor node_t;
-//		typedef ptree_t::node_attribs_t node_attribs_t;
+
+	public:
+		node_t node_here() const;
+		node_t node_at(qualified_path const& path) const;
 
 	private:
 		bool has_pt() const;
 		node_t child_by_name(node_t n, std::string const& name) const;
 		qualified_path path_from_node(node_t n) const;
 		node_t node_from_path(qualified_path const& p) const;
-		//node_attribs_t&
 		param_data& node_attribs(node_t n);
 		param_data node_attribs(node_t n) const;
 
-		bool match_name(std::string const& search, std::string const& node_name) const;
-		std::set< node_t > find_all_nodes(std::string const& name) const;
-		node_t find_node_unambiguous(std::string const& name) const;
+		static Match match_name(std::string const& search, std::string const& node_name);
+		static bool match_qualifies(Match match, boost::optional< Match > existing, Match method, MatchComparison comp);
+		std::set< node_t > find_all_nodes(std::string const& name, indices_t const& indices = {}) const;
+		node_t find_node_unambiguous(std::string const& name, indices_t const& indices = {}) const;
 
 	private:
 		param_tree* m_pt;
 		std::stack< ptree_t::node_descriptor > m_location_stk;
+		bool m_locked;
+		bool m_auto_lock;
+		Match m_match_type;
+		MatchComparison m_comp_type;
 	};
 
-
-
-#if 0
-	class param_accessor
-	{
-	public:
-		
-
-	public:
-		param_accessor(
-			param p = param(),
-			/*param_tree* tree = nullptr,*/
-			qualified_path const& path = qualified_path(),
-			boost::optional< qualified_path > const& ignore = boost::none
-			):
-			m_root(p),
-			m_ignore(ignore)
-		{
-			m_path_stk.push(path);
-			m_all_paths = construct_abs_paths(m_root, qualified_path());
-		}
-
-		param get_root() const
-		{
-			return m_root;
-		}
-
-	public:
-		inline qualified_path get_current_path() const
-		{
-			return m_path_stk.top();
-		}
-
-		inline qualified_path where() const
-		{
-			return m_path_stk.top();
-		}
-
-		inline bool at_leaf() const
-		{
-			return m_path_stk.top().is_leaf();
-		}
-
-		inline std::set< qualified_path > const& get_all_paths() const
-		{
-			return m_all_paths;
-		}
-
-	private:
-		param m_root;
-		boost::optional< qualified_path > m_ignore;
-		std::stack< qualified_path > m_path_stk;
-
-		std::set< qualified_path > m_all_paths;
-	};
-#endif
 }
 
 

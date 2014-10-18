@@ -21,9 +21,36 @@
     <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WMultiIntervalDisplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WCommandLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WOutputConsoleBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WXHTMLOutputConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WPlainOutputConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\wt_custom_widgets\WCommandTerminal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WMultiIntervalDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WCommandLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WOutputConsoleBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WXHTMLOutputConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\wt_custom_widgets\WPlainOutputConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

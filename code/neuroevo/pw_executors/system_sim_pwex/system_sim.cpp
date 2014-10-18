@@ -5,8 +5,15 @@
 
 #include "systems/elevator/elevator_system_defn.h"
 #include "systems/elevator/elevator_system.h"
+#include "systems/elevator/elevator_agent_defn.h"
 #include "systems/elevator/dumb_elevator_controller.h"
-//#include "system_sim/"
+
+#include "systems/physics2d/phys2d_system_defn.h"
+#include "systems/physics2d/phys2d_system.h"
+#include "systems/physics2d/basic_biped_defn.h"
+
+#include "system_sim/passive_controller.h"
+#include "system_sim/system_state_values.h"
 
 #include "params/param_fwd.h"
 #include "params/param_tree.h"
@@ -25,6 +32,22 @@ extern "C" {
 		return "syssim";
 	}
 
+	std::map< std::string, std::unique_ptr< sys::i_system_defn > > sys_defns;
+
+	bool initialize_system_definitions()
+	{
+		sys_defns.clear();
+		std::unique_ptr< sys::i_system_defn > defn;
+
+		defn = sys::elev::elevator_system_defn::create_default();
+		sys_defns[defn->get_name()] = std::move(defn);
+
+		defn = sys::phys2d::phys2d_system_defn::create_default();
+		sys_defns[defn->get_name()] = std::move(defn);
+
+		return true;
+	}
+
 	char* pw_ex_run(char const* spec, void* context, pwork::pw_ex_update_cb_fn update_fn, pwork::pw_ex_buffer_alloc_fn alloc)
 	{
 		auto yaml_spec = YAML::Load(spec);
@@ -32,9 +55,16 @@ extern "C" {
 		auto pt = prm::param_tree::generate_from_yaml(yaml_spec);
 		auto acc = prm::param_accessor{ &pt };
 
-		// here determine system type
-		auto defn = std::make_shared< sys::elev::elevator_system_defn >();
-		defn->add_controller_defn("Preset", std::make_unique< sys::elev::dumb_elevator_controller_defn >());
+		// TODO: just once at dll startup
+		initialize_system_definitions();
+
+		auto sys_type = prm::extract_as< prm::enum_param_val >(acc["sys_type"])[0];
+		auto defn_it = sys_defns.find(sys_type);
+		if(defn_it == std::end(sys_defns))
+		{
+			return nullptr;
+		}
+		auto const& defn = defn_it->second;
 
 		auto sys = defn->create_system(acc);
 		// TODO: sys->set_random_seed(...);
@@ -50,7 +80,8 @@ extern "C" {
 		auto result_value_names = prm::extract_as< prm::enum_param_val >(acc["results"]);
 		for(auto const& res : result_value_names)
 		{
-			results[res] = sys->get_state_value(res);
+			auto bound_id = sys->get_state_value_binding(sys::state_value_id::from_string(res));
+			results[res] = sys->get_state_value(bound_id);
 		}
 
 		auto result = YAML::Dump(results);

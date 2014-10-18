@@ -295,14 +295,15 @@ namespace prm
 	///////////// TODO: Temp solution
 }
 
-#include <boost/random/mersenne_twister.hpp>
+//#include <boost/random/mersenne_twister.hpp>
+#include <random>
 
 namespace prm {
 
 	fixed_or_random<
 		double,
-		boost::random::uniform_real_distribution< double >,
-		boost::random::mt19937
+		std::uniform_real_distribution< double >,
+		std::default_random_engine
 	> extract_fixed_or_random(
 		prm::param const& node,
 		double default_value = 0.0

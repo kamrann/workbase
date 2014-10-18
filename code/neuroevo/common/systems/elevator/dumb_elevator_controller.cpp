@@ -18,16 +18,15 @@ namespace sys {
 
 		std::string dumb_elevator_controller_defn::update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
 		{
-			auto relative = get_name();
-			auto path = prefix + relative;
+			auto path = prefix;
 
 			(*provider)[path] = [=](prm::param_accessor acc)
 			{
-				auto s = sb::list(relative);
+				auto s = sb::list(path.leaf().name());
 				return s;
 			};
 
-			return relative;
+			return path.leaf().name();
 		}
 
 		controller_ptr dumb_elevator_controller_defn::create_controller() const
