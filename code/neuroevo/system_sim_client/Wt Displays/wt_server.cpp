@@ -1,21 +1,29 @@
 // wt_server.cpp
 
 #include "wt_server.h"
+
+#include "terminal.h"
+
 #include "chart.h"
 #include "drawer.h"
 
 #include "util/open_url.h"
 
+#include "wt_custom_widgets/WCommandLine.h"
+#include "wt_custom_widgets/WOutputConsoleBase.h"
+
 #include <Wt/WApplication>
 #include <Wt/WEnvironment>
 #include <Wt/WServer>
 #include <Wt/WContainerWidget>
+#include <Wt/WVBoxLayout>
 
 #include <string>
 #include <sstream>
 #include <memory>
 #include <map>
 #include <mutex>
+#include <condition_variable>
 
 
 unsigned long next_id = 0;
@@ -35,52 +43,144 @@ std::map< unsigned long, registered_display > display_data_mp;	// TODO: Prob nee
 std::mutex dd_mx;
 
 
+class wt_terminal_impl:
+	public i_terminal
+{
+public:
+	wt_terminal_impl(std::string session_id, WCommandLine* cmdline, WOutputConsoleBase* console):
+		m_session_id{ session_id },
+		m_cmdline{ cmdline },
+		m_console{ console }
+	{}
+
+public:
+	virtual void register_command_handler(cmd_handler_fn handler) override
+	{
+		post([this, handler]
+		{
+			m_cmdline->on_command().connect(std::bind(handler, std::placeholders::_1));
+		});
+	}
+	
+	virtual void output(std::string text) override
+	{
+		post([this, text] { m_console->add_element(text); Wt::WApplication::instance()->triggerUpdate(); });
+	}
+
+	virtual void set_prompt(std::string prompt) override
+	{
+		post([this, prompt] { m_cmdline->set_prompt(prompt); Wt::WApplication::instance()->triggerUpdate(); });
+	}
+
+private:
+	void post(std::function< void() > fn)
+	{
+		Wt::WServer::instance()->post(m_session_id, fn);
+	}
+
+private:
+	std::string m_session_id;
+	WCommandLine* m_cmdline;
+	WOutputConsoleBase* m_console;
+};
+
+std::mutex term_mx;
+std::condition_variable term_cv;
+std::unique_ptr< wt_terminal_impl > terminal;
+
+
 class wt_display_app:
 	public Wt::WApplication
 {
 public:
 	wt_display_app(const Wt::WEnvironment& env): Wt::WApplication(env)
 	{
+//		setCssTheme("polished");
+
 		auto title = env.getParameterValues("name")[0];
 		setTitle(title);
 
-		m_display_id = std::stoul(env.getParameterValues("id")[0]);
-
+		auto type = env.getParameterValues("type")[0];
+		if(type == "terminal")
 		{
-			std::lock_guard< std::mutex > lock_{ dd_mx };
-			auto& rd = display_data_mp.at(m_display_id);
-			rd.session_id = sessionId();
+			auto layout_ = new Wt::WVBoxLayout{};
+			layout_->setContentsMargins(0, 0, 0, 0);
+			root()->setLayout(layout_);
 
-			Wt::WWidget* disp = nullptr;
-			switch(rd.dd.type)
+			auto term = new terminal_display{};
+			layout_->addWidget(term);
+
 			{
-				case DisplayType::Chart:
-				{
-					auto const& data = boost::any_cast<chart_dd const&>(rd.dd.data);
-					auto chart_disp = new chart_display(data);
-					rd.disp = chart_disp;
-					disp = chart_disp;
-				}
-				break;
+				std::lock_guard< std::mutex > lock_{ term_mx };
 
-				case DisplayType::Drawer:
+				if(!terminal)
 				{
-					auto const& data = boost::any_cast<drawer_dd const&>(rd.dd.data);
-					auto drawer_disp = new drawer_display(data);
-					rd.disp = drawer_disp;
-					disp = drawer_disp;
+					terminal = std::make_unique< wt_terminal_impl >(
+						sessionId(),
+						term->get_cmdline(),
+						term->get_console()
+						);
 				}
-				break;
+				else
+				{
+					// hack to allow page reload to just update to the new terminal
+					*terminal = wt_terminal_impl{
+						sessionId(),
+						term->get_cmdline(),
+						term->get_console()
+					};
+				}
 			}
+			term_cv.notify_one();
+		}
+		else if(type == "display")
+		{
+			m_display_id = std::stoul(env.getParameterValues("id")[0]);
 
-			root()->addWidget(disp);
-
-/*	call update or not?
-if(!rd.dd.data.empty())
 			{
+				std::lock_guard< std::mutex > lock_{ dd_mx };
+				auto& rd = display_data_mp.at(m_display_id);
+				rd.session_id = sessionId();
+
+				Wt::WWidget* disp = nullptr;
+				switch(rd.dd.type)
+				{
+					case DisplayType::Chart:
+					{
+						auto const& data = boost::any_cast<chart_dd const&>(rd.dd.data);
+						auto chart_disp = new chart_display(data);
+						rd.disp = chart_disp;
+						disp = chart_disp;
+					}
+					break;
+
+					case DisplayType::Drawer:
+					{
+						auto const& data = boost::any_cast<drawer_dd const&>(rd.dd.data);
+						auto drawer_disp = new drawer_display(data);
+						rd.disp = drawer_disp;
+						disp = drawer_disp;
+					}
+					break;
+				}
+
+				root()->addWidget(disp);
+
+				/*	call update or not?
+				if(!rd.dd.data.empty())
+				{
 				rd.disp->update_from_data(rd.dd);
+				}
+				*/
 			}
-*/		}
+		}
+		else
+		{
+			// TODO: What is effect of throwing here? Kill Wt server?
+			throw std::runtime_error("invalid display type");
+		}
+
+		useStyleSheet("style/terminal.css");
 
 		enableUpdates(true);
 	}
@@ -124,6 +224,24 @@ void terminate_wt_server()
 }
 
 
+i_terminal* create_wt_terminal()
+{
+	std::stringstream url;
+	url << "http://";
+	url << "127.0.0.1:"; // TODO: Can't get WServer http address??
+	url << Wt::WServer::instance()->httpPort();
+	url << "/?name=system%20simulation%20terminal";	// TODO:
+	url << "&type=terminal";
+
+	open_url(url.str(), SW_SHOWNA);
+
+	std::unique_lock< std::mutex > lock_{ term_mx };
+	term_cv.wait(lock_, []{ return (bool)terminal; });
+
+	return terminal.get();
+}
+
+
 unsigned long create_wt_display(display_data data)
 {
 	auto const id = next_id++;
@@ -138,6 +256,7 @@ unsigned long create_wt_display(display_data data)
 	url << "127.0.0.1:"; // TODO: Can't get WServer http address??
 	url << Wt::WServer::instance()->httpPort();
 	url << "/?name=foo";	// TODO:
+	url << "&type=display";
 	url << "&id=" << id;
 
 	open_url(url.str(), SW_SHOWNA);

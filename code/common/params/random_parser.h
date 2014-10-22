@@ -17,37 +17,73 @@ namespace phx = boost::phoenix;
 namespace prm {
 
 	template < typename Iterator >
-	struct random_parser: qi::grammar< Iterator, random(), qi::space_type >
+	struct random_parser
 	{
-		random_parser(): random_parser::base_type(start)
-		{
-			using qi::lit;
-			using qi::double_;
-			using qi::_1;
-			using qi::_2;
-			using qi::_val;
-			
-			random_value =
-				double_
-				;
-			
-			random_range =
-				(double_ >> ',' >> double_)
-				[
-					_val = phx::construct< prm::random >(
-					phx::construct< std::pair< double, double > >(
-					_1, _2))
-				];
-			
-			start =
-				lit("[") >>
-				(random_range | random_value) >>
-				lit("]");
-		}
+		static const char open_ch = '[';
+		static const char close_ch = ']';
 
-		qi::rule< Iterator, random(), qi::space_type > random_value;
-		qi::rule< Iterator, random(), qi::space_type > random_range;
-		qi::rule< Iterator, random(), qi::space_type > start;
+		struct core: qi::grammar < Iterator, random(), qi::space_type >
+		{
+			core(): core::base_type(start)
+			{
+				using qi::double_;
+				using qi::_1;
+				using qi::_2;
+				using qi::_val;
+
+				random_value =
+					double_
+					;
+
+				random_range =
+					(double_ >> ',' >> double_)
+					[
+						_val = phx::construct< prm::random >(
+						phx::construct< std::pair< double, double > >(
+						_1, _2))
+					];
+
+				start =
+					(random_range | random_value)
+					;
+			}
+
+			qi::rule< Iterator, random(), qi::space_type > random_value;
+			qi::rule< Iterator, random(), qi::space_type > random_range;
+			qi::rule< Iterator, random(), qi::space_type > start;
+		};
+
+		struct strict: qi::grammar < Iterator, random(), qi::space_type >
+		{
+			strict(): strict::base_type(start)
+			{
+				using qi::lit;
+
+				start =
+					lit(open_ch) >>
+					cr >>
+					lit(close_ch);
+			}
+
+			qi::rule< Iterator, random(), qi::space_type > start;
+
+			core cr;
+		};
+
+		struct lax: qi::grammar < Iterator, random(), qi::space_type >
+		{
+			lax(): lax::base_type(start)
+			{
+				start =
+					str
+					| cr;
+			}
+
+			qi::rule< Iterator, random(), qi::space_type > start;
+
+			strict str;
+			core cr;
+		};
 	};
 
 }

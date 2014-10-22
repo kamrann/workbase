@@ -3,6 +3,8 @@
 #ifndef __WB_PARAMS_ENUM_PARSER_H
 #define __WB_PARAMS_ENUM_PARSER_H
 
+#include "enum_element_parser.h"
+
 #include <boost/spirit/include/qi.hpp>
 
 
@@ -11,24 +13,53 @@ namespace qi = boost::spirit::qi;
 namespace prm {
 
 	template < typename Iterator >
-	struct enum_parser: qi::grammar< Iterator, enum_param_val(), qi::space_type >
+	struct enum_parser
 	{
-		enum_parser(): enum_parser::base_type(start)
+		static const char open_ch = '{';
+		static const char close_ch = '}';
+
+		struct core: qi::grammar < Iterator, enum_param_val(), qi::space_type >
 		{
-			using qi::lit;
-			using qi::alpha;
-			using qi::alnum;
-			using qi::char_;
-			using qi::lexeme;
+			core(): core::base_type(start)
+			{
+				start = (element % ',');
+			}
 
-			enum_value = +(char_ - char_(" ,{}"));
-				//lexeme[alpha >> *(alnum | char_('_'))];
-			
-			start = lit("{") >> -(enum_value % ',') >> lit("}");
-		}
+			qi::rule< Iterator, enum_param_val(), qi::space_type > start;
 
-		qi::rule< Iterator, std::string(), qi::space_type > enum_value;
-		qi::rule< Iterator, enum_param_val(), qi::space_type > start;
+			enum_element_parser< Iterator > element;
+		};
+
+		struct strict: qi::grammar < Iterator, enum_param_val(), qi::space_type >
+		{
+			strict(): strict::base_type(start)
+			{
+				using qi::lit;
+
+				start =
+					lit(open_ch) >> -cr >> lit(close_ch);
+			}
+
+			qi::rule< Iterator, enum_param_val(), qi::space_type > start;
+
+			core cr;
+		};
+
+		struct lax: qi::grammar < Iterator, enum_param_val(), qi::space_type >
+		{
+			lax(): lax::base_type(start)
+			{
+				start =
+					str
+					| cr
+					;
+			}
+
+			qi::rule< Iterator, enum_param_val(), qi::space_type > start;
+
+			strict str;
+			core cr;
+		};
 	};
 
 }

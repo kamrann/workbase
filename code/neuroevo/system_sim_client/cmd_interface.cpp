@@ -9,6 +9,28 @@ m_os{ out }
 
 }
 
+cmd_interface::Result cmd_interface::process(std::string cmd_str)
+{
+/*	if(cmd_str == quit_str)
+	{
+
+	}
+	*/
+
+	auto pp_result = preprocess_cmd(cmd_str);
+	if(pp_result)
+	{
+		// Valid command
+		dispatch(std::move(pp_result.fn));
+		return Result::Success;
+	}
+	else
+	{
+		// Invalid command
+		return Result::ParseFailure;
+	}
+}
+
 void cmd_interface::enter_cmd_loop(std::istream& in, std::string const& quit_str)
 {
 	while(true)
@@ -23,16 +45,12 @@ void cmd_interface::enter_cmd_loop(std::istream& in, std::string const& quit_str
 			break;
 		}
 
-		auto pp_result = preprocess_cmd(input);
-		if(pp_result)
+		auto res = process(input);
+		switch(res)
 		{
-			// Valid command
-			dispatch(std::move(pp_result.fn));
-		}
-		else
-		{
-			// Invalid command
-			m_os << pp_result.err << std::endl;
+			case Result::ParseFailure:
+			m_os << "parse failure" << std::endl;// TODO: pp_result.err << std::endl;
+			break;
 		}
 	}
 }

@@ -14,30 +14,32 @@ namespace prm {
 
 	template < /*WorldDimensionality Dim,*/ typename Iterator >
 //	struct vector_parser: qi::grammar< Iterator, vec< Dim >(), qi::space_type >
-	struct vec2_parser: qi::grammar< Iterator, vec2(), qi::space_type >
+	struct vec2_parser
 	{
-		//typedef vec< Dim > vector_type;
 		typedef vec2 vector_type;
-//		enum { Dimensions = DimensionalityTraits< Dim >::Dimensions };
 
-		vec2_parser(): vec2_parser::base_type(start)
+		static const char open_ch = '(';
+		static const char close_ch = ')';
+
+		struct core: qi::grammar < Iterator, vector_type(), qi::space_type >
 		{
-			using qi::lit;
-			using qi::double_;
-			using qi::repeat;
-			using qi::as;
+			//typedef vec< Dim > vector_type;
+			//		enum { Dimensions = DimensionalityTraits< Dim >::Dimensions };
 
-			start %= 
-				lit("(") >>
-				double_ >>
-				lit(",") >>
-				double_ >>
-				lit(")")
-				;
+			core(): core::base_type(start)
+			{
+				using qi::lit;
+				using qi::double_;
 
-			/*
-			start %= as< std::vector< double > >()	// TODO: Don't understand why this is needed, since 
-					// exposed attribute type should already be vector< double >
+				start %=
+					double_ >>
+					lit(",") >>
+					double_
+					;
+
+				/*
+				start %= as< std::vector< double > >()	// TODO: Don't understand why this is needed, since
+				// exposed attribute type should already be vector< double >
 				[
 				lit("(") >>
 				double_ >>
@@ -50,17 +52,45 @@ namespace prm {
 				]
 				;
 				*/
-		}
+			}
 
-		qi::rule< Iterator, vector_type(), qi::space_type > start;
+			qi::rule< Iterator, vector_type(), qi::space_type > start;
+		};
+
+		struct strict: qi::grammar < Iterator, vector_type(), qi::space_type >
+		{
+			strict(): strict::base_type(start)
+			{
+				using qi::lit;
+
+				start =
+					lit(open_ch) >>
+					cr >>
+					lit(close_ch);
+			}
+
+			qi::rule< Iterator, vector_type(), qi::space_type > start;
+
+			core cr;
+		};
+
+		struct lax: qi::grammar < Iterator, vector_type(), qi::space_type >
+		{
+			lax(): lax::base_type(start)
+			{
+				start =
+					str
+					| cr
+					;
+			}
+
+			qi::rule< Iterator, vector_type(), qi::space_type > start;
+
+			strict str;
+			core cr;
+		};
 	};
 
-/*	template < typename Iterator >
-	using vec2_parser = vector_parser< WorldDimensionality::dim2D, Iterator >;
-	
-	template < typename Iterator >
-	using vec3_parser = vector_parser< WorldDimensionality::dim3D, Iterator >;
-	*/
 }
 
 

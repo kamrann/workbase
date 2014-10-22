@@ -26,7 +26,7 @@ namespace sys_control {
 
 		qi::rule< Iterator, chart_cmd(), qi::space_type > start;
 
-		prm::enum_parser< Iterator > enum_vals;
+		typename prm::enum_parser< Iterator >::lax enum_vals;
 	};
 
 }

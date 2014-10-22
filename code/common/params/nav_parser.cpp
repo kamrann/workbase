@@ -27,7 +27,7 @@ namespace prm {
 			lexeme[alpha >> *(alnum | char_('_'))];
 
 		rpt_indices_list =
-			*(lit('[') >> uint_ >> lit(']'))
+			*(lit('/') >> uint_)
 			;
 
 		nav_path =

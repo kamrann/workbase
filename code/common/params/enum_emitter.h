@@ -22,7 +22,7 @@ namespace prm {
 
 			enum_value %= string;
 			
-			start %= lit("{") << -(enum_value % ',') << lit("}");
+			start %= lit("{") << -(" " << (enum_value % ", ") << " ") << lit("}");
 		}
 
 		karma::rule< OutputIterator, std::string() > enum_value;

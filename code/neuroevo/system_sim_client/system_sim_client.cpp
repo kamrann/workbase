@@ -3,6 +3,8 @@
 
 #include "system_sim_client.h"
 //#include "sys_controller.h"
+#include "paramtree_fsm.h"
+
 #include "control_fsm.h"
 #include "sys_cmd_interface.h"
 #include "cmd_parser.h"
@@ -180,15 +182,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	auto sch = (*sch_mp)[root](dummy_acc);
 	auto pt = prm::param_tree::generate_from_schema(sch, sch_mp);
 
-	prm::cmdline_processor cmdln{ sch_mp, pt };
-	cmdln.enter_cmd_loop(std::cin, std::cout);
+//	prm::cmdline_processor cmdln{ sch_mp, pt };
+//	cmdln.enter_cmd_loop(std::cin, std::cout);
 
 	arg_list server_args{
 		"system_sim_client.exe",
 		"--docroot", ".",
 		"--http-address", "0.0.0.0",
-		"--http-port", "8080",
-		"--accesslog", "NUL"
+		"--http-port", "8080"
+//		, "--accesslog", "NUL"
 	};
 
 	auto server_ok = start_wt_server(server_args);
@@ -230,19 +232,59 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	*/
 
-	sys_control::fsm::system_controller sys_ctrl{ std::move(sys_defns), std::move(pt), [](std::string prompt)
-	{
-		std::cout << std::endl << prompt;
-	} };
-	std::thread ctrl_thread{ [&sys_ctrl]
-	{
-		sys_ctrl.start();
-	} };
+	auto term = create_wt_terminal();
 
+	auto sink = [term](std::string text)
+	{
+		term->output(text);
+	};
+
+	auto prompt_cb = [term](std::string prompt)
+	{
+		term->set_prompt(prompt);
+	};
+
+
+//	prm::cmdline_processor cmdln{ sch_mp, pt };
+//	cmdln.enter_cmd_loop(std::cin, std::cout);
+	prm::fsm::paramtree_editor ptree_ctrl{ std::move(pt), sch_mp, sink };
+
+	term->register_command_handler([&ptree_ctrl, term](std::string cmd)
+	{
+		// NOTE: This handler is invoked from a Wt session thread
+		std::cout << "cmd [" << cmd << "]" << std::endl;
+
+		ptree_ctrl.process_event(clsm::ev_command{ cmd });
+
+		auto prompt = ptree_ctrl.get_prompt();
+		term->set_prompt(prompt);
+	});
+
+	ptree_ctrl.initiate();
+	term->set_prompt(ptree_ctrl.get_prompt());
+
+	while(true)
+	{
+		std::this_thread::sleep_for(std::chrono::seconds{ 1 });
+	}
+
+
+	sys_control::fsm::system_controller sys_ctrl{ std::move(sys_defns), std::move(pt), sink, prompt_cb };
 	sys_control::sys_cmd_interface cmd_if{ sys_ctrl, std::cout };
-	cmd_if.enter_cmd_loop(std::cin);
 
-	sys_ctrl.terminate();
+	term->register_command_handler([&cmd_if](std::string cmd)
+	{
+		// NOTE: This handler is invoked from a Wt session thread
+		std::cout << "cmd [" << cmd << "]" << std::endl;
+
+		cmd_if.process(cmd);
+	});
+
+//	cmd_if.enter_cmd_loop(std::cin);
+
+	sys_ctrl.start();
+
+	// ?? sys_ctrl.terminate();
 
 	terminate_wt_server();
 

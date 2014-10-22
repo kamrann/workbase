@@ -6,6 +6,8 @@
 WXHTMLOutputConsole::WXHTMLOutputConsole()
 {
 	setTextFormat(Wt::XHTMLText);
+
+	addStyleClass("console");
 }
 
 void WXHTMLOutputConsole::update_display()

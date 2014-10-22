@@ -34,11 +34,18 @@ public:
 		std::string err;
 	};
 
+	enum class Result {
+		ParseFailure,
+		Quit,
+		Success,
+	};
+
 public:
 	cmd_interface(std::ostream& out);
 
 public:
 	void enter_cmd_loop(std::istream& in, std::string const& quit_str = ":q");
+	Result process(std::string cmd_str);
 
 private:
 	virtual std::string prompt() const = 0;

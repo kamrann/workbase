@@ -11,19 +11,45 @@ namespace qi = boost::spirit::qi;
 namespace prm {
 
 	template < typename Iterator >
-	struct string_parser: qi::grammar< Iterator, std::string(), qi::space_type >
+	struct string_parser
 	{
-		string_parser(): string_parser::base_type(start)
+		static const char quote_ch = '\"';
+
+		struct strict: qi::grammar < Iterator, std::string(), qi::space_type >
 		{
-			using qi::lit;
-			using qi::char_;
-			using qi::lexeme;
+			strict(): strict::base_type(start)
+			{
+				using qi::lit;
+				using qi::char_;
+				using qi::lexeme;
 
-			// TODO: also single quote
-			start %= lit('\"') >> lexeme[*(char_ - lit('\"'))] >> lit('\"');
-		}
+				start =
+					lexeme
+					[
+						lit(quote_ch) >>
+						*(char_ - lit(quote_ch)) >>
+						lit(quote_ch)
+					];
+			}
 
-		qi::rule< Iterator, std::string(), qi::space_type > start;
+			qi::rule< Iterator, std::string(), qi::space_type > start;
+		};
+
+		struct lax: qi::grammar < Iterator, std::string(), qi::space_type >
+		{
+			lax(): lax::base_type(start)
+			{
+				using qi::string_;
+
+				start =
+					str
+					| string_;
+			}
+
+			qi::rule< Iterator, std::string(), qi::space_type > start;
+
+			strict str;
+		};
 	};
 
 }

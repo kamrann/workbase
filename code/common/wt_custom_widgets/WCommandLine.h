@@ -9,7 +9,7 @@
 
 
 namespace Wt {
-	class WText;
+	class WLabel;
 	class WLineEdit;
 }
 
@@ -26,7 +26,7 @@ public:
 	Wt::Signal< std::string >& on_command();
 
 private:
-	Wt::WText* m_prompt;
+	Wt::WLabel* m_prompt;
 	Wt::WLineEdit* m_command_edit;
 
 	Wt::Signal< std::string > m_cmd_signal;

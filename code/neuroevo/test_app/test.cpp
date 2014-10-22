@@ -163,112 +163,56 @@ struct Sine
 
 #endif
 
+#include <boost/variant/static_visitor.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+namespace qi = boost::spirit::qi;
+namespace phx = boost::phoenix;
 
-namespace sb = prm::schema;
 
+struct vis: public boost::static_visitor < void >
+{
+	template < typename T >
+	result_type operator() (T const&)
+	{
+		std::cout << T::value << std::endl;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-#if 0
-	sb::schema_provider_map_handle sch_mp = std::make_shared< sb::schema_provider_map >();
-	prm::qualified_path path;
+	typedef std::string::const_iterator iter_t;
 
-	path += std::string{ "root" };
-	path += std::string{ "container" };
+	struct one_t{ enum { value = 1 }; };
+	struct two_t{ enum { value = 2 }; };
 
-	(*sch_mp)[path + prm::qualified_path{ "some_bool" }] = [](prm::param_accessor& acc)
+	qi::rule< iter_t, boost::variant< one_t, two_t >() > p;
+
 	{
-		auto s = sb::boolean("some_bool", true);
-		return s;
-	};
-	(*sch_mp)[path + prm::qualified_path{ "some_vec" }] = [](prm::param_accessor& acc)
-	{
-		auto s = sb::vector2("some_vec", prm::vec2{ -1.0, 1.0 });
-		return s;
-	};
-	(*sch_mp)[path + prm::qualified_path{ "some_random" }] = [](prm::param_accessor& acc)
-	{
-		auto s = sb::random("some_random", 0.0, boost::none, boost::none);
-		return s;
-	};
-	(*sch_mp)[path + prm::qualified_path{ "some_enum" }] = [](prm::param_accessor& acc)
-	{
-		auto s = sb::enum_selection(
-			"some_enum",
-			std::vector < std::string > { "apple", "orange", "banana" },
-			0,
-			1
-			);
-		return s;
-	};
+		qi::rule< iter_t, one_t() > one = qi::lit("one")[qi::_val = phx::val(one_t{})];
+		qi::rule< iter_t, two_t() > two = qi::lit("two")[qi::_val = phx::val(two_t{})];
 
-	(*sch_mp)[path] = [=](prm::param_accessor& acc)
-	{
-		auto s = sb::list("container");
-		sb::append(s, sch_mp->at(path + std::string{ "some_bool" })(acc));
-		sb::append(s, sch_mp->at(path + std::string{ "some_vec" })(acc));
-		sb::append(s, sch_mp->at(path + std::string{ "some_random" })(acc));
-		sb::append(s, sch_mp->at(path + std::string{ "some_enum" })(acc));
-		return s;
-	};
-
-	path.pop();
-
-	(*sch_mp)[path + prm::qualified_path{ "some_int" }] = [](prm::param_accessor& acc)
-	{
-		auto s = sb::integer("some_int", 0);
-		return s;
-	};
-	(*sch_mp)[path + prm::qualified_path{ "some_string" }] = [](prm::param_accessor& acc)
-	{
-		auto s = sb::string("some_string", "default");
-		return s;
-	};
-
-	(*sch_mp)[path] = [=](prm::param_accessor& acc)
-	{
-		auto s = sb::list("root");
-		sb::append(s, sch_mp->at(path + std::string{ "container" })(acc));
-		sb::append(s, sch_mp->at(path + std::string{ "some_int" })(acc));
-		sb::append(s, sch_mp->at(path +std::string{ "some_string" })(acc));
-		return s;
-	};
-
-	auto root = path;
-#endif
-
-	std::shared_ptr< sys::i_system_defn > defn = std::make_shared< sys::elev::elevator_system_defn >();
-	defn->add_agent_defn("Default", std::make_unique< sys::elev::elevator_agent_defn >());
-	defn->add_controller_defn("Preset", std::make_unique< sys::elev::dumb_elevator_controller_defn >());
-
-	auto sch_mp = std::make_shared< sb::schema_provider_map >();
-	auto root = defn->update_schema_provider(sch_mp, prm::qualified_path{ "the_root" });
-
-
-	auto dummy_acc = prm::param_accessor{};
-	auto sch = (*sch_mp)[root](dummy_acc);
-	auto pt = prm::param_tree::generate_from_schema(sch, sch_mp);
-
-	auto as_yaml = pt.convert_to_yaml();
-	std::cout << YAML::Dump(as_yaml) << std::endl;
-
-	//pt = prm::param_tree::generate_from_yaml(as_yaml);
-
-	prm::cmdline_processor cmdln{ sch_mp, pt };
-	cmdln.enter_cmd_loop(std::cin, std::cout);
-
-	auto system = defn->create_system(prm::param_accessor{ &pt });
-	system->initialize();
-
-	bool active = true;
-	while(active)
-	{
-		active = system->update(nullptr);
+		p = one.copy() | two.copy();
 	}
 
-	std::cout << "Time: " << system->get_state_value("Time") << std::endl;
-	std::cout << "# Waiting: " << system->get_state_value("# Waiting") << std::endl;
+	while(true)
+	{
+		boost::variant< one_t, two_t > attr;
 
+		std::string input;
+		std::getline(std::cin, input);
+		auto it = std::begin(input);
+		auto result = qi::phrase_parse(it, std::end(input), p, qi::space_type{}, attr);
+		if(!result)
+		{
+			std::cout << "parse failure" << std::endl;
+		}
+		else
+		{
+			vis v{};
+			boost::apply_visitor(v, attr);
+		}
+	}
 
 #if 0
 	auto lcounts = nnet::mlp::layer_counts_t{ 6, 4, 2 };

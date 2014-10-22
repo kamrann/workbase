@@ -1,14 +1,6 @@
-// control_fsm.cpp
+// .cpp
 
-#include "control_fsm.h"
-
-#include "system_sim/system_defn.h"
-#include "system_sim/system.h"
-
-#include "params/param_accessor.h"
-
-#include <chrono>
-#include <thread>
+#include ".h"
 
 
 namespace sys_control {
@@ -17,10 +9,12 @@ namespace sys_control {
 		system_controller::system_controller(
 			std::map< std::string, std::shared_ptr< sys::i_system_defn > > _sys_defns,
 			prm::param_tree _pt,
+			std::function< void(std::string) > _output_sink,
 			std::function< void(std::string) > _prompt_callback
 			):
 			sys_defns{ std::move(_sys_defns) },
 			ptree{ std::move(_pt) },
+			output_sink{ _output_sink },
 			prompt_callback{ _prompt_callback }
 		{
 
@@ -131,13 +125,30 @@ namespace sys_control {
 */		}
 
 		// Advances the system by a single update frame
-		bool active::step_system()
+		bool active::step_system(frame_update_cfg const& cfg)
 		{
 			auto still_going = sys->update(nullptr);
 
-			// TODO: do stuff
+			if(cfg.output_updates)
+			{
+				output_state_values(update_vals);
+			}
+
+			++frame;
 
 			return still_going;
+		}
+
+		bool active::step_system(size_t frames, frame_update_cfg const& cfg)
+		{
+			for(size_t i = 0; i < frames; ++i)
+			{
+				if(!step_system(cfg))
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 
 		void active::output_state_values(sys::state_value_id_list const& svids) const
@@ -148,8 +159,9 @@ namespace sys_control {
 			{
 				auto bound = sys->get_state_value_binding(v_id);
 				auto value = sys->get_state_value(bound);
-				// TODO: output sink
-				std::cout << v_id.to_string() << ": " << value << std::endl;
+				std::stringstream ss;
+				ss << v_id.to_string() << ": " << value;
+				context< system_controller >().output_sink(ss.str());
 			}
 		}
 
@@ -197,10 +209,11 @@ namespace sys_control {
 			return "@paused>";
 		}
 
-		sc::result paused::react(ev_step const&)
+		sc::result paused::react(ev_step const& ev)
 		{
 			// Step system
-			auto still_going = context< active >().step_system();
+			auto frames = ev.frames ? *ev.frames : 1;
+			auto still_going = context< active >().step_system(frames);
 
 			if(still_going)
 			{
@@ -220,12 +233,21 @@ namespace sys_control {
 			post_event(ev);
 			return transit< running >();
 		}
-
-		completed::completed(my_context ctx): my_base(ctx)
+		
+		completed::completed(my_context ctx): innermost_state_base(ctx)
 		{
-			context< system_controller >().prompt_callback(get_prompt());
-		}
+			auto& ctrl = context< system_controller >();
+			ctrl.output_sink("system completed");
 
+			// Output result values
+			auto& atv = context< active >();
+			if(!atv.result_vals.empty())
+			{
+				ctrl.output_sink("result state values:");
+				atv.output_state_values(atv.result_vals);
+			}
+		}
+		
 		std::string completed::get_prompt() const
 		{
 			return "@completed>";
@@ -248,7 +270,7 @@ namespace sys_control {
 			}
 
 			bool still_going = true;
-			while(still_going && !interrupt_requested())//!context< system_controller >().commands_waiting())
+			while(still_going && !interrupt_requested())
 			{
 				if(run_framerate)
 				{
@@ -256,8 +278,7 @@ namespace sys_control {
 					std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::milliseconds>(dur));
 				}
 
-				still_going = context< active >().step_system();
-					//update_frame(cfg);
+				still_going = context< active >().step_system(cfg);
 			}
 
 			if(!still_going)
@@ -309,6 +330,12 @@ namespace sys_control {
 		sc::result running::react(ev_run const& ev)
 		{
 			run_framerate = ev.frame_rate;
+			if(run_framerate && *run_framerate == 0.0)
+			{
+				// Set realtime frame rate for system
+				run_framerate = 1.0;	// TODO:
+			}
+
 			interrupt_request = false;
 			run_thread = std::thread{ [this]{ do_run(); } };
 			

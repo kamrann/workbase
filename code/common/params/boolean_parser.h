@@ -11,17 +11,22 @@ namespace qi = boost::spirit::qi;
 namespace prm {
 
 	template < typename Iterator >
-	struct boolean_parser: qi::grammar< Iterator, bool(), qi::space_type >
+	struct boolean_parser
 	{
-		boolean_parser(): boolean_parser::base_type(start)
+		struct core: qi::grammar < Iterator, bool(), qi::space_type >
 		{
-			using qi::bool_;
+			core(): core::base_type(start)
+			{
+				using qi::bool_;
 
-			// TODO: expand to allow t/f or 1/0?
-			start %= bool_;
-		}
+				// TODO: expand to allow t/f or 1/0?
+				start %= bool_;
+			}
 
-		qi::rule< Iterator, bool(), qi::space_type > start;
+			qi::rule< Iterator, bool(), qi::space_type > start;
+		};
+
+		typedef core strict, lax;
 	};
 
 }

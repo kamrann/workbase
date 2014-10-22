@@ -36,13 +36,13 @@ namespace prm {
 				;
 		}
 
-		boolean_parser< Iterator > boolean;
-		integer_parser< Iterator > integer;
-		realnum_parser< Iterator > realnum;
-		enum_parser< Iterator > enumeration;
-		string_parser< Iterator > string_;
-		vec2_parser< Iterator > vec2_;
-		random_parser< Iterator > random_;
+		typename boolean_parser< Iterator >::strict boolean;
+		typename integer_parser< Iterator >::strict integer;
+		typename realnum_parser< Iterator >::strict realnum;
+		typename enum_parser< Iterator >::strict enumeration;
+		typename string_parser< Iterator >::strict string_;
+		typename vec2_parser< Iterator >::strict vec2_;
+		typename random_parser< Iterator >::strict random_;
 
 		qi::rule< Iterator, param(), qi::space_type > start;
 	};

@@ -22,54 +22,70 @@ namespace prm {
 	}
 
 	template < typename Iterator >
-	struct realnum_parser: qi::grammar< Iterator, double(), qi::space_type >
+	struct realnum_parser
 	{
-		realnum_parser(): realnum_parser::base_type(start)
+		struct strict: qi::grammar < Iterator, double(), qi::space_type >
 		{
-			//using qi::double_;
-			using qi::lexeme;
-			using qi::matches;
-			using qi::digit;
-			using qi::string;
-			using qi::char_;
-			using qi::_val;
-			using qi::_1;
+			strict(): strict::base_type(start)
+			{
+				using qi::lexeme;
+				using qi::matches;
+				using qi::digit;
+				using qi::string;
+				using qi::char_;
+				using qi::_val;
+				using qi::_1;
 
-			// For strict parsing, as used when parsing a value when the type isn't known in advance, need to
-			// differentiate real number from integer unambiguously. Therefore, require decimal point.
-			minus =
-				string("-")
-				;
+				// For strict parsing, as used when parsing a value when the type isn't known in advance, need to
+				// differentiate real number from integer unambiguously. Therefore, require decimal point.
+				minus =
+					string("-")
+					;
 
-			before =
-				string("0")
-				| char_("1-9") >> *digit
-				;
+				before =
+					string("0")
+					| char_("1-9") >> *digit
+					;
 
-			dp =
-				string(".")
-				;
+				dp =
+					string(".")
+					;
 
-			after =
-				*digit
-				;
+				after =
+					*digit
+					;
 
-			value_as_string =
-				-minus >> -before >> dp >> after
-				;
+				value_as_string =
+					-minus >> -before >> dp >> after
+					;
 
-			start = value_as_string
-				[
-					_val = phx::bind(&detail::convert_double, _1)
-				];
-		}
+				start = value_as_string
+					[
+						_val = phx::bind(&detail::convert_double, _1)
+					];
+			}
 
-		qi::rule< Iterator, std::string() > minus;
-		qi::rule< Iterator, std::string() > before;
-		qi::rule< Iterator, std::string() > dp;
-		qi::rule< Iterator, std::string() > after;
-		qi::rule< Iterator, std::string() > value_as_string;
-		qi::rule< Iterator, double(), qi::space_type > start;
+			qi::rule< Iterator, std::string() > minus;
+			qi::rule< Iterator, std::string() > before;
+			qi::rule< Iterator, std::string() > dp;
+			qi::rule< Iterator, std::string() > after;
+			qi::rule< Iterator, std::string() > value_as_string;
+			qi::rule< Iterator, double(), qi::space_type > start;
+		};
+
+		struct lax: qi::grammar < Iterator, double(), qi::space_type >
+		{
+			lax(): lax::base_type(start)
+			{
+				using qi::double_;
+
+				start =
+					double_
+					;
+			}
+
+			qi::rule< Iterator, double(), qi::space_type > start;
+		};
 	};
 
 }

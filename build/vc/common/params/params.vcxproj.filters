@@ -153,6 +153,15 @@
     <ClInclude Include="..\..\..\..\code\common\params\save_cmd_parser.h">
       <Filter>io\commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\enum_add_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\enum_element_parser.h">
+      <Filter>io\terminals\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.h">
+      <Filter>io\commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\common\params\stdafx.cpp">
@@ -207,6 +216,12 @@
       <Filter>io\commands</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\common\params\save_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\enum_add_cmd_parser.cpp">
+      <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.cpp">
       <Filter>io\commands</Filter>
     </ClCompile>
   </ItemGroup>

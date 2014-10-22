@@ -47,8 +47,9 @@ bool open_url(std::string const& url, int showcmd)
 	se_inf.fMask = SEE_MASK_FLAG_NO_UI;
 	se_inf.lpVerb = "open";
 	// TODO: configurable by function arguments. also dependent on browser, currently just assuming chrome
-	auto params = std::string{ "--new-window --app=" };
-	params += url;
+	auto params = std::string{};
+	params += " --new-window";
+	params += " --app=" + url;
 	se_inf.lpParameters = params.c_str();
 	se_inf.lpFile = url.c_str();
 	se_inf.nShow = showcmd;

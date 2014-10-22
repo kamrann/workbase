@@ -28,29 +28,6 @@ namespace sys_control {
 				auto ev = fsm::ev_reset{};
 				ev.seed = cmd.seed;
 				_ctrl.process_event(ev);
-#if 0
-				if(_ctrl.mode() != Mode::Stopped && _ctrl.mode() != Mode::Completed)
-				{
-					// todo:
-					return;
-				}
-
-				boost::optional< unsigned int > rseed;
-				switch(cmd.seed.method)
-				{
-					case reset_cmd::seed_data::SeedMethod::Random:
-					rseed = static_cast<uint32_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff);
-					break;
-
-					case reset_cmd::seed_data::SeedMethod::Fixed:
-					rseed = cmd.seed.value;
-					break;
-
-					default:	// Same - leave rseed uninitialized so argument will be ignored and seed left unchanged
-					break;
-				}
-				_ctrl.reset_system(rseed);
-#endif
 			};
 		}
 
@@ -59,18 +36,9 @@ namespace sys_control {
 			auto& _ctrl = ctrl;
 			return [&_ctrl, cmd]
 			{
-				_ctrl.process_event(fsm::ev_step{});
-#if 0
-				if(_ctrl.mode() != Mode::Stopped)
-				{
-					// todo:
-					return;
-				}
-
-				unsigned int frames = cmd.frames ? *cmd.frames : 1u;
-
-				_ctrl.step(frames);
-#endif
+				auto ev = fsm::ev_step{};
+				ev.frames = cmd.frames;
+				_ctrl.process_event(ev);
 			};
 		}
 
@@ -82,21 +50,6 @@ namespace sys_control {
 				auto ev = fsm::ev_run{};
 				ev.frame_rate = cmd.frame_rate;
 				_ctrl.process_event(ev);
-#if 0
-				if(_ctrl.mode() != Mode::Stopped)
-				{
-					return;
-				}
-
-				auto frame_rate = cmd.frame_rate;
-				if(frame_rate && *frame_rate == 0.0)
-				{
-					// Set realtime frame rate for system
-					frame_rate = 1.0;	// TODO:
-				}
-
-				_ctrl.run(frame_rate);
-#endif
 			};
 		}
 
@@ -106,14 +59,6 @@ namespace sys_control {
 			return [&_ctrl, cmd]
 			{
 				_ctrl.process_event(fsm::ev_pause{});
-#if 0
-				if(_ctrl.mode() != Mode::Running)
-				{
-					return;
-				}
-
-				_ctrl.stop();
-#endif
 			};
 		}
 
@@ -122,21 +67,12 @@ namespace sys_control {
 			auto& _ctrl = ctrl;
 			return [&_ctrl, cmd]
 			{
-#if 0
-				if(_ctrl.mode() != Mode::Stopped && _ctrl.mode() != Mode::Completed)
-				{
-					return;
-				}
-#endif
 				auto val_ids = sys::state_value_id_list{};
 				for(auto const& str : cmd.values)
 				{
 					val_ids.push_back(sys::state_value_id::from_string(str));
 				}
 				_ctrl.process_event(fsm::ev_get{ val_ids });
-#if 0
-				_ctrl.output_values(val_ids);
-#endif
 			};
 		}
 

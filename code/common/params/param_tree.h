@@ -80,6 +80,11 @@ namespace prm
 			return m_tree;
 		}
 
+		inline tree_t const& tree() const
+		{
+			return m_tree;
+		}
+
 	private:
 		static param generate_default_terminal(schema::schema_node s);
 		void generate_from_schema(schema::schema_node s, tree_t::node_descriptor node, param_accessor acc, schema::schema_provider_map_handle sch_mp);

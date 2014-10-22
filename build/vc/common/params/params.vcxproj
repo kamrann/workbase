@@ -87,8 +87,11 @@
     <ClInclude Include="..\..\..\..\code\common\params\cmdline.h" />
     <ClInclude Include="..\..\..\..\code\common\params\cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\debug_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\enum_add_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\enum_element_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\enum_emitter.h" />
     <ClInclude Include="..\..\..\..\code\common\params\enum_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\integer_emitter.h" />
     <ClInclude Include="..\..\..\..\code\common\params\integer_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\list_cmd_parser.h" />
@@ -127,6 +130,8 @@
     <ClCompile Include="..\..\..\..\code\common\params\cmdline.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\debug_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\enum_add_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\list_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\load_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\nav_cmd_parser.cpp" />
