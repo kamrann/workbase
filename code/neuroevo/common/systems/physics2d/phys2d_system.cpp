@@ -3,6 +3,7 @@
 #include "phys2d_system.h"
 #include "phys2d_system_defn.h"
 #include "phys2d_entity_data.h"
+#include "phys2d_object.h"
 #include "phys2d_sensors.h"
 #include "phys2d_systemstatevalues.h"
 #include "scenario.h"
@@ -303,7 +304,10 @@ namespace sys {
 				i_controller::input_list_t inputs;
 				for(auto const& input_id : required_inputs)
 				{
-					inputs.push_back(agent.get_sensor_value(input_id));
+					auto bound = get_state_value_binding(input_id);
+					auto value = get_state_value(bound);
+					inputs.push_back(value);
+						//agent.get_sensor_value(input_id));
 				}
 
 				auto outputs = controller.process(inputs);
@@ -346,7 +350,6 @@ namespace sys {
 
 		void phys2d_system::on_contact(b2Contact* contact, ContactType ctype)
 		{
-#if 0
 			auto fixA = contact->GetFixtureA();
 			auto fixB = contact->GetFixtureB();
 
@@ -373,24 +376,23 @@ namespace sys {
 				auto edA = get_body_data(bodyA);
 				auto edB = get_body_data(bodyB);
 
-				agent_body* agentA = nullptr;
+				object* objA = nullptr;
 				if(edA && edA->type == entity_data::Type::Agent)
 				{
-					agentA = boost::any_cast<agent_body*>(edA->type_value);
-					agentA->on_contact(fixA, fixB, ctype);
+					objA = boost::any_cast<object*>(edA->type_value);
+					objA->on_contact(fixA, fixB, ctype);
 				}
 
 				if(edB && edB->type == entity_data::Type::Agent)
 				{
-					auto agentB = boost::any_cast<agent_body*>(edB->type_value);
-					bool same_entity = agentB == agentA;
+					auto objB = boost::any_cast<object*>(edB->type_value);
+					bool same_entity = objB == objA;
 					if(!same_entity)
 					{
-						agentB->on_contact(fixB, fixA, ctype);
+						objB->on_contact(fixB, fixA, ctype);
 					}
 				}
 			}
-#endif
 		}
 
 		void phys2d_system::BeginContact(b2Contact* contact)

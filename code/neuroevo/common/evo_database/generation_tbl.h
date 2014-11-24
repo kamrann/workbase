@@ -20,7 +20,9 @@ public:
 
 	dbo::ptr< evo_run >		run;
 	int						index;
-	double					genotype_diversity;		// TODO: type...?
+	std::string				highest_obj_val;	// Stored as YAML, either single real value, or sequence of pareto components
+	double					genetic_diversity;		// TODO: type...?
+	// TODO: highest objective value - perhaps just have 2 obj val types, double and pareto< double... >
 	genome_list				genomes;
 
 	inline size_t population_size() const
@@ -32,7 +34,8 @@ public:
 	void persist(Action& a)
 	{
 		dbo::field(a, index, "index");
-		dbo::field(a, genotype_diversity, "genotype_diversity");
+		dbo::field(a, highest_obj_val, "highest_obj_val");
+		dbo::field(a, genetic_diversity, "genetic_diversity");
 
 		dbo::belongsTo(a, run, "generation__evo_run", dbo::NotNull | dbo::OnDeleteCascade);
 

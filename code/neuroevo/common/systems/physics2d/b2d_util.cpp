@@ -52,7 +52,19 @@ void draw_body(b2Body const* b, Wt::WPainter& painter)
 			}
 			break;
 
-			// TODO: edge/chain
+			case b2Shape::e_edge:
+			{
+				auto edge = (b2EdgeShape const*)shape;
+				painter.drawLine(
+					edge->m_vertex1.x,
+					edge->m_vertex1.y,
+					edge->m_vertex2.x,
+					edge->m_vertex2.y
+					);
+			}
+			break;
+
+			// TODO: chain
 		}
 
 		fix = fix->GetNext();

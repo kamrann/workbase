@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <set>
+#include <map>
 
 
 template < typename Comp >
@@ -39,6 +40,11 @@ private:
 	}
 */
 public:
+	inline size_t size() const
+	{
+		return components.size();
+	}
+
 	inline comp_t& operator[] (size_t i)
 	{
 		return components[i];

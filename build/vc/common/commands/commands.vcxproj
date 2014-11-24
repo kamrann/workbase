@@ -76,12 +76,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\common\commands\cmd_input.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\commands\history.cpp" />
     <ClCompile Include="..\..\..\..\code\common\commands\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\common\commands\cmd.h" />
+    <ClInclude Include="..\..\..\..\code\common\commands\cmd_input.h" />
+    <ClInclude Include="..\..\..\..\code\common\commands\history.h" />
     <ClInclude Include="..\..\..\..\code\common\commands\stdafx.h" />
     <ClInclude Include="..\..\..\..\code\common\commands\targetver.h" />
   </ItemGroup>

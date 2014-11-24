@@ -1,0 +1,135 @@
+- root
+- container
+-
+  -
+    - ga_cfg
+    - container
+    -
+      -
+        - pop_size
+        - int
+        - 10
+      -
+        - crossover
+        - container
+        -
+          -
+            - cx_rate
+            - container
+            -
+              -
+                - type
+                - enum
+                -
+                  - fixed
+              -
+                - fixed
+                - container
+                -
+                  -
+                    - rate
+                    - real
+                    - 1
+          -
+            - cx_op
+            - container
+            -
+              -
+                - func_opt
+                - container
+      -
+        - mutation
+        - container
+        -
+          -
+            - mut_rate
+            - container
+            -
+              -
+                - type
+                - enum
+                -
+                  - fixed
+              -
+                - fixed
+                - container
+                -
+                  -
+                    - rate
+                    - real
+                    - 0.4
+          -
+            - mut_op
+            - container
+            -
+              -
+                - func_opt
+                - container
+                -
+                  -
+                    - gene_mutation
+                    - container
+                    -
+                      -
+                        - type
+                        - enum
+                        -
+                          - variable_gaussian
+                      -
+                        - variable_gaussian
+                        - container
+                        -
+                          -
+                            - initial_stddev
+                            - real
+                            - 1
+                          -
+                            - cutoff_generations
+                            - int
+                            - 1000
+                          -
+                            - cutoff_stddev
+                            - real
+                            - 0.01
+  -
+    - domain_cfg
+    - container
+    -
+      -
+        - type
+        - enum
+        -
+          - func_opt
+      -
+        - func_opt
+        - container
+        -
+          -
+            - type
+            - enum
+            -
+              - rosenbrock
+          -
+            - rosenbrock
+            - container
+            -
+              -
+                - dimensions
+                - int
+                - 2
+              -
+                - param_lower_bound
+                - real
+                - -50
+              -
+                - param_upper_bound
+                - real
+                - 50
+              -
+                - a
+                - real
+                - 1
+              -
+                - b
+                - real
+                - 100

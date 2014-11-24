@@ -3,6 +3,8 @@
 #ifndef __NE_SYSSIM_CONTROLLER_H
 #define __NE_SYSSIM_CONTROLLER_H
 
+#include "system_state_values.h"
+
 #include "params/param_fwd.h"
 
 #include "util/bimap.h"
@@ -43,14 +45,21 @@ namespace sys {
 		static std::unique_ptr< i_controller_factory > create_factory(prm::param_accessor param);
 
 	public:
-		typedef int input_id;
-		typedef std::vector< input_id > input_id_list_t;
+//		typedef int input_id;
+//		typedef std::vector< input_id > input_id_list_t;
+		typedef state_value_id_list input_id_list_t;
 
 		typedef double input_t;
 		typedef std::vector< input_t > input_list_t;
 		typedef double output_t;
 		typedef std::vector< output_t > output_list_t;
 
+		// TODO: this method is essentially just being used to create a 2 stage controller construction.
+		// basically its inputs will be bound, resulting in a function which sets an array of values 
+		// corresponding to the ids. this function will then be stored alongside (or perhaps within?)
+		// the controller. so in fact, the bounding could be done at creation time, removing the need for this
+		// method. would require the system to be constructed and available at the point the controller
+		// gets created.
 		virtual input_id_list_t get_input_ids() const = 0;
 		virtual output_list_t process(input_list_t const& inputs) = 0;
 

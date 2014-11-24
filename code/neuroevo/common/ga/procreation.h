@@ -28,8 +28,10 @@ template <
 	typename ProcreationSelection,
 	typename CrossoverFtr,
 	typename MutationFtr,
+	typename RectificationFtr,
 	typename CrossoverRateFtr,
 	typename MutationRateFtr,
+	typename RateContext,
 	typename RGen = boost::random::mt19937
 >
 class basic_procreation
@@ -41,6 +43,8 @@ private:
 	typedef CrossoverFtr			crossover_ftr_t;
 	typedef MutationRateFtr			mutation_rate_ftr_t;
 	typedef MutationFtr				mutation_ftr_t;
+	typedef RectificationFtr		rectification_ftr_t;
+	typedef RateContext				rate_context_t;
 
 private:
 	RGen&										rgen;
@@ -51,6 +55,8 @@ public:
 	crossover_ftr_t&		cx_ftr;
 	mutation_rate_ftr_t&	mut_rate_ftr;
 	mutation_ftr_t&			mut_ftr;
+	rectification_ftr_t&	rect_ftr;
+	rate_context_t			rate_ctx;
 
 public:
 	basic_procreation(
@@ -59,8 +65,9 @@ public:
 		crossover_ftr_t& _cx,
 		mutation_rate_ftr_t& _mut_rate,
 		mutation_ftr_t& _mut,
+		rectification_ftr_t& _rect,
 		RGen& rg,
-		double _evo_stage = 0.0): proc_sel(_proc_sel), cx_rate_ftr(_cx_rate), cx_ftr(_cx), mut_rate_ftr(_mut_rate), mut_ftr(_mut), rgen(rg), evo_stage(_evo_stage)
+		rate_context_t _rate_ctx): proc_sel(_proc_sel), cx_rate_ftr(_cx_rate), cx_ftr(_cx), mut_rate_ftr(_mut_rate), mut_ftr(_mut), rect_ftr(_rect), rgen(rg), rate_ctx(_rate_ctx)
 	{}
 
 public:
@@ -84,10 +91,9 @@ public:
 		while(num_offspring-- > 0)
 		{
 			// First determine whether or not to create the child through crossover
-			if(can_crossover && rdist_0_1(rgen) < cx_rate_ftr(evo_stage))
+			if(can_crossover && rdist_0_1(rgen) < cx_rate_ftr(rate_ctx, rgen))
 			{
 				// Select the parents for the crossover operation
-				//std::vector< individual_t* > parents(num_parents_cx, nullptr);
 				std::vector< genome_t const* > parents(num_parents_cx, nullptr);
 				proc_sel.select_parents(num_parents_cx, parents_start, parents_end, parents.begin());
 
@@ -97,25 +103,24 @@ public:
 			else
 			{
 				// Not using crossover, so select a single individual from the parent population
-				//std::array< individual_t*, 1 > parent;
 				std::vector< genome_t const* > parent(1, nullptr);
 				proc_sel.select_parents(1, parents_start, parents_end, parent.begin());
 
 				// And clone it
-				//offspring->genome = parent[0]->genome;
 				*offspring = *parent[0];
 			}
 
 			// Now apply mutation
-			double mutation_rate = mut_rate_ftr(evo_stage);
+			double mutation_rate = mut_rate_ftr(rate_ctx, rgen);
 			mut_ftr(*offspring, mutation_rate);
+
+			// Finally rectification
+			rect_ftr(*offspring);
+			// TODO: deal with failure (eg. by repeatedly mutating/cx+mutating until a valid solution is found)
 
 			++offspring;
 		}
 	}
-
-private:
-	double evo_stage;
 };
 
 

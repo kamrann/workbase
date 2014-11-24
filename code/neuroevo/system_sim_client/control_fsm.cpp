@@ -227,10 +227,10 @@ namespace sys_control {
 			}
 		}
 
-		sc::result paused::react(ev_run const& ev)
+		sc::result paused::react(clsm::ev_cmd< run_cmd > const& cmd)
 		{
-			//need to pass ev.frame_rate to initialization of running state...
-			post_event(ev);
+			// need to pass ev.frame_rate to initialization of running state...
+			post_event(cmd);
 			return transit< running >();
 		}
 		

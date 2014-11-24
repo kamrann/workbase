@@ -3,7 +3,7 @@
 #ifndef __WB_SYSSIM_CLIENT_CONTROL_ROOT_STATE_H
 #define __WB_SYSSIM_CLIENT_CONTROL_ROOT_STATE_H
 
-#include "clsm.h"
+#include "clsm/clsm.h"
 #include "control_fsm_defn.h"
 
 
@@ -16,12 +16,13 @@ namespace sys_control {
 		struct inactive;
 
 		struct root:
-			clsm::clsm_state_base < root, system_controller, inactive >,
-			i_cmd_state
+			clsm::clsm_state_base < root, system_controller, inactive >
 		{
-// todo:			typedef sc::termination< ev_quit > reactions;
+			typedef clsm_state_base base;
 
-			virtual std::string get_prompt() const override;
+			using base::base;
+
+// todo:			typedef sc::termination< ev_quit > reactions;
 		};
 
 	}

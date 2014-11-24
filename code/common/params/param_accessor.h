@@ -38,6 +38,17 @@ namespace prm
 			PreferBeginningOrExact,		// Beginning matches hide non-beginning, while exact hide all non-exact
 		};
 
+		/*
+		Specifies how candidates are located when looking up node by name.
+		*/
+		enum LookupMode {
+			Default,			// Any node is considered, however descendents are preferred to non-descendents, and direct children to indirect descendents
+			Descendent,			// Only nodes at or below current position
+			Child,				// Only immediate child nodes
+		};
+
+		// TODO: Maybe separate above into Lookup { Any, Descendent, Child } and PreferenceFlags { PreferDescendent | PreferDirectChild }
+
 	public:
 		param_accessor(param_tree* pt = nullptr);
 
@@ -73,11 +84,18 @@ namespace prm
 		void set_lock_on_failed_move(bool autolock);
 
 		void set_match_method(Match match_type, MatchComparison comp_type);
+		void set_lookup_mode(LookupMode mode);
 
 		std::list< qualified_path > children() const;
 
 		operator bool() const;
 		bool operator! () const;
+
+		// Shortcuts to create a copy of the accessor with an adjustment
+		param_accessor operator() (LookupMode mode) const;
+		param_accessor operator() (std::string dest) const;
+		param_accessor operator() (qualified_path const& abs) const;
+		// TODO: overloaded on Matching modes, also possibly on string/path for relative/absolute move
 
 	private:
 		typedef param_tree::tree_t ptree_t;
@@ -97,6 +115,7 @@ namespace prm
 
 		static Match match_name(std::string const& search, std::string const& node_name);
 		static bool match_qualifies(Match match, boost::optional< Match > existing, Match method, MatchComparison comp);
+		std::list< std::set< node_t > > get_lookup_candidates() const;
 		std::set< node_t > find_all_nodes(std::string const& name, indices_t const& indices = {}) const;
 		node_t find_node_unambiguous(std::string const& name, indices_t const& indices = {}) const;
 
@@ -107,6 +126,7 @@ namespace prm
 		bool m_auto_lock;
 		Match m_match_type;
 		MatchComparison m_comp_type;
+		LookupMode m_lookup_mode;
 	};
 
 }

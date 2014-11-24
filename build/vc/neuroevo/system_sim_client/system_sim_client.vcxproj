@@ -51,9 +51,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>D:\Coding Projects\External Libraries\pgsql\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>D:\Coding Projects\External Libraries\pgsql\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -67,7 +69,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>D:\Coding Projects\workbase\build\vc\common\peerwork\lib\Debug\pwork_client.lib;D:\Coding Projects\workbase\build\vc\common\peerwork\lib\Debug\shared.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\Coding Projects\workbase\build\vc\common\peerwork\lib\Debug\pwork_client.lib;D:\Coding Projects\workbase\build\vc\common\peerwork\lib\Debug\shared.lib;wtdbod.lib;wtdbopostgresd.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,23 +88,23 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>wtdbo.lib;wtdbopostgres.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\active_state.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\chart_cmd_parser.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_interface.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_parser.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\completed_state.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm_defn.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\drawer_cmd_parser.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\enum_state.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\base_node_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\editing_state.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\get_cmd_parser.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\paramtree_fsm_defn.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\random_state.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\repeat_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\notready_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\paused_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\ready_state.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\reset_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\running_state.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\run_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -111,40 +113,25 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\step_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\stop_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\system_sim_client.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\sys_cmd_interface.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\sys_controller.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\chart.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\drawer.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\terminal.cpp" />
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\wt_server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\active_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\chart_cmd_parser.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\choice_point.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\clsm.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_interface.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\completed_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm_defn.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\drawer_cmd_parser.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\enum_state.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\base_node_state.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\editing_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\get_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\inactive_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\is_completed_choice.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\is_ready_choice.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\node_type_choice.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\notready_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\notrunning_state.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\paramtree_fsm.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\paramtree_fsm_defn.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\parser_helpers.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\paused_state.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\random_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\ready_state.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\repeat_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\reset_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\root_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\running_state.h" />
@@ -153,23 +140,35 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\step_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\stop_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\system_sim_client.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\sys_cmd_interface.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\sys_controller.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\targetver.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\general_state.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\display_base.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\display_types.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\chart.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\drawer.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\terminal.h" />
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\wt_server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\common\commands\commands.vcxproj">
+      <Project>{6ff13d62-015f-446a-803e-32c6eb72206f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\common\params\params.vcxproj">
       <Project>{e98f782b-e701-44b7-97bd-8057a11f6ec4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\common\wt_cmdline_server\wt_cmdline_server.vcxproj">
+      <Project>{82eeaae2-795c-4d2e-b540-c6aa01a59498}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\common\wt_custom_widgets\wt_custom_widgets.vcxproj">
       <Project>{f7c9c12a-fc74-4498-bcaa-d46d3e788314}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\common\wt_displays\wt_displays.vcxproj">
+      <Project>{0654a6c5-e34b-41ed-a3a7-adacf55f1ce5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\evolvable_systems\evolvable_systems.vcxproj">
+      <Project>{c9218092-2dad-40ef-93fb-98c984877389}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\evo_database\evo_database.vcxproj">
+      <Project>{0db7562c-4f2d-405f-b5ce-826dc483461e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\genetic_algorithm\genetic_algorithm.vcxproj">
+      <Project>{b454e86e-5c94-462b-9581-cf7d8a266c78}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\neuralnet\neuralnet.vcxproj">
+      <Project>{5e3419dc-727f-44da-a09f-27e8c6ea016d}</Project>
     </ProjectReference>
     <ProjectReference Include="..\common\systems\elevator\elevator.vcxproj">
       <Project>{04de12ba-9759-4abb-bd6f-dfecee19b0a9}</Project>
@@ -179,6 +178,9 @@
     </ProjectReference>
     <ProjectReference Include="..\common\system_sim\system_sim.vcxproj">
       <Project>{cd95ca33-3886-4cc3-9f42-f32b2b2da3f7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\common\wt_displays_ne\wt_displays_ne.vcxproj">
+      <Project>{8b538a0d-7445-4fb5-883f-861e59631988}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

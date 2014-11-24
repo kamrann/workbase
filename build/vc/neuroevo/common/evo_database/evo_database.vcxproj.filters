@@ -33,9 +33,6 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evo_database\generation_tbl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evo_database\genetic_language_tbl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evo_database\genome_tbl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

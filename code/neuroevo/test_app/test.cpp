@@ -179,8 +179,136 @@ struct vis: public boost::static_visitor < void >
 	}
 };
 
+
+#include "genetic_algorithm/genalg.h"
+#include "genetic_algorithm/genetic_population.h"
+#include "genetic_algorithm/fixed_binary_genome.h"
+
+
 int main(int argc, char* argv[])
 {
+	ga::rgen_t rgen;
+	rgen.seed(static_cast< uint32_t >(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff));
+	ga::genalg alg{ rgen };
+
+	typedef ga::fixed_binary_genome genome_t;
+
+	size_t const pop_size = 200;
+	size_t const num_generations = 1000;
+
+	size_t const bits_per_character = 8;
+	std::string target_str = "cameron";
+	auto const string_length = target_str.length();
+	size_t const gn_length = string_length * bits_per_character;
+
+	ga::basic_array_crossover< genome_t > _crossover{ gn_length };
+	alg.crossover_fn() = [&_crossover](ga::genome const& p1, ga::genome const& p2, ga::rgen_t& rgen)
+	{
+		return std::make_unique< genome_t >(_crossover(p1.as< genome_t >(), p2.as< genome_t >(), rgen));
+	};
+	ga::basic_binary_mutation _mutation{};
+	alg.mutation_fn() = [&_mutation](ga::genome& gn, double const rate, ga::rgen_t& rgen)
+	{
+		_mutation(gn.as< genome_t >(), rate, rgen);
+	};
+
+	alg.crossover_rate_fn() = []()
+	{
+		return 1.0;
+	};
+
+	alg.mutation_rate_fn() = []()
+	{
+		return 0.05;
+	};
+
+	auto decode_fn = [=](genome_t const& gn) -> std::string
+	{
+		std::string result;
+		auto it = gn.cbegin();//std::begin(gn);
+		for(size_t i = 0; i < string_length; ++i)
+		{
+			char ch = 0;
+			for(size_t b = 0; b < bits_per_character; ++b)
+			{
+				if(*it != 0)
+				{
+					ch |= (1 << b);
+				}
+				++it;
+			}
+
+			result += ch;
+		}
+		return result;
+	};
+
+	auto fitness_fn = [=](std::string str) -> double
+	{
+		size_t num_correct = 0;
+		for(size_t i = 0; i < string_length; ++i)
+		{
+			if(str[i] == target_str[i])
+			{
+				++num_correct;
+			}
+		}
+		return (double)(num_correct) / string_length;
+	};
+
+	ga::genetic_population pop;
+	pop.resize(pop_size);
+	
+	// Initialize first generation
+	for(auto& idv : pop)
+	{
+		idv.gn = ga::genome{ std::make_unique< genome_t >(genome_t::generate_random(gn_length, rgen)) };
+	}
+
+	for(size_t g = 0; g < num_generations; ++g)
+	{
+		// Evaluate solutions
+		std::string best;
+		double highest_fitness = -1.0;
+
+		for(auto& idv : pop)
+		{
+			auto str = decode_fn(idv.gn.as< genome_t >());
+			idv.fitness = fitness_fn(str);
+
+			if(idv.fitness > highest_fitness)
+			{
+				best = str;
+				highest_fitness = idv.fitness;
+			}
+		}
+
+		std::cout << "Generation #" << g << ": [" << best << "] (" << highest_fitness << ")" << std::endl;
+
+		// Create next generation
+		auto next = alg.next_generation(pop);
+		pop = std::move(next);
+	}
+
+	// Evaluate final solutions
+	std::string best;
+	double highest_fitness = -1.0;
+	for(auto idv : pop)
+	{
+		auto str = decode_fn(idv.gn.as< genome_t >());
+		idv.fitness = fitness_fn(str);
+
+		if(idv.fitness > highest_fitness)
+		{
+			best = str;
+			highest_fitness = idv.fitness;
+		}
+	}
+
+	std::cout << "Best solution: " << best << std::endl;
+
+
+#if 0
 	typedef std::string::const_iterator iter_t;
 
 	struct one_t{ enum { value = 1 }; };
@@ -213,6 +341,7 @@ int main(int argc, char* argv[])
 			boost::apply_visitor(v, attr);
 		}
 	}
+#endif
 
 #if 0
 	auto lcounts = nnet::mlp::layer_counts_t{ 6, 4, 2 };

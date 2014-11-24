@@ -8,7 +8,7 @@
 
 namespace prm
 {
-	std::string const unspecified = "<unspecified>";
+	std::string const unspecified = "_unspecified_";
 
 	// TODO: Probably need to build this into param type, so can support all types, not only enum
 	inline bool is_unspecified(param const& p)

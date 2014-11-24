@@ -118,6 +118,27 @@ namespace sys {
 				sv_id.pop();
 			}
 
+			sv_id = state_value_id::from_string("left_foot_contact");
+			bindings[sv_id] = bound_id++;
+			accessors.push_back([this]
+			{
+				return left_foot_contact ? 1.0 : 0.0;
+			});
+
+			sv_id = state_value_id::from_string("right_foot_contact");
+			bindings[sv_id] = bound_id++;
+			accessors.push_back([this]
+			{
+				return right_foot_contact ? 1.0 : 0.0;
+			});
+
+			sv_id = state_value_id::from_string("both_foot_contact");
+			bindings[sv_id] = bound_id++;
+			accessors.push_back([this]
+			{
+				return (left_foot_contact && right_foot_contact) ? 1.0 : 0.0;
+			});
+
 			return bindings.size() - initial_count;
 		}
 
@@ -276,6 +297,25 @@ namespace sys {
 			lower2->ApplyTorque(activations[3] * m_spec->joint_data.at(basic_biped_defn::Joint::RightKnee).max_torque * life, true);
 
 			// TODO: Upper
+		}
+
+		void basic_biped::on_contact(b2Fixture* fixA, b2Fixture* fixB, ContactType type)
+		{
+			// fixA is us, fixB could be anything
+			auto fd = get_fixture_data(fixA);
+			if(fd && !fd->value.empty())
+			{
+				// TODO:
+				auto val = boost::any_cast<int>(fd->value);
+				if(val == 0)
+				{
+					left_foot_contact = (type == ContactType::Begin);
+				}
+				else if(val == 1)
+				{
+					right_foot_contact = (type == ContactType::Begin);
+				}
+			}
 		}
 
 	}

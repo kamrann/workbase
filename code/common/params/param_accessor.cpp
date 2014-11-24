@@ -11,7 +11,8 @@ namespace prm
 		m_locked{ false },
 		m_auto_lock{ false },
 		m_match_type{ Match::Exact },
-		m_comp_type{ MatchComparison::Equal }
+		m_comp_type{ MatchComparison::Equal },
+		m_lookup_mode{ LookupMode::Default }
 	{
 		if(has_pt())
 		{
@@ -238,6 +239,11 @@ namespace prm
 		m_comp_type = comp_type;
 	}
 
+	void param_accessor::set_lookup_mode(LookupMode mode)
+	{
+		m_lookup_mode = mode;
+	}
+
 	std::list< qualified_path > param_accessor::children() const
 	{
 		auto p = param_here();
@@ -265,6 +271,27 @@ namespace prm
 	bool param_accessor::operator! () const
 	{
 		return !has_pt();
+	}
+
+	param_accessor param_accessor::operator() (LookupMode mode) const
+	{
+		auto cpy = *this;
+		cpy.set_lookup_mode(mode);
+		return cpy;
+	}
+
+	param_accessor param_accessor::operator() (std::string dest) const
+	{
+		auto cpy = *this;
+		cpy.move_to(cpy.find_path(dest));
+		return cpy;
+	}
+
+	param_accessor param_accessor::operator() (qualified_path const& abs) const
+	{
+		auto cpy = *this;
+		cpy.move_to(abs);
+		return cpy;
 	}
 
 
@@ -295,7 +322,7 @@ namespace prm
 
 	param_accessor::node_t param_accessor::node_from_path(qualified_path const& p) const
 	{
-		if(!p)
+		if(!has_pt() || !p)
 		{
 			return ptree_t::null_vertex();
 		}
@@ -420,6 +447,56 @@ namespace prm
 		throw std::runtime_error{ "invalid matc comparison type" };
 	}
 
+	std::list< std::set< param_accessor::node_t > > param_accessor::get_lookup_candidates() const
+	{
+		std::list< std::set< node_t > > result;
+
+		auto& tree = m_pt->tree();
+		auto const all = tree.nodes();
+		auto const all_set = std::set < node_t > { std::begin(all), std::end(all) };
+		auto const descendents = tree.pre_order_traversal(m_location_stk.top());
+		auto const descendents_set = std::set < node_t > { std::begin(descendents), std::end(descendents) };
+		auto const children = tree.children(m_location_stk.top());
+		auto const children_set = std::set < node_t > { std::begin(children), std::end(children) };
+
+		switch(m_lookup_mode)
+		{
+			case LookupMode::Default:
+			{
+				result.push_back({ std::begin(children_set), std::end(children_set) });
+				std::set< node_t > indirect_descendents;
+				std::set_difference(
+					std::begin(descendents_set), std::end(descendents_set),
+					std::begin(children_set), std::end(children_set),
+					std::inserter(indirect_descendents, std::end(indirect_descendents))
+					);
+				result.push_back({ std::begin(indirect_descendents), std::end(indirect_descendents) });
+				std::set< node_t > non_descendents;
+				std::set_difference(
+					std::begin(all_set), std::end(all_set),
+					std::begin(descendents_set), std::end(descendents_set),
+					std::inserter(non_descendents, std::end(non_descendents))
+					);
+				result.push_back({ std::begin(non_descendents), std::end(non_descendents) });
+			}
+			break;
+
+			case LookupMode::Descendent:
+			{
+				result.push_back({ std::begin(descendents_set), std::end(descendents_set) });
+			}
+			break;
+
+			case LookupMode::Child:
+			{
+				result.push_back({ std::begin(children_set), std::end(children_set) });
+			}
+			break;
+		}
+
+		return std::move(result);
+	}
+
 	std::set< param_accessor::node_t > param_accessor::find_all_nodes(std::string const& name, indices_t const& indices) const
 	{
 		if(!has_pt())
@@ -427,85 +504,79 @@ namespace prm
 			return{};
 		}
 
-		std::set< node_t > result;
-		boost::optional< Match > current_match_type;
-
 		auto pos = m_location_stk.top();
 		auto& tree = m_pt->tree();
-		auto nodes = tree.nodes();
-		for(auto n : nodes)
+		auto candidates = get_lookup_candidates();	//tree.nodes();
+		for(auto const& group : candidates)
 		{
-			// First, name must match
-			auto match = match_name(name, tree[n].name);
-			if(!match_qualifies(match, current_match_type, m_match_type, m_comp_type))
+			std::set< node_t > result;
+			boost::optional< Match > current_match_type;
+
+			for(auto n : group)
 			{
-				continue;
-			}
-			current_match_type = current_match_type ? std::min(*current_match_type, match) : match;
-
-			// Now need to check for ambiguity
-			auto ancestor = tree.common_ancestor(pos, n);
-			auto down_path = tree.path_to_node(ancestor, n).first;
-			// Need to see if any node on this path (excluding the last node) is a repeat
-			//down_path.pop_back();
-			auto end = std::prev(std::end(down_path));
-			auto ind_it = std::begin(indices);
-
-			auto ambiguous = false;
-			for(auto n_it = std::begin(down_path); n_it != end; ++n_it)
-			{
-				auto n = *n_it;
-
-				if(tree[n].type == ParamType::Repeat)
+				// First, name must match
+				auto match = match_name(name, tree[n].name);
+				if(!match_qualifies(match, current_match_type, m_match_type, m_comp_type))
 				{
-					if(ind_it == std::end(indices))
-					{
-						// No index specified for this repeat, fail
-						ambiguous = true;
-						break;
-					}
-
-					// Check the index value
-					auto idx = *ind_it;
-					auto next = std::next(n_it);
-//					auto edge = tree.in_edge(*next).first;
-//					if(*tree[edge].repeat_idx != idx)
-					if(tree.position_in_siblings(*next) != idx - 1)
-					{
-						// Given index does not match on this path, fail
-						ambiguous = true;
-						break;
-					}
-
-					// Matched okay
-					++ind_it;
+					continue;
 				}
+				current_match_type = current_match_type ? std::min(*current_match_type, match) : match;
+
+				// Now need to check for ambiguity
+				auto ancestor = tree.common_ancestor(pos, n);
+				auto down_path = tree.path_to_node(ancestor, n).first;
+				// Need to see if any node on this path (excluding the last node) is a repeat
+				//down_path.pop_back();
+				auto end = std::prev(std::end(down_path));
+				auto ind_it = std::begin(indices);
+
+				auto ambiguous = false;
+				for(auto n_it = std::begin(down_path); n_it != end; ++n_it)
+				{
+					auto n = *n_it;
+
+					if(tree[n].type == ParamType::Repeat)
+					{
+						if(ind_it == std::end(indices))
+						{
+							// No index specified for this repeat, fail
+							ambiguous = true;
+							break;
+						}
+
+						// Check the index value
+						auto idx = *ind_it;
+						auto next = std::next(n_it);
+						//					auto edge = tree.in_edge(*next).first;
+						//					if(*tree[edge].repeat_idx != idx)
+						if(tree.position_in_siblings(*next) != idx - 1)
+						{
+							// Given index does not match on this path, fail
+							ambiguous = true;
+							break;
+						}
+
+						// Matched okay
+						++ind_it;
+					}
+				}
+
+				// Also ensure all given indices were matched
+				if(ambiguous || ind_it != std::end(indices))
+				{
+					continue;
+				}
+
+				result.insert(n);
 			}
 
-			// Also ensure all given indices were matched
-			if(ambiguous || ind_it != std::end(indices))
+			if(!result.empty())
 			{
-				continue;
+				return result;
 			}
-
-/*			auto repeat = std::find_if(
-				std::begin(down_path),
-				std::end(down_path),
-				[&tree](node_t n)
-			{
-				return tree[n].type == ParamType::Repeat;
-			});
-
-			if(repeat != std::end(down_path))
-			{
-				// Have to pass downwards through a repeat node, therefore ambiguous search
-				continue;
-			}
-*/
-			result.insert(n);
 		}
 
-		return result;
+		return{};
 	}
 
 	param_accessor::node_t param_accessor::find_node_unambiguous(std::string const& name, indices_t const& indices) const

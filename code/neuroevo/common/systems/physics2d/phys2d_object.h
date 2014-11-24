@@ -3,6 +3,8 @@
 #ifndef __NE_RTP_PHYS2D_OBJECT_H
 #define __NE_RTP_PHYS2D_OBJECT_H
 
+#include "phys2d_contacts.h"
+
 #include "system_sim/system_state_values.h"
 
 #include "util/bimap.h"
@@ -27,13 +29,11 @@ namespace sys {
 			virtual b2Vec2 get_position() const = 0;
 			virtual b2Vec2 get_linear_velocity() const = 0;
 			virtual float get_kinetic_energy() const = 0;
-			/*
+
 			virtual void on_contact(b2Fixture* fixA, b2Fixture* fixB, ContactType type)
 			{}
-
 			virtual void on_collision(b2Fixture* fixA, b2Fixture* fixB, double approach_speed)
 			{}
-			*/
 
 			static state_value_id_list get_state_values();
 

@@ -17,7 +17,7 @@ namespace sys {
 			virtual std::string get_name() const override;
 			virtual std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const override;
 
-			virtual controller_ptr create_controller() const override;
+			virtual controller_ptr create_controller(prm::param_accessor acc) const override;
 		};
 
 		class dumb_elevator_controller:

@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6E28C8B5-CECB-417E-A0F1-DB9B3D4764D8}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ddl_test</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\..\workbase.props" />
+    <Import Project="..\..\..\Wt_dbg.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\..\workbase.props" />
+    <Import Project="..\..\..\Wt_rls.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\commands\commands.vcxproj">
+      <Project>{6ff13d62-015f-446a-803e-32c6eb72206f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\wt_cmdline_server\wt_cmdline_server.vcxproj">
+      <Project>{82eeaae2-795c-4d2e-b540-c6aa01a59498}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\wt_custom_widgets\wt_custom_widgets.vcxproj">
+      <Project>{f7c9c12a-fc74-4498-bcaa-d46d3e788314}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ddl\ddl.vcxproj">
+      <Project>{c64424cb-a537-4da9-85d5-ec57400c7136}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl_test\ddl_test.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl_test\stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\agent_spec_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\funcopt_ackley_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\funcopt_function_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\funcopt_mutation_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\funcopt_rosenbrock_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\func_opt_domain_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\objective_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\phys2d_domain_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\problem_domain_ddl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\stdafx.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\targetver.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\value_objective_ddl.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

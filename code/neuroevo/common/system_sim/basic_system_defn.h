@@ -25,9 +25,9 @@ namespace sys {
 			
 		virtual std::vector< std::string > get_agent_type_names() const override;
 		virtual std::vector< std::string > get_agent_sensor_names(prm::param agent_type, prm::param_accessor param_vals) const override;
-		virtual size_t get_agent_num_effectors(prm::param agent_type) const override;
+		virtual size_t get_agent_num_effectors(prm::param_accessor spec_acc) const override;
 
-//		virtual system_drawer_ptr get_drawer() const override;
+		virtual std::vector< prm::qualified_path > get_connected_agent_specs(std::string controller_cls, std::string controller_type, prm::param_accessor acc) const override;
 
 	protected:
 		static std::vector< std::pair< prm::qualified_path, std::string > > get_available_agent_specs(prm::param_accessor acc);
@@ -49,7 +49,7 @@ namespace sys {
 
 		virtual state_value_id_list get_system_core_state_values(prm::param_accessor acc) const = 0;
 
-		controller_ptr create_controller(prm::param_accessor acc) const;
+		//controller_ptr create_controller(prm::param_accessor acc) const;
 
 		virtual system_ptr create_system_core(prm::param_accessor acc) const = 0;
 		virtual system_ptr create_system(prm::param_accessor acc) const override;

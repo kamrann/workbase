@@ -185,6 +185,9 @@
     <ProjectReference Include="..\common\evo_database\evo_database.vcxproj">
       <Project>{0db7562c-4f2d-405f-b5ce-826dc483461e}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\common\genetic_algorithm\genetic_algorithm.vcxproj">
+      <Project>{b454e86e-5c94-462b-9581-cf7d8a266c78}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\common\neuralnet\neuralnet.vcxproj">
       <Project>{5e3419dc-727f-44da-a09f-27e8c6ea016d}</Project>
     </ProjectReference>

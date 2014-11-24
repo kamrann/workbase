@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\..\..\code\common\params\enum_add_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\enum_element_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\enum_emitter.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\dynamic_enum_schema.h" />
     <ClInclude Include="..\..\..\..\code\common\params\enum_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\common\params\integer_emitter.h" />
@@ -115,6 +116,14 @@
     <ClInclude Include="..\..\..\..\code\common\params\schema.h" />
     <ClInclude Include="..\..\..\..\code\common\params\schema_builder.h" />
     <ClInclude Include="..\..\..\..\code\common\params\setvalue_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\base_node_state.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\enum_state.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\general_state.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\node_type_choice.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\paramtree_fsm.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\paramtree_fsm_defn.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\random_state.h" />
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\repeat_state.h" />
     <ClInclude Include="..\..\..\..\code\common\params\stdafx.h" />
     <ClInclude Include="..\..\..\..\code\common\params\string_emitter.h" />
     <ClInclude Include="..\..\..\..\code\common\params\string_parser.h" />
@@ -146,6 +155,11 @@
     <ClCompile Include="..\..\..\..\code\common\params\schema.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\schema_builder.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\setvalue_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\base_node_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\enum_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\paramtree_fsm_defn.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\random_state.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\repeat_state.cpp" />
     <ClCompile Include="..\..\..\..\code\common\params\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

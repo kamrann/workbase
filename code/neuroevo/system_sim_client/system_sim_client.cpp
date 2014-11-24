@@ -2,24 +2,28 @@
 //
 
 #include "system_sim_client.h"
-//#include "sys_controller.h"
-#include "paramtree_fsm.h"
-
 #include "control_fsm.h"
-#include "sys_cmd_interface.h"
-#include "cmd_parser.h"
 
 #include "systems/elevator/elevator_system_defn.h"
 #include "systems/physics2d/phys2d_system_defn.h"
 
 #include "system_sim/system.h"
 
+#include "evolvable_systems/controllers/db_evolved_controller.h"
+
+#include "evo_database/evo_db.h"
+
 #include "params/param_accessor.h"
 #include "params/cmdline.h"
 #include "params/qualified_path.h"
 #include "params/schema_builder.h"
+#include "params/state_machine/paramtree_fsm.h"
 
-#include "Wt Displays/wt_server.h"
+#include "wt_cmdline_server/wt_server.h"
+#include "wt_displays/chart.h"
+#include "wt_displays_ne/drawer.h"
+
+#include <Wt/Dbo/FixedSqlConnectionPool>
 
 #include <boost/program_options.hpp>
 
@@ -36,15 +40,12 @@ namespace sb = prm::schema;
 // TODO: map of unique_ptr giving nonsense compiler error, despite same being fine in system_sim_pwex
 std::map< std::string, std::shared_ptr< sys::i_system_defn > > sys_defns;	// unique_ptr<>
 
-bool run_system_command_loop(prm::param_accessor acc);
-
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "show help message")
-//		("peer", po::value< std::string >(), "peer location <hostname>:<port number>")
 		;
 
 	po::variables_map vm;
@@ -52,35 +53,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		options(desc).run(), vm);
 	po::notify(vm);
 
-	auto client_name = std::string{ "system_sim_client" };
-	/*
-	if(!vm.count("peer"))
+	//
+	std::unique_ptr< Wt::Dbo::SqlConnectionPool > db_cp{
+		evodb_session::create_connection_pool("host=127.0.0.1 user=Cameron password='' port=5432 dbname=evo")
+		//"./evo.db")
+	};
+	if(!db_cp)
 	{
-		std::cout << "peer location must be specified" << std::endl;
-		return 0;
+		return -1;
 	}
-
-	auto peer_location = vm["peer"].as< std::string >();
-	auto colon = peer_location.find(":");
-	std::string hostname, port;
-	if(colon != std::string::npos)
-	{
-		hostname = peer_location.substr(0, colon);
-		port = peer_location.substr(colon + 1, std::string::npos);
-	}
-	else
-	{
-		std::cout << "usage: --peer <hostname>:<port number>..." << std::endl;
-		return 0;
-	}
-
-	auto pr = pwork::local_peer::try_connect(client_name, hostname, port);
-	if(!pr)
-	{
-		std::cout << "failed to connect to peer" << std::endl;
-		return 0;
-	}
-	*/
+	//
 	
 	std::unique_ptr< sys::i_system_defn > defn;
 
@@ -89,6 +71,16 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	defn = sys::phys2d::phys2d_system_defn::create_default();
 	sys_defns[defn->get_name()] = std::shared_ptr < sys::i_system_defn > { defn.release() };//std::move(defn);
+
+	auto db_cp_raw = db_cp.get();
+	auto db_session_fn = [db_cp_raw]
+	{
+		return std::make_unique< evodb_session >(*db_cp_raw);
+	};
+	for(auto& df : sys_defns)
+	{
+		df.second->add_controller_defn("db", std::make_unique< sys::ev::db_evolved_controller_defn >(db_session_fn));
+	}
 
 	auto sch_mp = std::make_shared< sb::schema_provider_map >();
 	prm::qualified_path root = std::string{ "root" };
@@ -178,12 +170,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		return s;
 	};
 
-	auto dummy_acc = prm::param_accessor{};
-	auto sch = (*sch_mp)[root](dummy_acc);
-	auto pt = prm::param_tree::generate_from_schema(sch, sch_mp);
-
-//	prm::cmdline_processor cmdln{ sch_mp, pt };
-//	cmdln.enter_cmd_loop(std::cin, std::cout);
 
 	arg_list server_args{
 		"system_sim_client.exe",
@@ -199,40 +185,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cout << "Failed to start Wt server" << std::endl;
 		return 0;
 	}
-	/*
-	prm::param_accessor acc{ &pt };
 
-	auto sys_type = prm::extract_as< prm::enum_param_val >(acc["sys_type"])[0];
-	auto defn_it = sys_defns.find(sys_type);
-	auto const& sys_defn = defn_it->second;
-
-	auto system = sys_defn->create_system(acc);
-
-	auto update_value_names = prm::extract_as< prm::enum_param_val >(acc["updates"]);
-	sys::state_value_id_list update_vals;
-	for(auto const& v : update_value_names)
-	{
-		update_vals.push_back(sys::state_value_id::from_string(v));
-	}
-
-	auto result_value_names = prm::extract_as< prm::enum_param_val >(acc["results"]);
-	sys::state_value_id_list result_vals;
-	for(auto const& v : result_value_names)
-	{
-		result_vals.push_back(sys::state_value_id::from_string(v));
-	}
-
-	sys_control::controller sys_ctrl{
-		sys_defn,
-		std::move(system),
-		std::move(update_vals),
-		std::move(result_vals),
-		std::cout
-	};
-
-	*/
-
-	auto term = create_wt_terminal();
+	auto term = create_wt_terminal("system%20simulation%20terminal");
 
 	auto sink = [term](std::string text)
 	{
@@ -245,42 +199,42 @@ int _tmain(int argc, _TCHAR* argv[])
 	};
 
 
-//	prm::cmdline_processor cmdln{ sch_mp, pt };
-//	cmdln.enter_cmd_loop(std::cin, std::cout);
-	prm::fsm::paramtree_editor ptree_ctrl{ std::move(pt), sch_mp, sink };
+	register_display_defn(std::make_unique< chart_display_defn >());
+	register_display_defn(std::make_unique< drawer_display_defn >());
 
-	term->register_command_handler([&ptree_ctrl, term](std::string cmd)
+
+	auto dummy_acc = prm::param_accessor{};
+	auto sch = (*sch_mp)[root](dummy_acc);
+	auto pt = prm::param_tree::generate_from_schema(sch, sch_mp);
+
+	sys_control::fsm::system_controller sys_ctrl{
+		sys_defns,// can't move as being global, it is accessed directly from the schema lambdas above... std::move(sys_defns),
+		std::move(pt),
+		sch_mp,
+		sink,
+		prompt_cb
+	};
+
+	term->register_command_handler([&sys_ctrl, term](std::string cmd)
 	{
 		// NOTE: This handler is invoked from a Wt session thread
 		std::cout << "cmd [" << cmd << "]" << std::endl;
 
-		ptree_ctrl.process_event(clsm::ev_command{ cmd });
+//		sys_ctrl.post([&sys_ctrl, cmd]
+//		{
+			sys_ctrl.process_event(clsm::ev_unprocessed_cmd_str{ cmd });
+//		});
 
-		auto prompt = ptree_ctrl.get_prompt();
-		term->set_prompt(prompt);
+			if(sys_ctrl.terminated())
+			{
+				sys_ctrl.io_work.reset();
+			}
+			else
+			{
+				term->set_prompt(sys_ctrl.get_prompt());
+			}
 	});
 
-	ptree_ctrl.initiate();
-	term->set_prompt(ptree_ctrl.get_prompt());
-
-	while(true)
-	{
-		std::this_thread::sleep_for(std::chrono::seconds{ 1 });
-	}
-
-
-	sys_control::fsm::system_controller sys_ctrl{ std::move(sys_defns), std::move(pt), sink, prompt_cb };
-	sys_control::sys_cmd_interface cmd_if{ sys_ctrl, std::cout };
-
-	term->register_command_handler([&cmd_if](std::string cmd)
-	{
-		// NOTE: This handler is invoked from a Wt session thread
-		std::cout << "cmd [" << cmd << "]" << std::endl;
-
-		cmd_if.process(cmd);
-	});
-
-//	cmd_if.enter_cmd_loop(std::cin);
 
 	sys_ctrl.start();
 

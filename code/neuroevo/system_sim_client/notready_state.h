@@ -3,7 +3,7 @@
 #ifndef __WB_SYSSIM_CLIENT_CONTROL_NOT_READY_STATE_H
 #define __WB_SYSSIM_CLIENT_CONTROL_NOT_READY_STATE_H
 
-#include "clsm.h"
+#include "clsm/clsm.h"
 #include "inactive_state.h"
 
 

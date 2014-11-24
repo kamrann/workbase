@@ -28,6 +28,9 @@
     <Filter Include="io\terminals\parsers">
       <UniqueIdentifier>{997806e3-e06d-4785-8aec-1bdae75348a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="io\state_machine">
+      <UniqueIdentifier>{52c56460-f45f-4e20-a89a-621bc0493ce8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -162,6 +165,33 @@
     <ClInclude Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.h">
       <Filter>io\commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\base_node_state.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\enum_state.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\general_state.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\node_type_choice.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\paramtree_fsm.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\paramtree_fsm_defn.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\random_state.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\state_machine\repeat_state.h">
+      <Filter>io\state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\params\dynamic_enum_schema.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\common\params\stdafx.cpp">
@@ -223,6 +253,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\common\params\enum_remove_cmd_parser.cpp">
       <Filter>io\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\base_node_state.cpp">
+      <Filter>io\state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\enum_state.cpp">
+      <Filter>io\state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\paramtree_fsm_defn.cpp">
+      <Filter>io\state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\random_state.cpp">
+      <Filter>io\state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\params\state_machine\repeat_state.cpp">
+      <Filter>io\state_machine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

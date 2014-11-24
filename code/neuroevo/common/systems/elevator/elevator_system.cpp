@@ -242,7 +242,10 @@ namespace sys {
 			i_controller::input_list_t inputs;
 			for(auto const& input_id : required_inputs)
 			{
-				inputs.push_back(m_agent->get_sensor_value(input_id));
+				auto bound = get_state_value_binding(input_id);
+				auto value = get_state_value(bound);
+				inputs.push_back(value);
+					//m_agent->get_sensor_value(input_id));
 			}
 
 			auto outputs = m_controller->process(inputs);

@@ -28,6 +28,8 @@ namespace sys {
 
 			virtual void activate_effectors(effector_activations const& activations) override;
 
+			virtual void on_contact(b2Fixture* fixA, b2Fixture* fixB, ContactType type) override;
+
 		public:
 			basic_biped(std::shared_ptr< basic_biped_defn::spec_data > _spec, std::shared_ptr< basic_biped_defn::instance_data > _inst);
 			//void set_system(phys2d_system const* sys);

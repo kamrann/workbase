@@ -10,13 +10,15 @@
 #include "random_procreation_selection.h"
 #include "procreation.h"
 #include "individual.h"
-
+/*
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+*/
 
 #include <vector>
 #include <ostream>
+#include <random>
 
 
 template <
@@ -26,15 +28,19 @@ template <
 	typename SurvivalSelection,// = truncation_survival_selection< std::vector< individual< Genome, FitnessType > >::iterator,
 	typename CrossoverFtr,// = basic_crossover< Individual::genome_t >,
 	typename MutationFtr,// = basic_real_mutation< Individual::genome_t >,
-	typename CrossoverRateFtr = FixedCrossoverRate,
-	typename MutationRateFtr = FixedMutationRate,
+	typename RectificationFtr,
+	typename CrossoverRateFtr,//= FixedCrossoverRate,
+	typename MutationRateFtr,// = FixedMutationRate,
+	typename RateContext,
 	typename ProcreationSelection = random_procreation_selection<>,
 	template <
 		typename _ProcreationSelection,
 		typename _CrossoverFtr,
 		typename _MutationFtr,
+		typename _RectificationFtr,
 		typename _CrossoverRateFtr,
 		typename _MutationRateFtr,
+		typename _RateContext,
 		typename _RGen
 	> class ProcreationT = basic_procreation
 >
@@ -50,17 +56,23 @@ struct gen_alg
 	typedef SurvivalSelection					survival_sel_t;
 	typedef CrossoverFtr						cx_ftr_t;
 	typedef MutationFtr							mut_ftr_t;
+	typedef RectificationFtr					rect_ftr_t;
 	typedef CrossoverRateFtr					cx_rate_ftr_t;
 	typedef MutationRateFtr						mut_rate_ftr_t;
+	typedef RateContext							rate_context_t;
 	typedef ProcreationSelection				proc_sel_t;
 
-	typedef boost::random::mt19937				rgen_t;
+	//typedef boost::random::mt19937				rgen_t;
+	typedef std::default_random_engine			rgen_t;
+
 	typedef ProcreationT< 
 		proc_sel_t,
 		cx_ftr_t,
 		mut_ftr_t,
+		rect_ftr_t,
 		cx_rate_ftr_t,
 		mut_rate_ftr_t,
+		rate_context_t,
 		rgen_t >	procreation_t;	// TODO: Really need to enforce the RGen type to be consistent among all template
 													// parameter types, but not sure how to do easily
 
@@ -72,11 +84,14 @@ struct gen_alg
 	cx_rate_ftr_t&		cx_rate_ftr;
 	mut_ftr_t&			mut_ftr;
 	mut_rate_ftr_t&		mut_rate_ftr;
+	rect_ftr_t&			rect_ftr;
 
-	size_t		generation;
-	size_t		max_generations;
+	size_t				generation;
+	size_t				max_generations;
 
-	boost::random::mt19937&						rgen;
+	rate_context_t		rate_ctx;
+
+	rgen_t&				rgen;
 //	boost::random::uniform_real_distribution<>	rdist_pve_clamped;
 //	boost::random::uniform_real_distribution<>	rdist_clamped;
 
@@ -87,15 +102,19 @@ struct gen_alg
 		cx_rate_ftr_t& _cx_rate,
 		mut_ftr_t& _mut,
 		mut_rate_ftr_t& _mut_rate,
-		boost::random::mt19937& rg
+		rect_ftr_t& _rect,
+		rate_context_t _rate_ctx,
+		rgen_t& rg
 		):
 		proc_sel(_proc_sel),
 		cx_ftr(_cx),
 		cx_rate_ftr(_cx_rate),
 		mut_ftr(_mut),
 		mut_rate_ftr(_mut_rate),
+		rect_ftr(_rect),
 		genome_length(1),
 		generation(0),
+		rate_ctx(_rate_ctx),
 //		rdist_pve_clamped(0.0, 1.0),
 //		rdist_clamped(-1.0, 1.0),
 		rgen(rg)
@@ -142,7 +161,7 @@ struct gen_alg
 		survival_sel.select_individuals(NumProgenitors, progenitors.begin());
 
 		// Next, procreation
-		procreation_t procreation(proc_sel, cx_rate_ftr, cx_ftr, mut_rate_ftr, mut_ftr, rgen, (double)generation / max_generations);
+		procreation_t procreation(proc_sel, cx_rate_ftr, cx_ftr, mut_rate_ftr, mut_ftr, rect_ftr, rgen, rate_ctx);	//(double)generation / max_generations);
 		bool const ParentSurvival = true;	// False = comma-selection, True = plus-selection
 		//population_t next_gen(ValidPopulationSize);
 		genome_population_t next_gen(ValidPopulationSize);

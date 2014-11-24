@@ -4,6 +4,11 @@
 #include "phys2d_system.h"
 #include "scenario.h"
 
+// for camera lock on hack
+#include "phys2d_object.h"
+#include "system_sim/agent.h"
+//
+
 #include "b2d_util.h"
 
 #include <Wt/WPainter>
@@ -42,7 +47,8 @@ namespace sys {
 			double const GridSquareSize = avail_size / GridDim;
 
 			// TODO: Hack - locking onto first agent
-			b2Vec2 grid_ref_pos = { 0.0f, 0.0f };//TODO: m_sys.m_agents.front().agent->get_position();
+			auto agent_ptr = dynamic_cast<object const*>(m_sys.m_agents.front().agent.get());
+			b2Vec2 grid_ref_pos = agent_ptr->get_position();
 
 			double x_off = std::fmod(-grid_ref_pos.x * scale, GridSquareSize);
 			if(x_off < 0.0)
@@ -128,40 +134,6 @@ namespace sys {
 			std::fixed(text);
 			text << m_sys.get_time() << "s";
 			painter.drawText(rc, Wt::AlignLeft | Wt::AlignMiddle, text.str());
-			/*
-					rc = Wt::WRectF(
-					0,
-					30,
-					dev_width.toPixels(),
-					30
-					);
-					text.str("");
-					text << "w = ";
-					text << st.ship.ang_velocity;
-					painter.drawText(rc, Wt::AlignLeft | Wt::AlignMiddle, text.str());
-
-					rc = Wt::WRectF(
-					0,
-					60,
-					dev_width.toPixels(),
-					30
-					);
-					text.str("");
-					text << "p = ";
-					text << vector_str< 2, double >(st.ship.position);
-					painter.drawText(rc, Wt::AlignLeft | Wt::AlignMiddle, text.str());
-
-					rc = Wt::WRectF(
-					0,
-					90,
-					dev_width.toPixels(),
-					30
-					);
-					text.str("");
-					text << "o = ";
-					text << orientation_str(st.ship.orientation);
-					painter.drawText(rc, Wt::AlignLeft | Wt::AlignMiddle, text.str());
-					*/
 		}
 
 	}

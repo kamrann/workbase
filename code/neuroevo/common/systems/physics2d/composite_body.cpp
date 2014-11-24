@@ -166,7 +166,7 @@ namespace sys {
 				comp);
 			entity_data ed{};
 			ed.type = entity_data::Type::Agent;
-			//ed.type_value = static_cast<??*>(this);
+			ed.type_value = static_cast<object*>(this);
 			ed.value = std::move(data);
 			set_body_data(comp, std::move(ed));
 		}

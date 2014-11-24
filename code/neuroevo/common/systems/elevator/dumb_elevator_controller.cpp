@@ -29,7 +29,7 @@ namespace sys {
 			return path.leaf().name();
 		}
 
-		controller_ptr dumb_elevator_controller_defn::create_controller() const
+		controller_ptr dumb_elevator_controller_defn::create_controller(prm::param_accessor acc) const
 		{
 			return std::make_unique< dumb_elevator_controller >();
 		}

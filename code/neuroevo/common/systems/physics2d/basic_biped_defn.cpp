@@ -154,6 +154,10 @@ namespace sys {
 				sv_id.pop();
 			}
 
+			svs.push_back(state_value_id::from_string("left_foot_contact"));
+			svs.push_back(state_value_id::from_string("right_foot_contact"));
+			svs.push_back(state_value_id::from_string("both_foot_contact"));
+
 			return svs;
 		}
 
@@ -164,7 +168,13 @@ namespace sys {
 
 		size_t basic_biped_defn::num_effectors(prm::param_accessor acc) const
 		{
-			return 0;
+			size_t count = 4;	// 2 knees, 2 hips
+			auto has_upper = prm::extract_as< bool >(acc["upper_body"]);
+			if(has_upper)
+			{
+				count += 0;	// TODO:
+			}
+			return count;
 		}
 
 		agent_ptr basic_biped_defn::create_agent(prm::param_accessor spec_acc, prm::param_accessor inst_acc) const
@@ -184,8 +194,8 @@ namespace sys {
 			spec->joint_data[basic_biped_defn::Joint::RightKnee].max_torque = max_knee;
 				
 			auto max_hip = prm::extract_as< double >(spec_acc["max_hip_torque"]);
-			spec->joint_data[basic_biped_defn::Joint::LeftKnee].max_torque = max_hip;
-			spec->joint_data[basic_biped_defn::Joint::RightKnee].max_torque = max_hip;
+			spec->joint_data[basic_biped_defn::Joint::LeftHip].max_torque = max_hip;
+			spec->joint_data[basic_biped_defn::Joint::RightHip].max_torque = max_hip;
 
 			auto has_upper = prm::extract_as< bool >(spec_acc["upper_body"]);
 			if(has_upper)

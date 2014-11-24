@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="genome_types">
+      <UniqueIdentifier>{301732a3-3473-4958-bce3-1d29df48a8bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="genome_types\real_valued">
+      <UniqueIdentifier>{3af2f906-f1f5-44ad-8d83-2ce61c8715bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="genome_types\binary">
+      <UniqueIdentifier>{ade7360b-9ee4-4a38-88a4-db922ffe4f3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="genome_types\array">
+      <UniqueIdentifier>{54e10f3c-42f3-47cf-9f98-73a0b9b5aabf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="param_spec">
+      <UniqueIdentifier>{d7b20549-46f3-49c2-8e87-65128b851257}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\genalg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\objective_value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fitness_assignment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\procreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fixed_real_genome.cpp">
+      <Filter>genome_types\real_valued</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fixed_binary_genome.cpp">
+      <Filter>genome_types\binary</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\param_spec\real_valued_mutation_ps.cpp">
+      <Filter>param_spec</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\genome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\genetic_population.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\genalg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\genalg_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\problem_domain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\operators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\rectification.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\rate_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fixed_rate_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\generation_variable_rate_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\interpolated_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\objective_value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fitness_assignment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\procreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fixed_binary_genome.h">
+      <Filter>genome_types\binary</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fixed_real_genome.h">
+      <Filter>genome_types\real_valued</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\real_valued_mutation.h">
+      <Filter>genome_types\real_valued</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\fixed_array_genome.h">
+      <Filter>genome_types\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\real_valued_diversity.h">
+      <Filter>genome_types\real_valued</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\genetic_algorithm\param_spec\real_valued_mutation_ps.h">
+      <Filter>param_spec</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

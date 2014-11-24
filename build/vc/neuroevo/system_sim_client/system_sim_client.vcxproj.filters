@@ -16,17 +16,11 @@
     <Filter Include="commands">
       <UniqueIdentifier>{0426d77d-7141-4b26-be88-d4b10c1a8253}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Wt displays">
-      <UniqueIdentifier>{222ad79b-8d58-426f-ad34-3a4a51b797a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="state machine">
       <UniqueIdentifier>{cff8b11d-24d7-475d-80c1-c9b97d27abc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="state machine\app">
       <UniqueIdentifier>{edb6ca86-4f0f-4f67-9382-42289c30b4fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="state machine\paramtree">
-      <UniqueIdentifier>{015f5025-b382-4587-a1a8-84e7822a03cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,58 +45,37 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_parser.cpp">
       <Filter>commands</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\wt_server.cpp">
-      <Filter>Wt displays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\chart.cpp">
-      <Filter>Wt displays</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\chart_cmd_parser.cpp">
       <Filter>commands</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\drawer_cmd_parser.cpp">
       <Filter>commands</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\drawer.cpp">
-      <Filter>Wt displays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_interface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\sys_cmd_interface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\sys_controller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\reset_cmd_parser.cpp">
       <Filter>commands</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.cpp">
-      <Filter>state machine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\terminal.cpp">
-      <Filter>Wt displays</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\enum_state.cpp">
-      <Filter>state machine\paramtree</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\paramtree_fsm_defn.cpp">
-      <Filter>state machine\paramtree</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\random_state.cpp">
-      <Filter>state machine\paramtree</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\repeat_state.cpp">
-      <Filter>state machine\paramtree</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\base_node_state.cpp">
-      <Filter>state machine\paramtree</Filter>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\active_state.cpp">
+      <Filter>state machine\app</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm_defn.cpp">
       <Filter>state machine\app</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\active_state.cpp">
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\completed_state.cpp">
+      <Filter>state machine\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\paused_state.cpp">
+      <Filter>state machine\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\running_state.cpp">
+      <Filter>state machine\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\ready_state.cpp">
+      <Filter>state machine\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\notready_state.cpp">
+      <Filter>state machine\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\editing_state.cpp">
       <Filter>state machine\app</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,77 +104,17 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\system_sim_client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\display_types.h">
-      <Filter>Wt displays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\wt_server.h">
-      <Filter>Wt displays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\chart.h">
-      <Filter>Wt displays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\display_base.h">
-      <Filter>Wt displays</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\chart_cmd_parser.h">
       <Filter>commands</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\drawer_cmd_parser.h">
       <Filter>commands</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\drawer.h">
-      <Filter>Wt displays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\cmd_interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\sys_cmd_interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\sys_controller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\reset_cmd_parser.h">
       <Filter>commands</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.h">
-      <Filter>state machine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\Wt Displays\terminal.h">
-      <Filter>Wt displays</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\choice_point.h">
-      <Filter>state machine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\clsm.h">
-      <Filter>state machine</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\parser_helpers.h">
       <Filter>commands</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\enum_state.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\general_state.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\node_type_choice.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\paramtree_fsm.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\paramtree_fsm_defn.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\random_state.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\repeat_state.h">
-      <Filter>state machine\paramtree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\base_node_state.h">
-      <Filter>state machine\paramtree</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm_defn.h">
       <Filter>state machine\app</Filter>
@@ -237,6 +150,12 @@
       <Filter>state machine\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\completed_state.h">
+      <Filter>state machine\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\control_fsm.h">
+      <Filter>state machine\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\editing_state.h">
       <Filter>state machine\app</Filter>
     </ClInclude>
   </ItemGroup>

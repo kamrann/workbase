@@ -53,7 +53,7 @@ namespace prm
 			throw std::runtime_error{ "shouldn't happen!" };
 		}
 */
-		acc.set_lock_on_failed_move(true);
+		//acc.set_lock_on_failed_move(true);
 
 		auto name = s["name"].as< std::string >();
 /*		if(acc && !acc.move_relative(name)) // todo: Maybe allow to push a non-valid state onto the location stack,
@@ -140,7 +140,7 @@ namespace prm
 		auto root = pt.m_tree.create_root().first;
 		if(acc)
 		{
-			acc.set_lock_on_failed_move(true);
+			//acc.set_lock_on_failed_move(true);
 			acc.move_to(s["name"].as< std::string >());
 		}
 		pt.generate_from_schema(s, root, acc, sch_mp);
@@ -198,7 +198,7 @@ namespace prm
 		auto contents_name = boost::any_cast<repeat_extra>(m_tree[rpt_node].extra).contents_name;
 		path += contents_name;
 
-		acc.set_lock_on_failed_move(true);
+		//acc.set_lock_on_failed_move(true);
 		acc.move_to(path);
 		auto sch = sch_mp->at(path.unindexed())(acc);
 		generate_from_schema(sch, instance, acc, sch_mp);

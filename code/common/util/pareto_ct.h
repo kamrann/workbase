@@ -20,21 +20,21 @@ namespace fus = boost::fusion;
 template <
 	typename ComponentTypelist
 >
-class pareto: public fus::result_of::as_vector< ComponentTypelist >::type
+class pareto_ct: public fus::result_of::as_vector< ComponentTypelist >::type
 {
 private:
-	typedef pareto this_t;
+	typedef pareto_ct this_t;
 	typedef fus::vector< this_t const&, this_t const& > zip_seq_t;
 	typedef fus::zip_view< zip_seq_t > zip_view_t;
 
 private:
-	inline zip_view_t zipped_to(pareto const& other) const
+	inline zip_view_t zipped_to(pareto_ct const& other) const
 	{
 		return zip_view_t(zip_seq_t(*this, other));
 	}
 
 	template < typename Ftr >
-	void parallel_for_each(pareto const& other, Ftr& ftr) const
+	void parallel_for_each(pareto_ct const& other, Ftr& ftr) const
 	{
 		fus::for_each(
 			zipped_to(other),
@@ -43,7 +43,7 @@ private:
 	}
 
 	template < typename Ftr >
-	typename Ftr::result_type parallel_fold(pareto const& other, Ftr& ftr, typename Ftr::result_type const& initial_st) const
+	typename Ftr::result_type parallel_fold(pareto_ct const& other, Ftr& ftr, typename Ftr::result_type const& initial_st) const
 	{
 		return fus::fold(
 			zipped_to(other),
@@ -82,7 +82,7 @@ private:
 	};
 
 	template < class Ftr >
-	void parallel_breakable_for_each(pareto const& other, Ftr& ftr) const
+	void parallel_breakable_for_each(pareto_ct const& other, Ftr& ftr) const
 	{
 		parallel_breakable_for_each_detail::impl(zipped_to(other), ftr, parallel_breakable_for_each_detail::uint_< 0 >(), 0);
 	}
@@ -139,44 +139,44 @@ private:
 	};
 
 public:
-	inline bool dominates(pareto const& other) const
+	inline bool dominates(pareto_ct const& other) const
 	{
 		dom_ftr ftr;
 		parallel_breakable_for_each(other, ftr);
 		return ftr.result();
 	}
 
-	inline bool dominated_by(pareto const& other) const
+	inline bool dominated_by(pareto_ct const& other) const
 	{
 		return other.dominates(*this);
 	}
 
-	inline bool same_rank(pareto const& other) const
+	inline bool same_rank(pareto_ct const& other) const
 	{
 		return !dominates(other) && !dominated_by(other);
 	}
 
-	inline bool operator> (pareto const& other) const
+	inline bool operator> (pareto_ct const& other) const
 	{
 		return dominates(other);
 	}
 
-	inline bool operator< (pareto const& other) const
+	inline bool operator< (pareto_ct const& other) const
 	{
 		return dominated_by(other);
 	}
 
-	inline bool operator== (pareto const& other) const
+	inline bool operator== (pareto_ct const& other) const
 	{
 		return same_rank(other);
 	}
 
-	inline bool operator>= (pareto const& other) const
+	inline bool operator>= (pareto_ct const& other) const
 	{
 		return !dominated_by(other);
 	}
 
-	inline bool operator<= (pareto const& other) const
+	inline bool operator<= (pareto_ct const& other) const
 	{
 		return !dominates(other);
 	}

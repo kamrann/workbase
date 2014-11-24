@@ -531,24 +531,57 @@ namespace sys {
 		return{};
 	}
 
-	size_t basic_system_defn::get_agent_num_effectors(prm::param agent_type) const
+	size_t basic_system_defn::get_agent_num_effectors(prm::param_accessor spec_acc) const
 	{
-		// TODO: ...
-		return 0;
+		auto role = get_agent_role_name(spec_acc);
+		auto type = get_agent_type_name(spec_acc);
+		auto defn = get_agent_defn(role, type);
+		return defn->num_effectors(spec_acc);
 	}
 
-/*	system_drawer_ptr basic_system_defn::get_drawer() const
+	std::vector< prm::qualified_path > basic_system_defn::get_connected_agent_specs(std::string controller_cls, std::string controller_type, prm::param_accessor acc) const
 	{
-		return nullptr;
-	}
-	*/
-	controller_ptr basic_system_defn::create_controller(prm::param_accessor acc) const
-	{
-		auto cls = prm::extract_as< prm::enum_param_val >(acc["controller_class"])[0];
-		auto type = prm::extract_as< prm::enum_param_val >(acc["controller_type"])[0];
+		std::vector< prm::qualified_path > result;
+		auto inst_list_path = acc.find_path("inst_list");
+		if(inst_list_path)
+		{
+			acc.move_to(inst_list_path);
+			// For every agent instance...
+			auto inst_paths = acc.children();
+			for(auto const& p : inst_paths)
+			{
+				auto acc2 = acc;
+				acc2.move_to(p);
 
-		auto defn = get_controller_defn(cls, type);
-		return defn->create_controller();	// TODO: should take acc ??
+				acc2.move_relative(std::string{ "inst_controller" });
+
+				auto cls_name = prm::extract_as< prm::enum_param_val >(acc2["controller_class"])[0];
+				if(cls_name != controller_cls)
+				{
+					continue;
+				}
+
+				auto type_name = prm::extract_as< prm::enum_param_val >(acc2["controller_type"])[0];
+				if(type_name != controller_type)
+				{
+					continue;
+				}
+
+				acc2.revert();
+
+				auto spec_name = get_agent_instance_spec_name(acc2);
+				if(!spec_name)
+				{
+					// As yet unspecified
+					continue;
+				}
+				auto agent_spec_path = get_agent_instance_spec_path(*spec_name, acc2);
+				acc2.revert();
+
+				result.push_back(agent_spec_path);
+			}
+		}
+		return result;
 	}
 
 	boost::optional< std::string > basic_system_defn::get_agent_instance_spec_name(prm::param_accessor acc)
@@ -632,7 +665,7 @@ namespace sys {
 			auto con_type = prm::extract_as< prm::enum_param_val >(acc["controller_type"])[0];
 
 			auto con_defn = get_controller_defn(con_cls, con_type);
-			auto controller = con_defn->create_controller();	// TODO: should take acc
+			auto controller = con_defn->create_controller(acc);
 
 			sys->register_agent_controller(agent_id, std::move(controller));
 

@@ -30,10 +30,11 @@ namespace sys {
 
 		virtual std::vector< std::string > get_agent_type_names() const = 0;
 		virtual std::vector< std::string > get_agent_sensor_names(prm::param agent_type, prm::param_accessor param_vals) const = 0;
-		virtual size_t get_agent_num_effectors(prm::param agent_type) const = 0;
+		virtual size_t get_agent_num_effectors(prm::param_accessor spec_acc) const = 0;
 
 		virtual state_value_id_list get_system_state_values(prm::param_accessor param_vals) const = 0;
 
+		// TODO: virtual bool is_defined(prm::param_accessor acc) const = 0;
 		virtual system_ptr create_system(prm::param_accessor acc) const = 0;
 
 		// TODO: probably want to combine these two
@@ -41,6 +42,13 @@ namespace sys {
 		virtual update_info get_update_info() const = 0;
 
 //		virtual system_drawer_ptr get_drawer() const = 0;
+
+		////////////// TODO: This is dodgy since parameters are really referring to basic_system_defn.
+		// Thing is, for evolved system, external access to agent/controller pairings is needed...
+		// Current impl: returns list of paths to each agent spec which has 1 or more instances connected
+		// with the given controller.
+		virtual std::vector< prm::qualified_path > get_connected_agent_specs(std::string controller_cls, std::string controller_type, prm::param_accessor acc) const = 0;
+		//////////////
 
 	public:
 		virtual ~i_system_defn()

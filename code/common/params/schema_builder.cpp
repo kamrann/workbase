@@ -90,7 +90,9 @@ namespace prm {
 			auto default_val = std::vector < std::string > {};
 			if(max_sel == 1)
 			{
-				bool const autoselect_singleoption = true;	// TODO: Make parameter
+				bool const autoselect_singleoption = false;	// TODO: Make parameter - NOTE: Set to false, think autoselect currently causes
+					// issues with associated param_tree not initially reflecting schema, at least in case
+					// of nested structures with multiple nodes having matching name.
 				default_val.push_back(min_sel == 0 && (!autoselect_singleoption || values.size() != 1) ? unspecified : values.front().first);
 			}
 			n["default"] = default_val;

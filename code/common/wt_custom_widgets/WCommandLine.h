@@ -22,14 +22,17 @@ public:
 
 public:
 	void set_prompt(std::string prompt);
+	void set_command(std::string cmd);
 
 	Wt::Signal< std::string >& on_command();
+	Wt::Signal< Wt::Key >& on_key();
 
 private:
 	Wt::WLabel* m_prompt;
 	Wt::WLineEdit* m_command_edit;
 
 	Wt::Signal< std::string > m_cmd_signal;
+	Wt::Signal< Wt::Key > m_key_signal;
 };
 
 

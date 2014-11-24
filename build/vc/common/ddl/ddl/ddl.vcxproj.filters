@@ -1,0 +1,468 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="schema_defn">
+      <UniqueIdentifier>{c4481514-1cef-4d86-9b86-a70579f37fc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="schema_inst">
+      <UniqueIdentifier>{c79d98de-fcda-49aa-a2a5-3bff8ac62f8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="values">
+      <UniqueIdentifier>{387a09f5-6dec-40f2-a4e5-5ade6d0dea8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{ca4ff7f7-d34a-4292-b5a9-e114cd852028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="state_machine">
+      <UniqueIdentifier>{f85987c9-62e7-487d-a8ac-2299dc58a2c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="commands">
+      <UniqueIdentifier>{b80d310c-9a2d-44b1-ad7f-81fdf961f47e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="terminal_io">
+      <UniqueIdentifier>{75317678-b12f-43d5-986e-fec2fc8c4854}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\stdafx.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\output.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\boolean_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\composite_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\enum_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\integer_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\list_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\realnum_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\string_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\composite_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\enum_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\integer_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\list_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\realnum_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\string_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\specifiers.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\conditional_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\values\value_node.cpp">
+      <Filter>values</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\instantiate.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\boolean_defn_node.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\value_output.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\values\schema_adjustment.cpp">
+      <Filter>values</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\values\schema_validation.cpp">
+      <Filter>values</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\values\navigator.cpp">
+      <Filter>values</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\condition.cpp">
+      <Filter>schema_defn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\base_node_state.cpp">
+      <Filter>state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\paramtree_fsm_defn.cpp">
+      <Filter>state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\debug_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\enum_add_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\enum_remove_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\list_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\load_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\nav_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\nav_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\repeat_add_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\repeat_remove_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\save_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\setvalue_cmd_parser.cpp">
+      <Filter>commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\path.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\general_state.cpp">
+      <Filter>state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\repeat_state.cpp">
+      <Filter>state_machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\node_ref.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\ddl.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\ddl_types.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\output.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\stdafx.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\targetver.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\value_node.h">
+      <Filter>values</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\boolean_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\composite_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\enum_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\integer_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\list_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\realnum_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\string_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\boolean_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\composite_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\enum_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\integer_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\realnum_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\sch_node_ptr.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\list_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\string_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\defn_node_ptr.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\boolean_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\boolean_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\composite_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\composite_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\enum_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\enum_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\integer_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\integer_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\list_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\list_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\realnum_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\realnum_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\string_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\string_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\conditional_defn_node.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\sch_node_type_from_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\defn_node_type_from_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\enum_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\instantiate.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\conditional_defn_node_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\navigator.h">
+      <Filter>values</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\integer_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\node_ref.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\condition.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\defn_node_base_impl.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\base_node_state.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\enum_state.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\general_state.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\node_type_choice.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\paramtree_fsm.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\paramtree_fsm_defn.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\random_state.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\repeat_state.h">
+      <Filter>state_machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\debug_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\enum_add_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\enum_remove_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\list_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\load_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\nav_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\nav_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\repeat_add_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\repeat_remove_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\save_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\setvalue_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\boolean_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\boolean_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\enum_element_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\enum_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\enum_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\integer_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\integer_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\random_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\random_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\realnum_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\realnum_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\string_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\string_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\vector_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\vector_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\value_emitter.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\value_parser.h">
+      <Filter>terminal_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\value.h">
+      <Filter>values</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\path.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\boolean_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\defn_node_holder.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\default_specifier.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\range_specifier.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\realnum_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\list_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\string_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\basic_value_specifier.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\min_specifier.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\composite_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\conditional_specifiers.h">
+      <Filter>schema_defn</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

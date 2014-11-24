@@ -1,6 +1,7 @@
 // control_fsm_defn.cpp
 
 #include "control_fsm_defn.h"
+#include "control_fsm.h"
 
 #include "system_sim/system_defn.h"
 #include "system_sim/system.h"
@@ -17,15 +18,22 @@ namespace sys_control {
 		system_controller::system_controller(
 			std::map< std::string, std::shared_ptr< sys::i_system_defn > > _sys_defns,
 			prm::param_tree _pt,
+			prm::schema::schema_provider_map_handle _provider,
 			std::function< void(std::string) > _output_sink,
 			std::function< void(std::string) > _prompt_callback
 			):
 			sys_defns{ std::move(_sys_defns) },
 			ptree{ std::move(_pt) },
+			provider{ _provider },
 			output_sink{ _output_sink },
 			prompt_callback{ _prompt_callback }
 		{
 
+		}
+
+		std::string system_controller::get_prompt() const
+		{
+			return state_cast<clsm::i_cmd_state const&>().get_prompt();
 		}
 
 		void system_controller::start()
@@ -39,9 +47,11 @@ namespace sys_control {
 			// temp
 			io_service.post([this]
 			{
-				process_event(ev_init{});
+//				process_event(clsm::ev_cmd< init_cmd >{});
 			});
 			//
+
+			prompt_callback(get_prompt());
 
 			io_service.run();
 		}

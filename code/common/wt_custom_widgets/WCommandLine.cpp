@@ -29,6 +29,11 @@ WCommandLine::WCommandLine()
 		m_command_edit->setText("");
 		m_cmd_signal.emit(cmd);
 	}));
+	m_command_edit->keyWentDown().connect(std::bind([this](Wt::WKeyEvent ev)
+	{
+		m_key_signal.emit(ev.key());
+	}, std::placeholders::_1));
+
 //	m_command_edit->setMinimumSize(200.0, Wt::WLength::Auto);
 //	m_command_edit->setWidth(Wt::WLength::Auto);
 	layout_->addWidget(m_command_edit, 1, Wt::AlignBottom);
@@ -43,9 +48,19 @@ void WCommandLine::set_prompt(std::string prompt)
 	m_prompt->setText(prompt);
 }
 
+void WCommandLine::set_command(std::string cmd)
+{
+	m_command_edit->setText(cmd);
+}
+
 Wt::Signal< std::string >& WCommandLine::on_command()
 {
 	return m_cmd_signal;
+}
+
+Wt::Signal< Wt::Key >& WCommandLine::on_key()
+{
+	return m_key_signal;
 }
 
 

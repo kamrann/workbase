@@ -8,16 +8,28 @@
 #include "named_genome_tbl.h"
 
 #include <Wt/Dbo/FixedSqlConnectionPool>
+//#include <Wt/Dbo/backend/Sqlite3>
+#include <Wt/Dbo/backend/Postgres>
 
 
-dbo::SqlConnectionPool* evodb_session::create_connection_pool(const std::string& sqlite3_db)
+dbo::SqlConnectionPool* evodb_session::create_connection_pool(const std::string& conn_str)
 {
-	dbo::backend::Sqlite3* connection = new dbo::backend::Sqlite3(sqlite3_db);
+	try
+	{
+		auto connection =
+			//new dbo::backend::Sqlite3(conn_str);
+			new dbo::backend::Postgres(conn_str);
 
-	connection->setProperty("show-queries", "false");
-	connection->setDateTimeStorage(Wt::Dbo::SqlDateTime, Wt::Dbo::backend::Sqlite3::PseudoISO8601AsText);
+		connection->setProperty("show-queries", "false");
+		//	connection->setDateTimeStorage(Wt::Dbo::SqlDateTime, Wt::Dbo::backend::Sqlite3::PseudoISO8601AsText);
 
-	return new dbo::FixedSqlConnectionPool(connection, 10);	// NOTE: If use value of 1, all transactions will be serialized
+		return new dbo::FixedSqlConnectionPool(connection, 10);	// NOTE: If use value of 1, all transactions will be serialized
+	}
+	catch(Wt::WException& e)
+	{
+		std::cout << "DB Exception: " << e.what() << std::endl;
+		return nullptr;
+	}
 }
 
 evodb_session::evodb_session(dbo::SqlConnectionPool& conn_pool): connection_pool(conn_pool)

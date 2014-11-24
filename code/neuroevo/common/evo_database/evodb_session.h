@@ -9,7 +9,6 @@
 #include <Wt/Auth/Login>
 #include <Wt/Dbo/Session>
 #include <Wt/Dbo/ptr>
-#include <Wt/Dbo/backend/Sqlite3>
 
 
 namespace dbo = Wt::Dbo;
@@ -32,7 +31,7 @@ public:
 		return new_gen_sig;
 	}
 */
-	static dbo::SqlConnectionPool* create_connection_pool(const std::string& sqlite3_db);
+	static dbo::SqlConnectionPool* create_connection_pool(const std::string& conn_str);
 
 private:
 //	void check_static_tables();

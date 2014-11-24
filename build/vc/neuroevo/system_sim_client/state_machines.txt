@@ -14,9 +14,3 @@ Root (Quit) *	{ param tree }
 		Running (Pause->NotRunning)
 
 
-
-
-Param Editor
-
-States:
-
