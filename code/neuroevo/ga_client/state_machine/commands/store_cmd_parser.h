@@ -3,8 +3,6 @@
 #ifndef __WB_GA_CLIENT_STORE_CMD_PARSER_H
 #define __WB_GA_CLIENT_STORE_CMD_PARSER_H
 
-#include "params/param.h"
-
 #include <boost/spirit/include/qi.hpp>
 #include <boost/optional.hpp>
 

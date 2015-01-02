@@ -1,4 +1,15 @@
 // basic_biped.cpp
+/*
+BIPED LEARNING NOTES
+
+Muscle energy: per-muscle value that diminishes proprtionally (not necessarily linearly) with force applied.
+Gradually builds back to a maximum when force is below some threshold (obviously rebuilding more quickly the
+closer the applied force is to zero).
+
+The energy value affects the force that can be applied at the muscle. Either modulate the controller output
+by a function of the current muscle energy, or alternatively modulate the output by a static max force, but then
+clamp it to a function of the muscle energy.
+*/
 
 #include "basic_biped.h"
 #include "basic_biped_defn.h"
@@ -24,15 +35,17 @@ namespace sys {
 			// Biped specific ones
 			auto bound_id = accessors.size();
 			state_value_id sv_id;
-
+#if 0 TODO:
 			auto has_upper = false;// TODO:
-			auto joints = has_upper ? basic_biped_defn::all_joints() : basic_biped_defn::lower_joints();
-			for(auto jnt : joints)
+			auto joint_set = has_upper ? basic_biped_defn::all_joints() : basic_biped_defn::lower_joints();
+			for(auto jnt : joint_set)
 			{
 				sv_id += basic_biped_defn::s_joint_names.at(jnt);
 
-				for(auto jnt_sv : std::set < basic_biped_defn::JointStateValue >{ basic_biped_defn::JointStateValue::Angle, basic_biped_defn::JointStateValue::Speed })
+				for(auto jnt_sv_i = 0; jnt_sv_i < (int)basic_biped_defn::JointStateValue::Count; ++jnt_sv_i)
 				{
+					auto jnt_sv = (basic_biped_defn::JointStateValue)jnt_sv_i;
+
 					sv_id += basic_biped_defn::s_joint_sv_names.at(jnt_sv);
 
 					bindings[sv_id] = bound_id++;
@@ -54,6 +67,18 @@ namespace sys {
 								return knee1->GetJointSpeed();
 							});
 							break;
+							case basic_biped_defn::JointStateValue::Energy:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::LeftKnee).energy;
+							});
+							break;
+							case basic_biped_defn::JointStateValue::Torque:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::LeftKnee).applied_torque;
+							});
+							break;
 						}
 						break;
 
@@ -70,6 +95,18 @@ namespace sys {
 							accessors.push_back([this]
 							{
 								return knee2->GetJointSpeed();
+							});
+							break;
+							case basic_biped_defn::JointStateValue::Energy:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::RightKnee).energy;
+							});
+							break;
+							case basic_biped_defn::JointStateValue::Torque:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::RightKnee).applied_torque;
 							});
 							break;
 						}
@@ -90,6 +127,18 @@ namespace sys {
 								return hip1->GetJointSpeed();
 							});
 							break;
+							case basic_biped_defn::JointStateValue::Energy:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::LeftHip).energy;
+							});
+							break;
+							case basic_biped_defn::JointStateValue::Torque:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::LeftHip).applied_torque;
+							});
+							break;
 						}
 						break;
 
@@ -108,6 +157,18 @@ namespace sys {
 								return hip2->GetJointSpeed();
 							});
 							break;
+							case basic_biped_defn::JointStateValue::Energy:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::RightHip).energy;
+							});
+							break;
+							case basic_biped_defn::JointStateValue::Torque:
+							accessors.push_back([this]
+							{
+								return muscle_states.at(basic_biped_defn::Joint::RightHip).applied_torque;
+							});
+							break;
 						}
 						break;
 					}
@@ -117,6 +178,7 @@ namespace sys {
 
 				sv_id.pop();
 			}
+#endif
 
 			sv_id = state_value_id::from_string("left_foot_contact");
 			bindings[sv_id] = bound_id++;
@@ -159,8 +221,12 @@ namespace sys {
 			return{};// m_system->m_state_value_accessors[sensor]();
 		}
 
-		basic_biped::basic_biped(std::shared_ptr< basic_biped_defn::spec_data > _spec, std::shared_ptr< basic_biped_defn::instance_data > _inst)//:
-//			m_system(nullptr)
+		basic_biped::basic_biped(
+			std::shared_ptr< basic_biped_defn::spec_data > _spec,
+			std::shared_ptr< basic_biped_defn::instance_data > _inst
+//			, phys2d_system* system
+			)
+//			: composite_body(system)
 		{
 			m_spec = _spec;
 			m_inst = _inst;
@@ -171,7 +237,8 @@ namespace sys {
 // TODO:?			reset_state();
 			m_bodies.clear();	// TODO: this should be in composite_body
 
-			auto phys2d_sys = static_cast<phys2d_system const*>(sys);
+			auto phys2d_sys = static_cast<phys2d_system /*const*/*>(sys);
+			m_sys = phys2d_sys;
 			auto world = phys2d_sys->get_world();
 
 			float32 const initial_y = m_spec->pelvis_height / 2 + m_spec->upper_len + m_spec->lower_len + m_spec->foot_radius + 0.1f;	// TODO: temp +0.1
@@ -233,7 +300,7 @@ namespace sys {
 			// TODO: fix data value? body part enum?
 			set_fixture_data(foot1, entity_fix_data{ entity_fix_data::Type::Other, entity_fix_data::val_t{ 0 } });
 			set_fixture_data(foot2, entity_fix_data{ entity_fix_data::Type::Other, entity_fix_data::val_t{ 1 } });
-
+#if 0
 			b2RevoluteJointDef jd;
 			jd.enableLimit = true;
 			jd.enableMotor = false;// true;
@@ -246,26 +313,69 @@ namespace sys {
 			jd.upperAngle = b2_pi / 2;
 
 			jd.Initialize(pelvis, upper1, b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2));
-			hip1 = (b2RevoluteJoint*)world->CreateJoint(&jd);
+			/*hip1 =*/joints[(int)basic_biped_defn::Joint::LeftHip] = (b2RevoluteJoint*)world->CreateJoint(&jd);
 
 			jd.Initialize(pelvis, upper2, b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2));
-			hip2 = (b2RevoluteJoint*)world->CreateJoint(&jd);
+			/*hip2 = */ joints[(int)basic_biped_defn::Joint::RightHip] = (b2RevoluteJoint*)world->CreateJoint(&jd);
 
 			// Knee joints
 			jd.lowerAngle = -3 * b2_pi / 4;
 			jd.upperAngle = 0;
 
 			jd.Initialize(upper1, lower1, b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2 - m_spec->upper_len));
-			knee1 = (b2RevoluteJoint*)world->CreateJoint(&jd);
+			/*knee1 =*/joints[(int)basic_biped_defn::Joint::LeftKnee] = (b2RevoluteJoint*)world->CreateJoint(&jd);
 
 			jd.Initialize(upper2, lower2, b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2 - m_spec->upper_len));
-			knee2 = (b2RevoluteJoint*)world->CreateJoint(&jd);
-
+			/*knee2 =*/joints[(int)basic_biped_defn::Joint::RightKnee] = (b2RevoluteJoint*)world->CreateJoint(&jd);
+#endif
 			add_component_body(pelvis, entity_data::val_t{});
 			add_component_body(upper1, entity_data::val_t{});
 			add_component_body(upper2, entity_data::val_t{});
 			add_component_body(lower1, entity_data::val_t{});
 			add_component_body(lower2, entity_data::val_t{});
+
+
+			auto left_hip = revolute_joint::create_torque_activation(
+				pelvis,
+				upper1,
+				b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2),
+				m_spec->joint_data.at(basic_biped_defn::Joint::LeftHip).max_torque,
+				std::make_pair< double, double >(-b2_pi / 9, b2_pi / 2),
+				false
+				);
+			add_revolute(basic_biped_defn::s_joint_names.at(basic_biped_defn::Joint::LeftHip), left_hip);
+
+			auto right_hip = revolute_joint::create_torque_activation(
+				pelvis,
+				upper2,
+				b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2),
+				m_spec->joint_data.at(basic_biped_defn::Joint::RightHip).max_torque,
+				std::make_pair< double, double >(-b2_pi / 9, b2_pi / 2),
+				false
+				);
+			add_revolute(basic_biped_defn::s_joint_names.at(basic_biped_defn::Joint::RightHip), right_hip);
+
+			auto left_knee = revolute_joint::create_torque_activation(
+				upper1,
+				lower1,
+				b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2 - m_spec->upper_len),
+				m_spec->joint_data.at(basic_biped_defn::Joint::LeftKnee).max_torque,
+				std::make_pair< double, double >(-3 * b2_pi / 4, 0.0),
+				false
+				);
+			add_revolute(basic_biped_defn::s_joint_names.at(basic_biped_defn::Joint::LeftKnee), left_knee);
+
+			auto right_knee = revolute_joint::create_torque_activation(
+				upper2,
+				lower2,
+				b2Vec2(0.0f, initial_y - m_spec->pelvis_height / 2 - m_spec->upper_len),
+				m_spec->joint_data.at(basic_biped_defn::Joint::RightKnee).max_torque,
+				std::make_pair< double, double >(-3 * b2_pi / 4, 0.0),
+				false
+				);
+			add_revolute(basic_biped_defn::s_joint_names.at(basic_biped_defn::Joint::RightKnee), right_knee);
+
+			// todo: upper body joints
 
 
 			// Initial conditions
@@ -276,6 +386,14 @@ namespace sys {
 
 			damage = 0.0;
 			life = 1.0;
+
+			for(size_t j = 0; j < (size_t)basic_biped_defn::Joint::Count; ++j)
+			{
+				auto jnt = (basic_biped_defn::Joint)j;
+
+				muscle_states[jnt].energy = 1.0;
+				muscle_states[jnt].applied_torque = 0.0;
+			}
 		}
 
 /*		void basic_biped::set_system(phys2d_system const* sys)
@@ -283,18 +401,47 @@ namespace sys {
 			m_system = sys;
 		}
 */
+		double basic_biped::get_force_strength(basic_biped_defn::Joint jnt, double desired)
+		{
+			auto const maximum = m_spec->joint_data.at(jnt).max_torque;
+			auto& energy = muscle_states.at(jnt).energy;
+
+			// for now just linear cap
+			auto modulation = std::min(std::abs(desired), energy * life);
+			auto strength = std::copysign(modulation * maximum, desired);
+
+			auto const timestep = 1.0 / 30.0;	// TODO: !!!!!!!!!!
+			// perhaps affect on energy levels should be dependent on effort in applying force, rather than 
+			// force that resulted. ie. original desired value, rather than modulated one.
+			auto const power = 2.0; /*??*/
+			auto const eqilibrium_force = 0.5;	// the modulation level at which force can be constantly applied without energy change
+				// below this and energy will increase, above and it will decrease
+			energy -= std::pow(modulation, power) * timestep * 1.0;	// this means will take 1s to exhaust full energy applying max force
+			energy += std::pow(eqilibrium_force, power) * timestep;
+			energy = std::max(0.0, energy);
+			energy = std::min(1.0, energy);
+
+			muscle_states.at(jnt).applied_torque = strength;
+
+			return strength;
+		}
+
 		void basic_biped::activate_effectors(effector_activations const& activations)
 		{
 			// TODO: Store activations so accessible as state values?
 
-			pelvis->ApplyTorque(-activations[0] * m_spec->joint_data.at(basic_biped_defn::Joint::LeftHip).max_torque * life, true);
-			upper1->ApplyTorque(activations[0] * m_spec->joint_data.at(basic_biped_defn::Joint::LeftHip).max_torque * life, true);
-			pelvis->ApplyTorque(-activations[1] * m_spec->joint_data.at(basic_biped_defn::Joint::RightHip).max_torque * life, true);
-			upper2->ApplyTorque(activations[1] * m_spec->joint_data.at(basic_biped_defn::Joint::RightHip).max_torque * life, true);
-			upper1->ApplyTorque(-activations[2] * m_spec->joint_data.at(basic_biped_defn::Joint::LeftKnee).max_torque * life, true);
-			lower1->ApplyTorque(activations[2] * m_spec->joint_data.at(basic_biped_defn::Joint::LeftKnee).max_torque * life, true);
-			upper2->ApplyTorque(-activations[3] * m_spec->joint_data.at(basic_biped_defn::Joint::RightKnee).max_torque * life, true);
-			lower2->ApplyTorque(activations[3] * m_spec->joint_data.at(basic_biped_defn::Joint::RightKnee).max_torque * life, true);
+			auto left_hip_tq = get_force_strength(basic_biped_defn::Joint::LeftHip, activations[0]);
+			pelvis->ApplyTorque(-left_hip_tq, true);
+			upper1->ApplyTorque(left_hip_tq, true);
+			auto right_hip_tq = get_force_strength(basic_biped_defn::Joint::RightHip, activations[1]);
+			pelvis->ApplyTorque(-right_hip_tq, true);
+			upper2->ApplyTorque(right_hip_tq, true);
+			auto left_knee_tq = get_force_strength(basic_biped_defn::Joint::LeftKnee, activations[2]);
+			upper1->ApplyTorque(-left_knee_tq, true);
+			lower1->ApplyTorque(left_knee_tq, true);
+			auto right_knee_tq = get_force_strength(basic_biped_defn::Joint::RightKnee, activations[3]);
+			upper2->ApplyTorque(-right_knee_tq, true);
+			lower2->ApplyTorque(right_knee_tq, true);
 
 			// TODO: Upper
 		}
@@ -314,6 +461,17 @@ namespace sys {
 				else if(val == 1)
 				{
 					right_foot_contact = (type == ContactType::Begin);
+				}
+			}
+			else if(type == ContactType::Begin)
+			{
+				// Non-foot contact
+				damage += 1.0;
+
+				if(m_spec->contact_damage)
+				{
+					// TODO: For now, insta death
+					life = 0.0;
 				}
 			}
 		}

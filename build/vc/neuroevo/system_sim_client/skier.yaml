@@ -1,0 +1,123 @@
+composite:
+  results:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        core:
+          composite:
+            position_iterations:
+              integer: 3
+            duration:
+              real: 20
+            velocity_iterations:
+              integer: 8
+            scenario_type:
+              enum:
+                - aerials
+            updates_per_sec:
+              integer: 60
+            scenario:
+              conditional:
+                composite:
+                  ramp_gradient:
+                    real: 2
+                  ramp_width:
+                    real: 20
+                  dip_depth:
+                    real: 6
+                  gravity:
+                    real: 9.810000000000001
+                  landing_flat_width:
+                    real: 10
+                  landing_slope_drop:
+                    real: 15
+                  overall_scale:
+                    real: 1.6
+                  platform_width:
+                    real: 5
+                  surface_friction:
+                    real: 0.1
+                  slope_gradient:
+                    real: 1.5
+                  wall_height:
+                    real: 2
+                  slope_drop:
+                    real: 20
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_angvel:
+                                real: 0
+                              init_linear_angle:
+                                real: 90
+                              init_linear_speed:
+                                real: 3
+                              init_orientation:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_y:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_skier
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite: ~
+                          controller_type:
+                            enum:
+                              - passive
+                    controller_class:
+                      enum:
+                        - preset
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  torso_width:
+                                    real: 1
+                                  ski_friction:
+                                    real: 0
+                                  ski_length:
+                                    real: 2
+                                  torso_height:
+                                    real: 2.5
+                            name:
+                              string: the_skier
+                      agent_type:
+                        enum:
+                          - skier
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []

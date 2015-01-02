@@ -15,10 +15,12 @@
 namespace sys {
 	namespace phys2d {
 
+		class phys2d_system;
+
 		class object
 		{
-		public:
-			//object(phys_agent_specification const& spec, phys_system* system);
+		public:			
+			object(phys2d_system* system = nullptr);
 
 		public:
 			virtual void translate(b2Vec2 const& vec) = 0;
@@ -46,6 +48,8 @@ namespace sys {
 			};
 
 			static bimap< StateValue, std::string > const s_sv_names;
+
+			phys2d_system* m_sys;
 		};
 
 	}

@@ -23,7 +23,8 @@ namespace ddl {
 			string_sch_node_ptr,
 			enum_sch_node_ptr,
 			list_sch_node_ptr,
-			composite_sch_node_ptr
+			composite_sch_node_ptr,
+			conditional_sch_node_ptr
 		>
 		sch_node_var_t;
 
@@ -37,6 +38,7 @@ namespace ddl {
 	class enum_sch_node;
 	class list_sch_node;
 	class composite_sch_node;
+	class conditional_sch_node;
 
 	class sch_node
 	{
@@ -49,6 +51,7 @@ namespace ddl {
 		sch_node(enum_sch_node const& en);
 		sch_node(list_sch_node const& ln);
 		sch_node(composite_sch_node const& cn);
+		sch_node(conditional_sch_node const& cn);
 
 		operator bool() const;
 
@@ -83,6 +86,9 @@ namespace ddl {
 			auto node_vis = node_visitor < Visitor > { vis };
 			return boost::apply_visitor(node_vis, storage_);
 		}
+
+		template < typename SchNodeType >
+		auto get_as() const->SchNodeType;
 
 	private:
 		detail::sch_node_var_t storage_;

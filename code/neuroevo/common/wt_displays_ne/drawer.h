@@ -8,6 +8,8 @@
 
 #include "system_sim/system_drawer.h"
 
+#include "input_stream/wt_input_stream.h"
+
 #include <Wt/WPaintedWidget>
 
 #include <mutex>
@@ -18,6 +20,15 @@ struct drawer_dd
 {
 	std::mutex* mx;
 	std::shared_ptr< sys::i_system_drawer > drawer;
+	double zoom;
+
+	std::shared_ptr< input::wt_input_stream > in_strm;
+
+	drawer_dd():
+		mx{ nullptr },
+		drawer{ nullptr },
+		zoom{ 1.0 }
+	{}
 };
 
 class drawer_display:

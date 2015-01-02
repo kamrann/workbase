@@ -1,0 +1,269 @@
+composite:
+  ga_cfg:
+    composite:
+      crossover:
+        composite:
+          cx_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 1
+              option:
+                enum:
+                  - fixed
+      mutation:
+        composite:
+          mut_rate:
+            composite:
+              option:
+                enum:
+                  - fixed
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 0.1
+      pop_size:
+        integer: 30
+      trials:
+        composite:
+          num_trials:
+            integer: 1
+          trial_merging:
+            enum:
+              - average
+  domain_cfg:
+    composite:
+      contents:
+        conditional:
+          composite:
+            obj:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      timespan:
+                        conditional:
+                          enum:
+                            - End
+                      value_type:
+                        enum:
+                          - Value
+                      direction_type:
+                        enum:
+                          - Maximise
+                      state_val:
+                        enum:
+                          - jump_distance
+                option:
+                  enum:
+                    - single_objective
+            ev_con:
+              composite:
+                option:
+                  enum:
+                    - rnn
+                contents:
+                  conditional:
+                    composite:
+                      temp_mutation:
+                        composite:
+                          option:
+                            enum:
+                              - variable_gaussian
+                          contents:
+                            conditional:
+                              composite:
+                                initial_std_dev:
+                                  real: 0.4
+                                cutoff_generations:
+                                  integer: 1000
+                                cutoff_std_dev:
+                                  real: 0.01
+                      output_steepness:
+                        real: 0.5
+                      hidden_steepness:
+                        real: 0.5
+                      hidden_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      inputs:
+                        enum:
+                          - knee/angle
+                          - hip/angle
+                          - shoulder/angle
+                          - wrist/angle
+                          - ski_back/contact
+                          - ski_front/contact
+                          - on_platform
+                          - platform_pos
+                          - on_takeoff
+                          - takeoff_pos
+                      output_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      hidden_neuron_count:
+                        integer: 10
+            sys:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      core:
+                        composite:
+                          duration:
+                            real: 20
+                          position_iterations:
+                            integer: 2
+                          scenario:
+                            conditional:
+                              composite:
+                                gravity:
+                                  real: 9.810000000000001
+                                inrun_incline:
+                                  real: 45
+                                inrun_length:
+                                  real: 30
+                                surface_friction:
+                                  real: 0.2
+                                takeoff_incline:
+                                  real: 0
+                                takeoff_length:
+                                  real: 5
+                                transition1_radius:
+                                  real: 8
+                                wall_height:
+                                  real: 2
+                                platform_width:
+                                  real: 5
+                                overall_scale:
+                                  real: 1
+                                jump_dropoff:
+                                  real: 2
+                                landing_drop:
+                                  real: 25
+                                landing_length:
+                                  real: 140
+                                landing_x1:
+                                  real: 3.5
+                                landing_x2:
+                                  real: -10
+                          scenario_type:
+                            enum:
+                              - ski_jump
+                          updates_per_sec:
+                            integer: 30
+                          velocity_iterations:
+                            integer: 4
+                      instances:
+                        list:
+                          - composite:
+                              inst_contents:
+                                composite:
+                                  spec_reference:
+                                    enum:
+                                      - the_skier
+                                  inst_details:
+                                    conditional:
+                                      composite:
+                                        initial_conditions:
+                                          composite:
+                                            init_angvel:
+                                              real: 0
+                                            init_orientation:
+                                              real: 0
+                                            init_y:
+                                              real: 0
+                                            init_x:
+                                              real: 0
+                                            init_linear_angle:
+                                              real: 0
+                                            init_linear_speed:
+                                              real: 0
+                              inst_controller:
+                                composite:
+                                  class_contents:
+                                    conditional:
+                                      composite:
+                                        controller_contents:
+                                          conditional:
+                                            composite:
+                                              details:
+                                                conditional:
+                                                  composite: ~
+                                        controller_type:
+                                          enum:
+                                            - evolved
+                                  controller_class:
+                                    enum:
+                                      - evolved_cls
+                      specs:
+                        list:
+                          - composite:
+                              agent_role:
+                                enum:
+                                  - default
+                              role_contents:
+                                conditional:
+                                  composite:
+                                    agent_contents:
+                                      conditional:
+                                        composite:
+                                          details:
+                                            conditional:
+                                              composite:
+                                                boot_width:
+                                                  real: 0.1
+                                                lower_leg_length:
+                                                  real: 0.5
+                                                arm_length:
+                                                  real: 0.5
+                                                arm_thickness:
+                                                  real: 0.1
+                                                boot_height:
+                                                  real: 0.1
+                                                ski_friction:
+                                                  real: 0
+                                                ski_length:
+                                                  real: 2
+                                                ski_thickness:
+                                                  real: 0.05
+                                                torso_height:
+                                                  real: 0.6
+                                                lower_leg_thickness:
+                                                  real: 0.1
+                                                max_ankle_torque:
+                                                  real: 1
+                                                max_hip_torque:
+                                                  real: 3
+                                                max_knee_torque:
+                                                  real: 3
+                                                max_shoulder_torque:
+                                                  real: 3
+                                                max_wrist_torque:
+                                                  real: 3
+                                                pole_friction:
+                                                  real: 1
+                                                pole_length:
+                                                  real: 0.4
+                                                pole_thickness:
+                                                  real: 0.05
+                                                torso_width:
+                                                  real: 0.3
+                                                upper_leg_length:
+                                                  real: 0.5
+                                                upper_leg_thickness:
+                                                  real: 0.15
+                                          name:
+                                            string: the_skier
+                                    agent_type:
+                                      enum:
+                                        - skier
+                option:
+                  enum:
+                    - physics_2d
+      option:
+        enum:
+          - syssim

@@ -164,6 +164,8 @@ namespace nnet {
 
 	public:
 		// i_neural_net interface
+		virtual std::string network_type_name() const override;
+
 		virtual size_t neuron_count() const override;
 		virtual size_t input_count() const override;
 		virtual size_t output_count() const override;

@@ -25,20 +25,21 @@ namespace ddl {
 		specifier();
 
 	public:
-		boolean_specifier boolean();
-		integer_specifier integer();
-		realnum_specifier realnum();
-		string_specifier string();
-		enum_specifier enumeration();
-		list_specifier list();
-		composite_specifier composite();
-		conditional_specifier conditional();
+		boolean_specifier boolean(std::string name);
+		integer_specifier integer(std::string name);
+		realnum_specifier realnum(std::string name);
+		string_specifier string(std::string name);
+		enum_specifier enumeration(std::string name);
+		list_specifier list(std::string name);
+		composite_specifier composite(std::string name);
+		conditional_specifier conditional(std::string name);
 
 	private:
 		template < typename T >
-		T id_assigned(T&& n)
+		T id_assigned(T&& n, std::string name)
 		{
 			n.set_id(next_id_++);
+			n.set_name(name);
 			return n;
 		}
 

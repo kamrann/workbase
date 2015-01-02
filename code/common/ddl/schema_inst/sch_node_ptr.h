@@ -16,6 +16,7 @@ namespace ddl {
 		class enum_sch_node_t;
 		class list_sch_node_t;
 		class composite_sch_node_t;
+		class conditional_sch_node_t;
 
 		typedef std::shared_ptr< boolean_sch_node_t > boolean_sch_node_ptr;
 		typedef std::shared_ptr< integer_sch_node_t > integer_sch_node_ptr;
@@ -24,6 +25,7 @@ namespace ddl {
 		typedef std::shared_ptr< enum_sch_node_t > enum_sch_node_ptr;
 		typedef std::shared_ptr< list_sch_node_t > list_sch_node_ptr;
 		typedef std::shared_ptr< composite_sch_node_t > composite_sch_node_ptr;
+		typedef std::shared_ptr< conditional_sch_node_t > conditional_sch_node_ptr;
 
 	}
 }

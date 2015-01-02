@@ -8,6 +8,7 @@
 #include "enum_sch_node.h"
 #include "list_sch_node.h"
 #include "composite_sch_node.h"
+#include "conditional_sch_node.h"
 
 
 namespace ddl {
@@ -59,6 +60,12 @@ namespace ddl {
 
 	}
 
+	sch_node::sch_node(conditional_sch_node const& cn):
+		storage_{ cn.ptr() }
+	{
+
+	}
+
 	sch_node::operator bool() const
 	{
 		// TODO: big hack
@@ -77,6 +84,16 @@ namespace ddl {
 	{
 		return id_;
 	}
+
+	template <>
+	auto sch_node::get_as< enum_sch_node >() const -> enum_sch_node
+	{
+		return enum_sch_node{ boost::get< detail::enum_sch_node_ptr >(storage_) };
+	}
+
+	// todo: other types
+
+	//template sch_node::get_as < > ;
 
 }
 

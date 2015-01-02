@@ -6,7 +6,7 @@
 #include "interactive_controller.h"
 #include "interactive_input.h"
 
-#include "params/param.h"
+//#include "params/param.h"
 
 #include <boost/optional.hpp>
 
@@ -21,8 +21,8 @@ namespace sys
 		public i_interactive_controller
 	{
 	public:
-		static boost::optional< unsigned long > extract_input_binding(prm::param binding);
-		static std::unique_ptr< interactive_controller > create_instance(prm::param_accessor param_vals);
+// TODO:		static boost::optional< unsigned long > extract_input_binding(prm::param binding);
+//		static std::unique_ptr< interactive_controller > create_instance(prm::param_accessor param_vals);
 
 	public:
 		interactive_controller(size_t num_effectors);

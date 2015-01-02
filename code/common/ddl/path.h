@@ -14,11 +14,15 @@ namespace ddl {
 	class path
 	{
 	public:
+		struct conditional{};
+
+	public:
 		path();
 
 	public:
 		void append(std::string str);
 		void append(unsigned int idx);
+		void append(conditional);
 		void pop();
 		void reset();
 		size_t length() const;
@@ -31,13 +35,15 @@ namespace ddl {
 		bool operator== (path const&) const;
 		path& operator+= (std::string);
 		path& operator+= (unsigned int);
-//		operator bool() const;
+		path& operator+= (conditional);
+		//		operator bool() const;
 //		bool operator! () const;
 
 	public:
 		enum class ComponentType {
 			CompositeChild,
 			ListItem,
+			Conditional,
 		};
 
 		class component
@@ -46,6 +52,7 @@ namespace ddl {
 			component();
 			component(std::string str);
 			component(unsigned int str);
+			component(conditional);
 
 			ComponentType type() const;
 			std::string as_child() const;
@@ -57,7 +64,7 @@ namespace ddl {
 			bool operator== (component const&) const;
 
 		private:
-			typedef boost::variant< std::string, unsigned int > comp_var_t;
+			typedef boost::variant< std::string, unsigned int, conditional > comp_var_t;
 
 			comp_var_t var_;
 		};
@@ -73,6 +80,12 @@ namespace ddl {
 
 	private:
 		component_list components_;
+
+#ifdef _DEBUG
+		void dbg_update();
+
+		std::string pathstr_;
+#endif
 	};
 
 }

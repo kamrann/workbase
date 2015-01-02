@@ -5,8 +5,9 @@
 
 #include "../real_valued_mutation.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
+//#include "params/param_accessor.h"
+//#include "params/schema_builder.h"
+#include "ddl/ddl.h"
 
 
 namespace ga {
@@ -14,35 +15,24 @@ namespace ga {
 	template < typename Rep >
 	struct linear_real_gene_mutation_defn
 	{
-		static void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		static ddl::defn_node get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
+			ddl::defn_node max_delta = spc.realnum("max_delta")
+				(ddl::spc_min < ddl::realnum_defn_node::value_t > { 0.0 })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 0.1 })
+				;
 
-			(*provider)[path + std::string{ "max_delta" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"max_delta",
-					0.1,
-					0.0
-					// TODO: (0-1) parameter normalized by gene range?? 1.0
-					);
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "max_delta" })(acc));
-				return s;
-			};
+			return spc.composite("linear_real_mut")(ddl::define_children{}
+				("max_delta", max_delta)
+				);
 		}
 
 		typedef Rep gene_t;
 		typedef ga::gene_mutation< gene_t > result_t;
 
-		static result_t generate(prm::param_accessor acc)
+		static result_t generate(ddl::navigator nav)
 		{
-			auto max_delta = prm::extract_as< double >(acc["max_delta"]);
+			auto max_delta = nav["max_delta"].get().as_real();
 			return ga::real_valued_gene< gene_t >::linear_mutation{ max_delta };
 		}
 	};
@@ -50,34 +40,24 @@ namespace ga {
 	template < typename Rep >
 	struct gaussian_real_gene_mutation_defn
 	{
-		static void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		static ddl::defn_node get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
+			ddl::defn_node std_dev = spc.realnum("std_dev")
+				(ddl::spc_min < ddl::realnum_defn_node::value_t > { std::numeric_limits< double >::min() })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 1.0 })
+				;
 
-			(*provider)[path + std::string{ "std_dev" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"std_dev",
-					1.0,
-					0.0
-					);
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "std_dev" })(acc));
-				return s;
-			};
+			return spc.composite("gaussian_real_mut")(ddl::define_children{}
+				("std_dev", std_dev)
+				);
 		}
 
 		typedef Rep gene_t;
 		typedef ga::gene_mutation< gene_t > result_t;
 
-		static result_t generate(prm::param_accessor acc)
+		static result_t generate(ddl::navigator nav)
 		{
-			auto std_dev = prm::extract_as< double >(acc["std_dev"]);
+			auto std_dev = nav["std_dev"].get().as_real();
 			return ga::real_valued_gene< gene_t >::gaussian_mutation{ std_dev };
 		}
 	};
@@ -85,59 +65,38 @@ namespace ga {
 	template < typename Rep >
 	struct variable_gaussian_real_gene_mutation_defn
 	{
-		static void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		static ddl::defn_node get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
+			ddl::defn_node init_std_dev = spc.realnum("initial_std_dev")
+				(ddl::spc_min < ddl::realnum_defn_node::value_t > { std::numeric_limits< double >::min() })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 1.0 })
+				;
 
-			(*provider)[path + std::string{ "initial_stddev" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"initial_stddev",
-					1.0,	// TODO:
-					std::numeric_limits< double >::min()		// stddev cannot be zero
-					);
-				return s;
-			};
+			ddl::defn_node cutoff_gens = spc.integer("cutoff_generations")
+				(ddl::spc_min < ddl::integer_defn_node::value_t > { 1 })
+				(ddl::spc_default < ddl::integer_defn_node::value_t > { 100 })
+				;
 
-			(*provider)[path + std::string{ "cutoff_generations" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::integer(
-					"cutoff_generations",
-					100,	// TODO:
-					1
-					);
-				return s;
-			};
+			ddl::defn_node cutoff_std_dev = spc.realnum("cutoff_std_dev")
+				(ddl::spc_min < ddl::realnum_defn_node::value_t > { std::numeric_limits< double >::min() })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 1.0 })
+				;
 
-			(*provider)[path + std::string{ "cutoff_stddev" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"cutoff_stddev",
-					1.0,	// TODO:
-					std::numeric_limits< double >::min()
-					);
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "initial_stddev" })(acc));
-				sb::append(s, provider->at(path + std::string{ "cutoff_generations" })(acc));
-				sb::append(s, provider->at(path + std::string{ "cutoff_stddev" })(acc));
-				return s;
-			};
+			return spc.composite("var_gaussian_real_mut")(ddl::define_children{}
+				("initial_std_dev", init_std_dev)
+				("cutoff_generations", cutoff_gens)
+				("cutoff_std_dev", cutoff_std_dev)
+				);
 		}
 
 		typedef Rep gene_t;
 		typedef ga::gene_mutation< gene_t > result_t;
 
-		static result_t generate(prm::param_accessor acc)
+		static result_t generate(ddl::navigator nav)
 		{
-			acc.set_lookup_mode(prm::param_accessor::LookupMode::Descendent);
-			auto initial = prm::extract_as< double >(acc["initial_stddev"]);
-			size_t cutoff_generations = prm::extract_as< int >(acc["cutoff_generations"]);
-			auto cutoff = prm::extract_as< double >(acc["cutoff_stddev"]);
+			auto initial = nav["initial_std_dev"].get().as_real();
+			size_t cutoff_generations = nav["cutoff_generations"].get().as_int();
+			auto cutoff = nav["cutoff_std_dev"].get().as_real();
 			return ga::real_valued_gene< gene_t >::variable_gaussian_mutation{ initial, { cutoff_generations, cutoff } };
 		}
 	};

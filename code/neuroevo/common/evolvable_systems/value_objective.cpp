@@ -3,9 +3,6 @@
 #include "value_objective.h"
 //#include "systems/rtp_system.h"
 
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
-
 
 namespace sys {
 	namespace ev {
@@ -212,6 +209,8 @@ namespace sys {
 					}
 				}
 			}
+
+			value_objective::finalise();
 		}
 
 	}

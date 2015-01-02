@@ -52,6 +52,17 @@ namespace ddl {
 		return{};
 	}
 
+	dep_list conditional_defn_node::deps() const
+	{
+		dep_list result;
+		for(auto const& comp : components_)
+		{
+			auto comp_deps = condition_dependencies(comp.cond);
+			result.insert(std::begin(comp_deps), std::end(comp_deps));
+		}
+		return result;
+	}
+
 }
 
 

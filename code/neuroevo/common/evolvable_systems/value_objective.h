@@ -5,7 +5,8 @@
 
 #include "system_sim/system_state_values.h"
 
-#include "params/param_fwd.h"
+//#include "params/param_fwd.h"
+#include "ddl/ddl.h"
 
 #include "util/bimap.h"
 
@@ -200,17 +201,18 @@ namespace sys {
 		class value_objective_defn
 		{
 		public:
-			typedef std::function< state_value_id_list(prm::param_accessor) > state_val_access_fn_t;
+			typedef //std::function< state_value_id_list(ddl::navigator) > state_val_access_fn_t;
+				ddl::dep_function< state_value_id_list > state_val_access_fn_t;
 
 		public:
-			value_objective_defn(state_val_access_fn_t sv_acc_fn);
+			value_objective_defn(state_val_access_fn_t& sv_acc_fn);
 
 		public:
-			void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
-			std::unique_ptr< value_objective > generate(prm::param_accessor acc, std::function< double(state_value_id) > get_state_value_fn);
+			ddl::defn_node get_defn(ddl::specifier& spc);
+			std::unique_ptr< value_objective > generate(ddl::navigator nav, std::function< double(state_value_id) > get_state_value_fn);
 
 		protected:
-			state_val_access_fn_t sv_acc_fn_;
+			state_val_access_fn_t& sv_acc_fn_;
 		};
 
 	}

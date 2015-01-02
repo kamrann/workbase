@@ -2,9 +2,6 @@
 
 #include "passive_controller.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
-
 
 namespace sys {
 
@@ -13,22 +10,12 @@ namespace sys {
 		return "passive";
 	}
 
-	namespace sb = prm::schema;
-
-	std::string passive_controller_defn::update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+	ddl::defn_node passive_controller_defn::get_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
-
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::list(path.leaf().name());
-			return s;
-		};
-
-		return path.leaf().name();
+		return spc.composite("passive");
 	}
 
-	controller_ptr passive_controller_defn::create_controller(prm::param_accessor acc) const
+	controller_ptr passive_controller_defn::create_controller(ddl::navigator nav) const
 	{
 		return std::make_unique< passive_controller >();
 	}

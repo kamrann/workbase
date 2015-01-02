@@ -5,7 +5,8 @@
 
 #include "clsm/clsm.h"
 #include "system_sim/system_sim_fwd.h"
-#include "params/param_tree.h"
+
+#include "ddl/ddl.h"
 
 #include <boost/asio.hpp>
 #include <boost/statechart/state_machine.hpp>
@@ -30,8 +31,7 @@ namespace sys_control {
 		{
 			system_controller(
 				std::map< std::string, std::shared_ptr< sys::i_system_defn > > _sys_defns,
-				prm::param_tree _pt,
-				prm::schema::schema_provider_map_handle _provider,
+				ddl::defn_node _ddl_defn,
 				std::function< void(std::string) > _output_sink,
 				// TEMP
 				std::function< void(std::string) > _prompt_callback
@@ -47,8 +47,9 @@ namespace sys_control {
 			bool is_defn_complete() const;
 
 			std::map< std::string, std::shared_ptr< sys::i_system_defn > > sys_defns;
-			prm::param_tree ptree;
-			prm::schema::schema_provider_map_handle provider;
+			ddl::defn_node ddl_defn;
+//			ddl::value_node ddl_data;
+			ddl::sd_tree ddl_data;
 
 			asio::io_service io_service;
 			std::unique_ptr< asio::io_service::work > io_work;

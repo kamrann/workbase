@@ -24,9 +24,6 @@
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\interactive.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\basic_system_defn.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,6 +43,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\passive_controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\basic_system_defn2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\interactive_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\ui_based_controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\generic_ui_controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\system_sim\direct_bindings_ui_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -114,6 +126,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\system_drawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\ui_based_controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\generic_ui_controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\system_sim\direct_bindings_ui_controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

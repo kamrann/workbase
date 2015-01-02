@@ -19,6 +19,7 @@ namespace sys {
 				Undefined,
 
 				Agent,
+				Scenario,
 				Other,
 			};
 

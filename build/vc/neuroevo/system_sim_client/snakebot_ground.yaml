@@ -1,0 +1,110 @@
+composite:
+  results:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        core:
+          composite:
+            updates_per_sec:
+              integer: 30
+            velocity_iterations:
+              integer: 4
+            duration:
+              real: 20
+            position_iterations:
+              integer: 2
+            scenario_type:
+              enum:
+                - ground_based
+            scenario:
+              conditional:
+                composite:
+                  friction:
+                    real: 0.25
+                  gravity:
+                    real: 9.810000000000001
+                  ground_expanse:
+                    real: 500
+                  incline:
+                    real: 0
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  friction:
+                                    real: 0.5
+                                  max_angle:
+                                    real: 45
+                                  max_torque:
+                                    real: 5
+                                  num_segments:
+                                    integer: 8
+                                  segment_size:
+                                    real: 0.75
+                            name:
+                              string: the_snake
+                      agent_type:
+                        enum:
+                          - snakebot
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_angvel:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_snake
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    enum:
+                                      - ground_snakebot
+                          controller_type:
+                            enum:
+                              - db_evolved
+                    controller_class:
+                      enum:
+                        - db
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []

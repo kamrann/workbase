@@ -10,7 +10,9 @@
 #include "system_sim/system_defn.h"
 #include "system_sim/system.h"
 
-#include "params/param_accessor.h"
+#include "system_sim/ui_based_controller.h"
+
+#include "input_stream/x360_input_stream.h"
 
 
 namespace sys_control {
@@ -25,28 +27,42 @@ namespace sys_control {
 			auto& sc_ctx = context< system_controller >();
 
 			// Entering active system state, construct a system from the param tree
-			auto acc = prm::param_accessor{ &sc_ctx.ptree };
+			auto nav = ddl::navigator{ &sc_ctx.ddl_data, ddl::sd_node_ref{ sc_ctx.ddl_data.get_root() } };
 			
-			auto sys_type = prm::extract_as< prm::enum_param_val >(acc["sys_type"])[0];
+			auto sys_type = nav["sys_type"].get().as_single_enum_str();
 			auto const& sys_defn = sc_ctx.sys_defns.at(sys_type);
-			sys = sys_defn->create_system(acc);
+			sys = sys_defn->create_system(nav["sys_details"][(size_t)0]);	// TODO: [0] is hack to access condition child
 
 			// And reset it
 			sys_rseed = static_cast<uint32_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff);
 			reset_system(boost::none);
 
 			// Also store update state value ids
-			auto update_value_names = prm::extract_as< prm::enum_param_val >(acc["updates"]);
+			auto update_value_names = nav["updates"].get().as_enum_str();
 			for(auto const& v : update_value_names)
 			{
 				update_vals.push_back(sys::state_value_id::from_string(v));
 			}
 
 			// And result state value ids
-			auto result_value_names = prm::extract_as< prm::enum_param_val >(acc["results"]);
+			auto result_value_names = nav["results"].get().as_enum_str();
 			for(auto const& v : result_value_names)
 			{
 				result_vals.push_back(sys::state_value_id::from_string(v));
+			}
+
+
+			/////////////////////////
+			// TODO: hard coding input stream type
+			auto in = std::make_shared< input::x360_input_stream >();
+			in->connect_to_controller();
+			in_strm = in;
+			//
+			auto cont = const_cast< sys::i_controller* >(&sys->get_agent_controller(0));	// TODO: 0 id BIG HACK!!!!
+			auto as_ui_cont = dynamic_cast<sys::ui_based_controller*>(cont);	// TODO: another hack
+			if(as_ui_cont)
+			{
+				as_ui_cont->set_input_stream(in_strm);
 			}
 		}
 
@@ -81,7 +97,8 @@ namespace sys_control {
 
 		void active::on_drawer(clsm::ev_cmd< drawer_cmd > const& cmd)
 		{
-			add_drawer();
+			auto zoom = cmd.zoom ? *cmd.zoom : 1.0;
+			add_drawer(zoom);
 		}
 
 		sc::result active::react(clsm::ev_cmd< reset_cmd > const& cmd)
@@ -120,6 +137,8 @@ namespace sys_control {
 		// Advances the system by a single update frame
 		bool active::step_system(frame_update_cfg const& cfg)
 		{
+			in_strm->update();
+
 			bool still_going;
 			{
 				std::lock_guard< std::mutex > lock_{ sys_mx };
@@ -198,7 +217,7 @@ namespace sys_control {
 			charts[id] = std::move(defn);
 		}
 
-		void active::add_drawer()
+		void active::add_drawer(double zoom)
 		{
 			display_data dd;
 			dd.type = drawer_display_defn::ID;
@@ -206,8 +225,24 @@ namespace sys_control {
 			drawer_data.mx = &sys_mx;
 			{
 				std::lock_guard< std::mutex > lock_{ sys_mx };
+
 				drawer_data.drawer.reset(sys->get_drawer().release());	//m_sys_defn->get_drawer().release();
+
+				// TODO: stream type hard coded!
+//				drawer_data.in_strm = todo cast of: in_strm;
+					//std::make_shared< input::wt_input_stream >();
+
+/*				auto cont = const_cast< sys::i_controller* >(&sys->get_agent_controller(0));	// TODO: 0 id BIG HACK!!!!
+				auto as_ui_cont = dynamic_cast<sys::ui_based_controller*>(cont);	// TODO: another hack
+				if(as_ui_cont)
+				{
+					as_ui_cont->set_input_stream(//drawer_data.
+						in_strm);
+				}
+*/
 			}
+			drawer_data.zoom = zoom;
+			
 			drawer_defn defn;
 			dd.data = drawer_data;
 			auto id = create_wt_display(dd);

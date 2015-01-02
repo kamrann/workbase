@@ -5,7 +5,7 @@
 
 #include "system_state_values.h"
 
-#include "params/param_fwd.h"
+//#include "params/param_fwd.h"
 
 #include "util/bimap.h"
 
@@ -41,8 +41,8 @@ namespace sys {
 		static Type decode_type(std::string const& as_str);
 
 //		static prm::param get_controller_agent_type(prm::param_accessor param);
-		static std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
-		static std::unique_ptr< i_controller_factory > create_factory(prm::param_accessor param);
+//		static std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
+//		static std::unique_ptr< i_controller_factory > create_factory(prm::param_accessor param);
 
 	public:
 //		typedef int input_id;

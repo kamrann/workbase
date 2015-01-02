@@ -5,8 +5,8 @@
 #include "Wt Displays/wt_server.h"
 
 #include "evo_database/evo_db.h"
-#include "wt_param_widgets/param_accessor.h"
-#include "wt_param_widgets/pw_yaml.h"
+//#include "wt_param_widgets/param_accessor.h"
+//#include "wt_param_widgets/pw_yaml.h"
 
 #include "neuralnet/interface/neuralnet.h"
 #include "neuralnet/interface/input.h"
@@ -21,6 +21,7 @@
 #include "neuralnet/visualisation/text_output.h"
 
 #include "neuralnet/implementations/mlf/mlp.h"
+#include "neuralnet/implementations/mlf/fc_rnn.h"
 
 #include "util/interval_io.h"
 
@@ -209,6 +210,7 @@ namespace cmd {
 		input_ranges,
 		fn,
 		weights,
+		reset,
 		run,
 		output_ranges,
 
@@ -250,6 +252,52 @@ namespace cmd {
 		state.input_ranges = boost::none;
 	}
 
+	void create_rnn(arg_list args)
+	{
+		nnet::fc_rnn::layer_counts_t layer_counts;
+		std::transform(
+			args.begin(),
+			args.end(),
+			std::back_inserter(layer_counts),
+			[](std::string const& str)
+		{
+			size_t pos;
+			auto val = std::stoul(str, &pos);
+			if(pos != str.length() || val == 0)
+			{
+				throw std::runtime_error("Invalid layer count");
+			}
+			else
+			{
+				return val;
+			}
+		});
+
+		size_t inputs = 0, hidden = 0, outputs = 0;
+		if(layer_counts.size() == 2)
+		{
+			inputs = layer_counts[0];
+			outputs = layer_counts[1];
+		}
+		else if(layer_counts.size() == 3)
+		{
+			inputs = layer_counts[0];
+			hidden = layer_counts[1];
+			outputs = layer_counts[2];
+		}
+		else
+		{
+			std::cout << "FC RNN requires either 2 or 3 layers" << std::endl;
+			return;
+		}
+
+		auto rnn = std::make_unique< nnet::fc_rnn >();
+		rnn->create(inputs, hidden, outputs);
+		state.net = std::move(rnn);
+		state.input = boost::none;
+		state.input_ranges = boost::none;
+	}
+
 	void create(arg_list args)
 	{
 		if(args.empty())
@@ -265,12 +313,18 @@ namespace cmd {
 			create_mlp(std::move(args));
 			return;
 		}
+		else if(type == "rnn")
+		{
+			create_rnn(std::move(args));
+			return;
+		}
 
 		std::cout << "Unrecognized network type" << std::endl;
 	}
 
 	void load(arg_list args)
 	{
+#if 0
 		if(args.empty())
 		{
 			std::cout << "usage: load <network-filename>" << std::endl;
@@ -379,6 +433,7 @@ namespace cmd {
 		state.net = std::move(mlp);
 		state.input = boost::none;
 		state.input_ranges = boost::none;
+#endif
 	}
 
 	void info(arg_list args)
@@ -560,7 +615,7 @@ namespace cmd {
 			for(auto const& nr : neurons)
 			{
 				auto const fn_type = (nnet::ActivationFnType)dist(rgen);
-				mod->set_activation_fn(nr.id, nnet::activation_function{ fn_type, 1.0 /* TODO: */});
+// TODO:				mod->set_activation_fn(nr.id, nnet::activation_function{ fn_type, 1.0 /* TODO: */});
 			}
 		}
 		else
@@ -605,6 +660,11 @@ namespace cmd {
 		{
 			throw std::runtime_error("Invalid argument");
 		}
+	}
+
+	void reset(arg_list args)
+	{
+		state.net->reset_state();
 	}
 
 	void run(arg_list args)
@@ -691,6 +751,10 @@ namespace cmd {
 			input_ranges(std::move(args));
 			break;
 
+			case Command::reset:
+			reset(std::move(args));
+			break;
+
 			case Command::fn:
 			fn(std::move(args));
 			break;
@@ -730,7 +794,7 @@ void prompt()
 	std::cout << "[";
 	if(state.net)
 	{
-		std::cout << /* TODO:*/ "mlp";
+		std::cout << state.net->network_type_name();
 		std::cout << " " <<
 			state.net->input_count() << " ";
 		auto hidden = state.net->hidden_count();
@@ -765,6 +829,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{ "input_ranges", cmd::Command::input_ranges },
 			{ "fn", cmd::Command::fn },
 			{ "weights", cmd::Command::weights },
+			{ "reset", cmd::Command::reset },
 			{ "run", cmd::Command::run },
 			{ "output_ranges", cmd::Command::output_ranges },
 
@@ -789,7 +854,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 0;
 	}
 
-	db_cp.reset(evodb_session::create_connection_pool("../webinterface/evo.db"));
+	db_cp.reset(evodb_session::create_connection_pool("host=127.0.0.1 user=Cameron password='' port=5432 dbname=evo"));
 	db_session = std::make_unique< evodb_session >(*db_cp);
 
 	// TODO: Non-portable. Ideally would just disable/redirect initial Wt output

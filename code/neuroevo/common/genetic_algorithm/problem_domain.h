@@ -27,7 +27,13 @@ namespace ga {
 		virtual crossover_fn_t crossover_op() const = 0;
 		virtual mutation mutation_op() const = 0;
 		virtual bool rectify_genome(ga::genome& gn) const = 0;
-		virtual objective_value evaluate_genome(genome const& gn) const = 0;
+
+		/*
+		Need to decide whether the idea of multiple trials should be extracted out to the ga level (as it is
+		currently), or left as the responsibility of the individual problem domains.
+		*/
+		virtual std::vector< objective_value > evaluate_genome(genome const& gn, ga::rgen_t& rgen, size_t trials = 1) const = 0;
+		
 		virtual diversity_t population_genetic_diversity(genetic_population const& pop) const = 0;
 
 		// TODO: Temp

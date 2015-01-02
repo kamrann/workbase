@@ -26,12 +26,16 @@ namespace sys {
 			virtual agent_sensor_list get_mapped_inputs(std::vector< std::string > const& named_inputs) const override;
 			virtual double get_sensor_value(agent_sensor_id const& sensor) const override;
 
+			double get_force_strength(basic_biped_defn::Joint jnt, double desired);
 			virtual void activate_effectors(effector_activations const& activations) override;
 
 			virtual void on_contact(b2Fixture* fixA, b2Fixture* fixB, ContactType type) override;
 
 		public:
-			basic_biped(std::shared_ptr< basic_biped_defn::spec_data > _spec, std::shared_ptr< basic_biped_defn::instance_data > _inst);
+			basic_biped(
+				std::shared_ptr< basic_biped_defn::spec_data > _spec,
+				std::shared_ptr< basic_biped_defn::instance_data > _inst);//,
+//				phys2d_system* system);
 			//void set_system(phys2d_system const* sys);
 
 		protected:
@@ -49,10 +53,21 @@ namespace sys {
 			b2Body* upper2;
 			b2Body* lower1;
 			b2Body* lower2;
-			b2RevoluteJoint* hip1;
-			b2RevoluteJoint* hip2;
-			b2RevoluteJoint* knee1;
-			b2RevoluteJoint* knee2;
+
+//			std::array< b2RevoluteJoint*, (int)basic_biped_defn::Joint::Count > joints;
+
+			struct muscle_state_t
+			{
+				double energy;
+				double applied_torque;
+
+				muscle_state_t():
+					energy(1.0),
+					applied_torque(0.0)
+				{}
+			};
+
+			std::map< basic_biped_defn::Joint, muscle_state_t > muscle_states;
 
 			bool left_foot_contact;
 			bool right_foot_contact;

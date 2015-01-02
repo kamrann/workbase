@@ -1,7 +1,7 @@
 // random_emitter.h
 
-#ifndef __WB_PARAMS_RANDOM_EMITTER_H
-#define __WB_PARAMS_RANDOM_EMITTER_H
+#ifndef __WB_DDL_RANDOM_EMITTER_H
+#define __WB_DDL_RANDOM_EMITTER_H
 
 #include "param.h"
 #include "value_parsing_ast.h"

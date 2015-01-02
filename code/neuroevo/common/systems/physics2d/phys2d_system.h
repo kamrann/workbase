@@ -5,10 +5,9 @@
 
 #include "system_sim/basic_system.h"
 
-#include "phys2d_contacts.h"
 #include "scenario.h"
 
-#include "params/param_fwd.h"
+#include "b2d_components/core/contacts.h"
 
 #include <Box2D/Box2D.h>
 
@@ -17,6 +16,7 @@
 
 #include <set>
 #include <chrono>
+#include <functional>
 
 
 class b2World;
@@ -31,7 +31,7 @@ namespace sys {
 			public b2ContactListener
 		{
 		public:
-			phys2d_system(std::unique_ptr< scenario > scen, double hertz);
+			phys2d_system(std::unique_ptr< scenario > scen, double duration, double hertz, size_t vel_its, size_t pos_its);
 			~phys2d_system();
 
 			void release_body_user_data();
@@ -55,6 +55,10 @@ namespace sys {
 
 			virtual system_drawer_ptr get_drawer() const override;
 
+			// TODO: temp inefficient implementation
+			typedef std::function< void(phys2d_system*) > updatable_fn_t;
+			void register_updatable(updatable_fn_t fn);
+
 		protected:
 			virtual size_t initialize_state_value_bindings(sv_bindings_t& bindings, sv_accessors_t& accessors) override;
 
@@ -62,6 +66,11 @@ namespace sys {
 			double get_time() const
 			{
 				return m_time;
+			}
+
+			double get_hertz() const
+			{
+				return m_hertz;
 			}
 			
 			b2World* get_world() const
@@ -104,15 +113,21 @@ namespace sys {
 			void EndContact(b2Contact* contact) override;
 			void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 
-			void on_contact(b2Contact* contact, ContactType ctype);
+			void on_contact(b2Contact* contact, b2dc::ContactType ctype);
 
 		private:
 			std::unique_ptr< scenario > m_scenario;
 			std::unique_ptr< b2World > m_world;
 			std::unique_ptr< b2DestructionListener > m_world_destructor;
 
+			std::list< updatable_fn_t > m_updatables;
+
 			double m_hertz;
 			double m_time;
+			double m_max_duration;
+
+			size_t m_vel_iterations;
+			size_t m_pos_iterations;
 
 		public:	// TODO: Temp public, see above re internal compiler error
 			agent_list m_agents;

@@ -13,6 +13,8 @@ public:
 	typedef boost::bimap< LeftKey, RightKey > base_t;
 	using base_t::base_t;
 
+	bimap()
+	{}
 	bimap(std::initializer_list< typename base_t::value_type > il): base_t{ std::begin(il), std::end(il) }
 	{}
 

@@ -22,6 +22,7 @@
 #include "schema_inst/enum_sch_node.h"
 #include "schema_inst/list_sch_node.h"
 #include "schema_inst/composite_sch_node.h"
+#include "schema_inst/conditional_sch_node.h"
 
 #include "values/value_node.h"
 

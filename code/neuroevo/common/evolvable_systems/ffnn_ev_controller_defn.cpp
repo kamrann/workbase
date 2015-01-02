@@ -10,43 +10,38 @@
 
 #include "neuralnet/interface/activation_functions.h"
 
-#include "params/param.h"
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
-
-
-namespace sb = prm::schema;
 
 namespace sys {
 	namespace ev {
 
-		ffnn_ev_controller_defn::ffnn_ev_controller_defn(evolvable_controller_impl_defn::sys_defn_fn_t sys_defn_fn):
+		ffnn_ev_controller_defn::ffnn_ev_controller_defn(
+			evolvable_controller_impl_defn::sys_defn_fn_t& sys_defn_fn,
+			evolvable_controller_impl_defn::state_vals_fn_t& sv_fn):
+			sv_fn_(sv_fn),
 			sys_defn_fn_(sys_defn_fn)
 		{
 			gene_mutation_defn_.register_option(
 				"linear",
-				ga::linear_real_gene_mutation_defn< double >::update_schema_provider,
+				ga::linear_real_gene_mutation_defn< double >::get_defn,
 				ga::linear_real_gene_mutation_defn< double >::generate
 				);
 			gene_mutation_defn_.register_option(
 				"gaussian",
-				ga::gaussian_real_gene_mutation_defn< double >::update_schema_provider,
+				ga::gaussian_real_gene_mutation_defn< double >::get_defn,
 				ga::gaussian_real_gene_mutation_defn< double >::generate
 				);
 			gene_mutation_defn_.register_option(
 				"variable_gaussian",
-				ga::variable_gaussian_real_gene_mutation_defn< double >::update_schema_provider,
+				ga::variable_gaussian_real_gene_mutation_defn< double >::get_defn,
 				ga::variable_gaussian_real_gene_mutation_defn< double >::generate
 				);
 		}
 
-		void ffnn_ev_controller_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		ddl::defn_node ffnn_ev_controller_defn::get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
-
-			(*provider)[path + std::string("ffnn_inputs")] = [this](prm::param_accessor param_vals)
+			auto available_input_names_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this](ddl::navigator nav)
 			{
-				auto sys_defn = sys_defn_fn_(param_vals);
+//				auto sys_defn = sys_defn_fn_(nav);
 
 				// Get a list of agents using this evolved controller
 				// TODO: !!! this. process will be similar to below in generate() where we find num_outputs
@@ -56,160 +51,116 @@ namespace sys {
 				// TODO: For now assuming just 1 agent, but ideally want to use the intersection of state values
 				// for each attached agent.
 				// TODO: Should be using get_agent_sensor_names(), or some agent-relative call
-				auto available_inputs = sys_defn->get_system_state_values(param_vals);
-				auto num_available_inputs = available_inputs.size();
-				std::vector< std::pair< std::string, std::string > > enum_values;
-				if(num_available_inputs > 0)
+//				auto available_inputs = sys_defn->get_system_state_values(nav);	// todo: deps
+				//auto num_available_inputs = available_inputs.size();
+
+				auto available_inputs = sv_fn_(nav);
+
+				ddl::enum_defn_node::enum_str_set_t enum_values;
+				for(auto const& ip : available_inputs)
 				{
-					enum_values.resize(num_available_inputs);
-					int idx = 0;
-					std::generate(begin(enum_values), end(enum_values), [&available_inputs, &idx]()
-					{
-						auto res = std::make_pair(
-							available_inputs[idx].to_string(),
-							available_inputs[idx].to_string()
-							);
-						++idx;
-						return res;
-					});
+					enum_values.insert(std::end(enum_values), ip.to_string());
 				}
-
-				auto s = sb::enum_selection("ffnn_inputs", enum_values, 1, num_available_inputs);
-				//sb::label(s, "Inputs");
-				//sb::update_on(s, "evolved_controller_compatibility_changed");
-				return s;
+				return enum_values;
+			}
 			};
+			available_input_names_fn.add_dependency(sv_fn_);// sys_defn_fn_);
 
-			path += std::string("hidden_layer_list");
+			ddl::defn_node inputs = spc.enumeration("inputs")
+				(ddl::spc_range < size_t > { 1, boost::none })
+				(ddl::define_enum_func{ available_input_names_fn })
+				;
 
-			(*provider)[path + std::string("hl_neuron_count")] = [=](prm::param_accessor param_vals)
-			{
-				auto const num_inputs = prm::extract_as< prm::enum_param_val >(param_vals["ffnn_inputs"]).size();
-				auto s = sb::integer("hl_neuron_count", std::max(num_inputs / 2, 1u), 1);
-				//sb::label(s, "# Neurons");
-				return s;
-			};
+			ddl::defn_node hl_neuron_count = spc.integer("hl_neuron_count")
+				(ddl::spc_min < ddl::integer_defn_node::value_t > { 1 })
+				(ddl::spc_default < ddl::integer_defn_node::value_t > { 1 })	// todo: dependent upon current sel count of inputs?
+				;
 
-			(*provider)[path] = [=](prm::param_accessor param_vals)
-			{
-				auto s = sb::repeating_list("hidden_layer_list", "hl_neuron_count");
-				//sb::label(s, "Hidden Layers");
-				return s;
-			};
+			ddl::defn_node hidden_layer = spc.composite("hidden_layer")(ddl::define_children{}
+				("num_neurons", hl_neuron_count)
+				// todo:
+				);
 
-			path.pop();
+			ddl::defn_node hidden_layer_list = spc.list("hidden_layer_list")
+				(ddl::spc_item{ hidden_layer })
+				;
 
-			std::vector< std::pair< std::string, std::string > > fn_enum_values;
+			
+			auto af_vals = ddl::define_enum_fixed{};
 			for(size_t fn = 0; fn < (size_t)nnet::ActivationFnType::Count; ++fn)
 			{
-				fn_enum_values.emplace_back(std::make_pair(
-					std::to_string(fn),
-					std::string{ nnet::ActivationFnNames[fn] }
-				));
+				af_vals = af_vals(std::string{ nnet::ActivationFnNames2[fn] });
 			}
 
-			(*provider)[path + std::string("hidden_activation_fn")] = [fn_enum_values](prm::param_accessor)
-			{
-				auto s = sb::enum_selection("hidden_activation_fn", fn_enum_values, 1, 1);
-				//sb::label(s, "Hidden Activation");
-				return s;
-			};
+			ddl::defn_node act_fn = spc.enumeration("act_fn")
+				(ddl::spc_range < size_t > { 1, 1 })
+				(ddl::spc_default < ddl::enum_defn_node::str_value_t > { { nnet::ActivationFnNames2[(int)nnet::ActivationFnType::SigmoidSymmetric] } })
+				(af_vals)
+				;
 
-			(*provider)[path + std::string("hidden_steepness")] = [](prm::param_accessor)
-			{
-				auto s = sb::real("hidden_steepness", 0.5, 0.0);
-				//sb::label(s, "Hidden Steepness");
-				return s;
-			};
-
-			(*provider)[path + std::string("output_activation_fn")] = [fn_enum_values](prm::param_accessor)
-			{
-				auto s = sb::enum_selection("output_activation_fn", fn_enum_values, 1, 1);
-				//sb::label(s, "Output Activation");
-				return s;
-			};
-
-			(*provider)[path + std::string("output_steepness")] = [](prm::param_accessor)
-			{
-				auto s = sb::real("output_steepness", 0.5, 0.0);
-				//sb::label(s, "Output Steepness");
-				return s;
-			};
+			ddl::defn_node steepness = spc.realnum("steepness")
+				(ddl::spc_min < ddl::realnum_defn_node::value_t > { 0.0 })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 0.5 })
+				;
 
 			//////////TODO other location in param tree
-			gene_mutation_defn_.update_schema_provider(provider, path + std::string{ "temp_mutation" });
+			ddl::defn_node temp_mutation = gene_mutation_defn_.get_defn(spc);
 
-			////////////////
-
-
-			(*provider)[path] = [=](prm::param_accessor param_vals)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string("ffnn_inputs"))(param_vals));
-				//			sb::append(s, provider->at(path + std::string("mlp_num_layers"))(param_vals));
-				sb::append(s, provider->at(path + std::string("hidden_layer_list"))(param_vals));
-				// TODO: if(num hidden layers > 0)
-				sb::append(s, provider->at(path + std::string("hidden_activation_fn"))(param_vals));
-				sb::append(s, provider->at(path + std::string("hidden_steepness"))(param_vals));
-				//
-				sb::append(s, provider->at(path + std::string("output_activation_fn"))(param_vals));
-				sb::append(s, provider->at(path + std::string("output_steepness"))(param_vals));
-
-				// TODO::
-				sb::append(s, provider->at(path + std::string{ "temp_mutation" })(param_vals));
-				return s;
-			};
+			return spc.composite("ffnn_ev_controller")(ddl::define_children{}
+				("inputs", inputs)
+				("hidden_layer_list", hidden_layer_list)
+				("hidden_act_fn", act_fn)
+				("hidden_steepness", steepness)
+				("output_act_fn", act_fn)
+				("output_steepness", steepness)
+				("temp_mutation", temp_mutation)
+				);
 		}
 			
-		void ffnn_ev_controller_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, int component)
-		{
-			switch(component)
-			{
-
-			}
-		}
-			
-		std::unique_ptr< i_genetic_mapping > ffnn_ev_controller_defn::generate(prm::param_accessor acc) const
+		std::unique_ptr< i_genetic_mapping > ffnn_ev_controller_defn::generate(ddl::navigator nav) const
 		{
 			state_value_id_list inputs;
-			auto inputs_param = prm::extract_as< prm::enum_param_val >(acc["ffnn_inputs"]);
+			auto inputs_param = nav["inputs"].get().as_enum_str();
 			for(auto const& str : inputs_param)
 			{
 				inputs.push_back(state_value_id::from_string(str));
 			}
 
 			std::vector< int > hidden_layer_counts;
-			acc.move_to(acc.find_path("hidden_layer_list"));
-			auto layer_paths = acc.children();
-			for(auto const& p : layer_paths)
+			auto hl_nav = nav["hidden_layer_list"];
+			auto hl_count = hl_nav.list_num_items();
+			for(size_t i = 0; i < hl_count; ++i)
 			{
-				acc.move_to(p);
-
-				auto count = prm::extract_as< int >(acc["hl_neuron_count"]);
-				hidden_layer_counts.push_back(count);
-
-				acc.revert();
+				auto nr_count = hl_nav[i]["num_neurons"].get().as_int();
+				hidden_layer_counts.push_back(nr_count);
 			}
-			acc.revert();
 
-			auto sys_defn = sys_defn_fn_(acc);
+			auto sys_defn = sys_defn_fn_(nav);
 			// TODO: following strings hard coded to match with 
 			// evolved_system_domain_defn::register_system_type(), and
 			// evolvable_controller_defn::get_name()
-			auto connected_paths = sys_defn->get_connected_agent_specs("evolved_cls", "evolved", acc);
+			auto connected_navs = sys_defn->get_connected_spec_navs_fn("evolved_cls", "evolved")(nav);
 			// TODO: here assuming only 1 agent spec associated with the evolved controller
-			auto connected_spec_acc = acc;
-			connected_spec_acc.move_to(connected_paths[0]);
-			size_t num_outputs = sys_defn->get_agent_num_effectors(connected_spec_acc);
+			auto connected_spec_nav = connected_navs[0]["details"][(size_t)0];
+			size_t num_outputs = sys_defn->get_inst_num_effectors_fn()(nav);//connected_spec_nav);
 
 			std::vector< size_t > layers;	// TODO: layer_counts_t should be part of nnet interface, not implementation
 			layers.push_back(inputs.size());
 			layers.insert(std::end(layers), std::begin(hidden_layer_counts), std::end(hidden_layer_counts));
 			layers.push_back(num_outputs);
 
-			auto gene_mut_fn = gene_mutation_defn_.generate(acc("temp_mutation"));	// TODO: 
+			auto hidden_af = nnet::activation_function{
+				nnet::ActivationFnNameMap.at(nav["hidden_act_fn"].get().as_single_enum_str()),
+				nav["hidden_steepness"].get().as_real()
+			};
+			auto output_af = nnet::activation_function{
+				nnet::ActivationFnNameMap.at(nav["output_act_fn"].get().as_single_enum_str()),
+				nav["output_steepness"].get().as_real()
+			};
 
-			return std::make_unique< fixed_ffnn_genetic_mapping >(inputs, layers, gene_mut_fn);
+			auto gene_mut_fn = gene_mutation_defn_.generate(nav["temp_mutation"]);	// TODO: 
+
+			return std::make_unique< fixed_ffnn_genetic_mapping >(inputs, layers, hidden_af, output_af, gene_mut_fn);
 		}
 
 	}

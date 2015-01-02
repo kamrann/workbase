@@ -21,7 +21,12 @@ namespace sys {
 			typedef ga::gene_mutation< genome_t::gene_t > gene_mut_fn_t;
 
 		public:
-			fixed_ffnn_genetic_mapping(state_value_id_list inputs, nnet::mlp::layer_counts_t nn_layers, gene_mut_fn_t mut_fn);
+			fixed_ffnn_genetic_mapping(
+				state_value_id_list inputs,
+				nnet::mlp::layer_counts_t nn_layers,
+				nnet::activation_function hidden_af,
+				nnet::activation_function output_af,
+				gene_mut_fn_t mut_fn);
 
 		public:
 			virtual ga::genome create_random_genome(ga::rgen_t& rgen) const override;
@@ -44,6 +49,8 @@ namespace sys {
 
 			state_value_id_list inputs_;
 			nnet::mlp::layer_counts_t layer_counts_;
+			nnet::activation_function hidden_af_;
+			nnet::activation_function output_af_;
 		};
 
 	}

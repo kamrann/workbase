@@ -6,6 +6,11 @@
 #include <boost/spirit/include/phoenix.hpp>
 
 
+BOOST_FUSION_ADAPT_STRUCT(
+	sys_control::drawer_cmd,
+	(boost::optional< double >, zoom)
+	);
+
 namespace phx = boost::phoenix;
 
 namespace sys_control {
@@ -15,9 +20,11 @@ namespace sys_control {
 		drawer_cmd_parser::base_type(start)
 	{
 		using qi::lit;
+		using qi::double_;
 
 		start =
-			lit("draw")[phx::nothing]
+			lit("draw")
+			>> -(lit("x") >> double_)
 			;
 	}
 

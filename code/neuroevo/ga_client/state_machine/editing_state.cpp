@@ -10,8 +10,8 @@ namespace ga_control {
 		editing::editing(my_context ctx):
 			base(ctx)
 			, editor(
-			std::move(context< ga_controller >().ptree),
-			context< ga_controller >().provider,
+			context< ga_controller >().ddl_defn,
+			std::move(context< ga_controller >().ddl_data),
 			context< ga_controller >().output_sink,
 			"exit"
 			)
@@ -24,7 +24,7 @@ namespace ga_control {
 			editor.process_event(cmd);
 			if(editor.terminated())
 			{
-				context< ga_controller >().ptree = std::move(editor.ptree);
+				context< ga_controller >().ddl_data = editor.data;
 				return transit< inactive >();
 			}
 			else

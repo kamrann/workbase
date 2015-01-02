@@ -7,13 +7,12 @@
 #include "genetic_algorithm/fixed_rate_function.h"
 #include "genetic_algorithm/generation_variable_rate_function.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
+//#include "params/param_accessor.h"
+//#include "params/schema_builder.h"
+#include "ddl/ddl.h"
 
 
 namespace ga {
-
-	namespace sb = prm::schema;
 
 	struct fixed_rate_fn_defn
 	{
@@ -22,35 +21,23 @@ namespace ga {
 			_default(default_rate)
 		{}
 */
-		static void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		static ddl::defn_node get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
+			ddl::defn_node rate = spc.realnum("rate")
+				(ddl::spc_range < ddl::realnum_defn_node::value_t > { 0.0, 1.0 })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 1.0 })	// todo:
+				;
 
-			(*provider)[path + std::string{ "rate" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"rate",
-					1.0,	// TODO:
-					0.0,
-					1.0
-					);
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "rate" })(acc));
-				return s;
-			};
+			return spc.composite("fixed_rate")(ddl::define_children{}
+				("rate", rate)
+				);
 		}
 
 		typedef ga::rate_fn_t result_t;
 
-		static result_t generate(prm::param_accessor acc)
+		static result_t generate(ddl::navigator nav)
 		{
-			auto rate = prm::extract_as< double >(acc["rate"]);
-			return ga::fixed_rate_fn{ rate };
+			return ga::fixed_rate_fn{ nav["rate"].get().as_real() };
 		}
 
 		double _default;
@@ -63,60 +50,37 @@ namespace ga {
 		_default(default_rate)
 		{}
 		*/
-		static void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		static ddl::defn_node get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
+			ddl::defn_node init_rate = spc.realnum("initial_rate")
+				(ddl::spc_range < ddl::realnum_defn_node::value_t > { 0.0, 1.0 })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 1.0 })
+				;
 
-			(*provider)[path + std::string{ "initial" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"initial",
-					1.0,	// TODO:
-					0.0,
-					1.0
-					);
-				return s;
-			};
+			ddl::defn_node cutoff_gens = spc.integer("cutoff_generations")
+				(ddl::spc_min < ddl::integer_defn_node::value_t > { 1 })
+				(ddl::spc_default < ddl::integer_defn_node::value_t > { 100 })
+				;
 
-			(*provider)[path + std::string{ "cutoff_generations" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::integer(
-					"cutoff_generations",
-					100,	// TODO:
-					1
-					);
-				return s;
-			};
+			ddl::defn_node cutoff_rate = spc.realnum("cutoff_rate")
+				(ddl::spc_range < ddl::realnum_defn_node::value_t > { 0.0, 1.0 })
+				(ddl::spc_default < ddl::realnum_defn_node::value_t > { 1.0 })
+				;
 
-			(*provider)[path + std::string{ "cutoff_rate" }] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::real(
-					"cutoff_rate",
-					0.0,	// TODO:
-					0.0,
-					1.0
-					);
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "initial" })(acc));
-				sb::append(s, provider->at(path + std::string{ "cutoff_generations" })(acc));
-				sb::append(s, provider->at(path + std::string{ "cutoff_rate" })(acc));
-				return s;
-			};
+			return spc.composite("var_gaussian_real_mut")(ddl::define_children{}
+				("initial_rate", init_rate)
+				("cutoff_generations", cutoff_gens)
+				("cutoff_rate", cutoff_rate)
+				);
 		}
 
 		typedef ga::rate_fn_t result_t;
 
-		static result_t generate(prm::param_accessor acc)
+		static result_t generate(ddl::navigator nav)
 		{
-			acc.set_lookup_mode(prm::param_accessor::LookupMode::Descendent);
-			auto initial = prm::extract_as< double >(acc["initial"]);
-			auto cutoff_generations = prm::extract_as< size_t >(acc["cutoff_generations"]);
-			auto cutoff_rate = prm::extract_as< double >(acc["cutoff_rate"]);
+			auto initial = nav["initial_rate"].get().as_real();
+			size_t cutoff_generations = nav["cutoff_generations"].get().as_int();
+			auto cutoff_rate = nav["cutoff_rate"].get().as_real();
 			return ga::generation_variable_rate_fn{
 				initial,
 				ga::generation_variable_rate_fn::control_point{ cutoff_generations, cutoff_rate }

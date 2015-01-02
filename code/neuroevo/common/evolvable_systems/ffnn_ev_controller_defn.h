@@ -6,8 +6,10 @@
 #include "ev_controller_genetic_mapping.h"
 #include "evolved_controller_defn.h"
 
-#include "params/param_fwd.h"
-#include "params/dynamic_enum_schema.h"
+//#include "params/param_fwd.h"
+//#include "params/dynamic_enum_schema.h"
+#include "ddl/ddl.h"
+#include "ddl/components/enum_choice.h"
 
 
 namespace sys {
@@ -16,17 +18,20 @@ namespace sys {
 		class ffnn_ev_controller_defn
 		{
 		public:
-			ffnn_ev_controller_defn(evolvable_controller_impl_defn::sys_defn_fn_t sys_defn_fn);
+			ffnn_ev_controller_defn(
+				evolvable_controller_impl_defn::sys_defn_fn_t& sys_defn_fn,
+				evolvable_controller_impl_defn::state_vals_fn_t& sv_fn
+				);
 
-			void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
-			void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, int component);
-			std::unique_ptr< i_genetic_mapping > generate(prm::param_accessor acc) const;
+			ddl::defn_node get_defn(ddl::specifier& spc);
+			std::unique_ptr< i_genetic_mapping > generate(ddl::navigator nav) const;
 
 		public:
-			evolvable_controller_impl_defn::sys_defn_fn_t sys_defn_fn_;
+			evolvable_controller_impl_defn::sys_defn_fn_t& sys_defn_fn_;
+			evolvable_controller_impl_defn::state_vals_fn_t& sv_fn_;
 
 			typedef ga::gene_mutation< double > gene_mut_fn_t;
-			prm::dynamic_enum_schema< gene_mut_fn_t > gene_mutation_defn_;
+			ddl::enum_choice< gene_mut_fn_t > gene_mutation_defn_;
 		};
 
 	}

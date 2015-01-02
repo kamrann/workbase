@@ -41,9 +41,13 @@ namespace ddl {
 		filename =
 			lexeme
 			[
+				// todo: requiring quotes to make sure the filename is not swallowed by the optional nav
+				// probably another way around this is quoting is annoying
+				lit('\"') >>
 				-hold[ prefix ] >>
 				-root >>
-				-(path_element >> *(char_('/') >> path_element))
+				-(path_element >> *(char_('/') >> path_element)) >>
+				lit('\"')
 			];
 		//
 

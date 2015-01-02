@@ -10,6 +10,7 @@
 #include "../schema_inst/enum_sch_node.h"
 #include "../schema_inst/list_sch_node.h"
 #include "../schema_inst/composite_sch_node.h"
+#include "../schema_inst/conditional_sch_node.h"
 
 #include "value.h"
 
@@ -34,10 +35,13 @@ namespace ddl {
 		value_node& operator= (realnum_sch_node::value_t const& val);
 		value_node& operator= (string_sch_node::value_t const& val);
 		value_node& operator= (enum_sch_node::value_t const& val);
+		value_node& operator= (enum_sch_node::str_value_t const& val);
 		value_node& operator= (std::vector< value_node > const& val);
 		value_node& operator= (std::map< node_name, value_node > const& val);
 
 		value_node& operator= (value const& val);
+
+		void assign(value_node rhs);
 
 	public:
 		bool is_bool() const;
@@ -54,6 +58,7 @@ namespace ddl {
 		realnum_sch_node::value_t as_real() const;
 		string_sch_node::value_t as_string() const;
 		enum_sch_node::value_t as_enum() const;
+		std::vector< std::string > as_enum_str() const;
 		std::vector< value_node > as_list() const;
 		std::map< node_name, value_node > as_composite() const;
 
@@ -61,6 +66,13 @@ namespace ddl {
 
 		// Shortcut access
 		enum_sch_node::enum_value_t as_single_enum() const;
+		std::string as_single_enum_str() const;
+
+		template < typename T >
+		T as_single_enum_data() const
+		{
+			return boost::any_cast<T>(as_single_enum().data);
+		}
 
 		void set_id(node_id id);
 		node_id get_id() const;
@@ -117,10 +129,6 @@ namespace ddl {
 			return *this;
 		}
 	};
-
-
-	void adjust_to_schema(value_node& vals, sch_node const& sch);
-	bool fits_schema(value_node const& vals, sch_node const& sch);
 
 }
 

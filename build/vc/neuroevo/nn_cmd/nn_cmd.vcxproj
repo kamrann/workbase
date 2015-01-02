@@ -49,9 +49,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>D:\Coding Projects\External Libraries\pgsql\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>D:\Coding Projects\External Libraries\pgsql\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -65,7 +67,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wtdbod.lib;wtdbosqlite3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wtdbod.lib;wtdbopostgresd.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -84,7 +86,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>wtdbo.lib;wtdbosqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wtdbo.lib;wtdbopostgres.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -93,9 +95,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\wt_custom_widgets\wt_custom_widgets.vcxproj">
       <Project>{f7c9c12a-fc74-4498-bcaa-d46d3e788314}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\wt_param_widgets\wt_param_widgets.vcxproj">
-      <Project>{51b32241-2a77-4223-9d29-87cf3ee53997}</Project>
     </ProjectReference>
     <ProjectReference Include="..\common\evo_database\evo_database.vcxproj">
       <Project>{0db7562c-4f2d-405f-b5ce-826dc483461e}</Project>

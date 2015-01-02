@@ -62,14 +62,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wtdbod.lib;wtdbopostgresd.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wtdbod.lib;wtdbopostgresd.lib;libpq.lib;%(AdditionalDependencies);Xinput9_1_0.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,7 +79,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>wtdbo.lib;wtdbopostgres.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wtdbo.lib;wtdbopostgres.lib;libpq.lib;%(AdditionalDependencies);Xinput9_1_0.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -102,6 +102,7 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\ga_params.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\plot_query.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\rosenbrock.cpp" />
+    <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\simple_timer_domain.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\state_machine\active_state.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\state_machine\commands\best_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\state_machine\commands\chart_cmd_parser.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\ga_params_rate_functions.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\ga_serializer.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\plot_query.h" />
+    <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\simple_timer_domain.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\state_machine\active_state.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\state_machine\commands\best_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\state_machine\commands\chart_cmd_parser.h" />
@@ -161,11 +163,20 @@
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\common\b2d_components\b2d_components.vcxproj">
+      <Project>{ac311baf-4a8a-4c80-9d6d-1d54a3282c52}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\common\b2d_script\b2d_script.vcxproj">
+      <Project>{4cf874a0-be0d-41c3-aa5b-a4b4ee60ce78}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\common\commands\commands.vcxproj">
       <Project>{6ff13d62-015f-446a-803e-32c6eb72206f}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\common\params\params.vcxproj">
-      <Project>{e98f782b-e701-44b7-97bd-8057a11f6ec4}</Project>
+    <ProjectReference Include="..\..\common\ddl\ddl\ddl.vcxproj">
+      <Project>{c64424cb-a537-4da9-85d5-ec57400c7136}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\common\input_stream\input_stream.vcxproj">
+      <Project>{4e9b423e-2734-45c9-8ed0-15445905214e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\common\wt_cmdline_server\wt_cmdline_server.vcxproj">
       <Project>{82eeaae2-795c-4d2e-b540-c6aa01a59498}</Project>
@@ -187,9 +198,6 @@
     </ProjectReference>
     <ProjectReference Include="..\common\neuralnet\neuralnet.vcxproj">
       <Project>{5e3419dc-727f-44da-a09f-27e8c6ea016d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\common\systems\elevator\elevator.vcxproj">
-      <Project>{04de12ba-9759-4abb-bd6f-dfecee19b0a9}</Project>
     </ProjectReference>
     <ProjectReference Include="..\common\systems\physics2d\physics2d.vcxproj">
       <Project>{ea47b4b9-816f-41bf-a52d-cd519cd99fcd}</Project>

@@ -12,7 +12,7 @@
 #include "observer.h"
 //
 
-#include "params/param_fwd.h"
+//#include "params/param_fwd.h"
 
 #include <boost/optional.hpp>
 

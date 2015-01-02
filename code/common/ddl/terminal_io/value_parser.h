@@ -1,7 +1,7 @@
 // value_parser.h
 
-#ifndef __WB_PARAMS_VALUE_PARSER_H
-#define __WB_PARAMS_VALUE_PARSER_H
+#ifndef __WB_DDL_VALUE_PARSER_H
+#define __WB_DDL_VALUE_PARSER_H
 
 #include "boolean_parser.h"
 #include "integer_parser.h"

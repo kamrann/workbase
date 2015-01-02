@@ -4,6 +4,7 @@
 #include "control_fsm.h"
 
 #include "../ga_params.h"
+#include "ddl/values/yaml_conversion.h"
 
 
 namespace ga_control {
@@ -16,12 +17,12 @@ namespace ga_control {
 			size_t const num_generations = 1000;
 
 			auto& ga_ctx = context< ga_controller >();
-			auto acc = prm::param_accessor{ &ga_ctx.ptree };
-			auto params_as_yaml = ga_ctx.ptree.convert_to_yaml();
+			auto nav = ddl::navigator{ &ga_ctx.ddl_data, ga_ctx.ddl_data.get_root() };
+			auto params_as_yaml = ddl::export_yaml(ga_ctx.ddl_data, ga_ctx.ddl_data.get_root());
 
 			auto& defn = ga_ctx.ga_def;
-			auto domain = defn.generate_domain(acc);
-			auto alg = defn.generate_alg(acc, domain);
+			auto domain = defn.generate_domain(nav);
+			auto alg = defn.generate_alg(nav, domain);
 
 			for(size_t trial = 0; trial < num_trials; ++trial)
 			{

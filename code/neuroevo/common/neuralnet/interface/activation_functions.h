@@ -5,11 +5,15 @@
 
 #include "activation_range.h"
 
+#include <Eigen/Dense>
+#include <unsupported/Eigen/MatrixFunctions>
+
 #include <boost/optional.hpp>
 
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <map>
 
 
 namespace nnet {
@@ -39,7 +43,12 @@ namespace nnet {
 		None,
 	};
 
+	// TODO: Bimap, or perhaps spirit parser/emitter definitions
 	extern const char* const ActivationFnNames[(int)ActivationFnType::Count];
+	extern const char* const ActivationFnNames2[(int)ActivationFnType::Count];
+
+	extern const std::map< std::string, ActivationFnType > ActivationFnNameMap;
+	//
 
 	inline bool is_symmetric(ActivationFnType fn)
 	{
@@ -208,6 +217,64 @@ namespace nnet {
 			}
 		}
 		return result;
+	}
+
+	template < typename Derived >
+	inline Eigen::ArrayXd evaluate(activation_function const& fn, Eigen::ArrayBase< Derived > const& v)
+	{
+		switch(fn.type)
+		{
+			case ActivationFnType::SigmoidSymmetric:
+			return ((v * (-2.0 * fn.steepness)).exp() + 1.0).cwiseInverse() * 2.0 - 1.0;
+
+			case ActivationFnType::Sigmoid:
+			return ((v * (-2.0 * fn.steepness)).exp() + 1.0).cwiseInverse();
+
+			case ActivationFnType::Linear:
+			return v * fn.steepness;
+			
+			case ActivationFnType::LinearBounded:
+			return (v * fn.steepness).cwiseMax(0.0).cwiseMin(1.0);
+
+			case ActivationFnType::LinearBoundedSymmetric:
+			return (v * fn.steepness).cwiseMax(-1.0).cwiseMin(1.0);
+			
+			case ActivationFnType::Threshold:
+			{
+				// TODO: Can this be done using an ArrayBase component-wise method?
+				auto count = v.size();
+				Eigen::ArrayXd result(count);
+				for(size_t i = 0; i < count; ++i)
+				{
+					result[i] = v[i] > 0 ? 1.0 : 0.0;
+				}
+				return result;
+			}
+			
+			case ActivationFnType::ThresholdSymmetric:
+			{
+				// TODO: Can this be done using an ArrayBase component-wise method?
+				auto count = v.size();
+				Eigen::ArrayXd result(count);
+				for(size_t i = 0; i < count; ++i)
+				{
+					result[i] = v[i] > 0 ? 1.0 : -1.0;
+				}
+				return result;
+			}
+			
+			case ActivationFnType::Sine:
+			return (v * fn.steepness).sin();
+			
+			case ActivationFnType::Cosine:
+			return (v * fn.steepness).cos();
+			
+			case ActivationFnType::Gaussian:
+			return (-(v * fn.steepness).square()).exp();
+			
+			case ActivationFnType::GaussianSymmetric:
+			return (-(v * fn.steepness).square()).exp() * 2.0 - 1.0;
+		}
 	}
 
 	// Allows evaluation when x could be -/+ infinity.

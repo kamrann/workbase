@@ -1,0 +1,209 @@
+composite:
+  domain_cfg:
+    composite:
+      contents:
+        conditional:
+          composite:
+            ev_con:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      temp_mutation:
+                        composite:
+                          option:
+                            enum:
+                              - variable_gaussian
+                          contents:
+                            conditional:
+                              composite:
+                                initial_std_dev:
+                                  real: 0.2
+                                cutoff_generations:
+                                  integer: 1000
+                                cutoff_std_dev:
+                                  real: 0.01
+                      output_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      output_steepness:
+                        real: 0.5
+                      hidden_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      hidden_layer_list:
+                        list:
+                          - composite:
+                              num_neurons:
+                                integer: 4
+                      hidden_steepness:
+                        real: 0.5
+                      inputs:
+                        enum:
+                          - pos_x
+                          - vel_x
+                          - pole_joint/angle
+                          - pole_joint/speed
+                option:
+                  enum:
+                    - ffnn
+            sys:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      specs:
+                        list:
+                          - composite:
+                              role_contents:
+                                conditional:
+                                  composite:
+                                    agent_contents:
+                                      conditional:
+                                        composite:
+                                          details:
+                                            conditional:
+                                              composite:
+                                                cart_mass:
+                                                  real: 1
+                                                fail_angle:
+                                                  real: 0.2094395160675049
+                                                fail_displacement:
+                                                  real: 2.400000095367432
+                                                max_force:
+                                                  real: 10
+                                                pole_length:
+                                                  real: 1
+                                                pole_mass:
+                                                  real: 0.1000000014901161
+                                          name:
+                                            string: the_cart
+                                    agent_type:
+                                      enum:
+                                        - pole_cart
+                              agent_role:
+                                enum:
+                                  - default
+                      instances:
+                        list:
+                          - composite:
+                              inst_controller:
+                                composite:
+                                  class_contents:
+                                    conditional:
+                                      composite:
+                                        controller_type:
+                                          enum:
+                                            - evolved
+                                        controller_contents:
+                                          conditional:
+                                            composite:
+                                              details:
+                                                conditional:
+                                                  composite: ~
+                                  controller_class:
+                                    enum:
+                                      - evolved_cls
+                              inst_contents:
+                                composite:
+                                  inst_details:
+                                    conditional:
+                                      composite:
+                                        initial_conditions:
+                                          composite:
+                                            init_angvel:
+                                              real: 0
+                                            init_linear_angle:
+                                              real: 0
+                                            init_y:
+                                              real: 0
+                                            init_x:
+                                              real: 0
+                                            init_linear_speed:
+                                              real: 0
+                                            init_orientation:
+                                              real: 0
+                                  spec_reference:
+                                    enum:
+                                      - the_cart
+                      core:
+                        composite:
+                          scenario_type:
+                            enum:
+                              - ground_based
+                          scenario:
+                            conditional:
+                              composite:
+                                gravity:
+                                  real: 9.810000000000001
+                                ground_expanse:
+                                  real: 0
+                          updates_per_sec:
+                            integer: 60
+                option:
+                  enum:
+                    - physics_2d
+            obj:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      direction_type:
+                        enum:
+                          - Minimise
+                      state_val:
+                        enum:
+                          - failure
+                      value_type:
+                        enum:
+                          - Sum
+                      timespan:
+                        conditional:
+                          composite:
+                            from:
+                              enum:
+                                - Start
+                            until:
+                              enum:
+                                - End
+                option:
+                  enum:
+                    - single_objective
+      option:
+        enum:
+          - syssim
+  ga_cfg:
+    composite:
+      crossover:
+        composite:
+          cx_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 1
+              option:
+                enum:
+                  - fixed
+      mutation:
+        composite:
+          mut_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 0.1
+              option:
+                enum:
+                  - fixed
+      pop_size:
+        integer: 30
+      trials:
+        composite:
+          num_trials:
+            integer: 10
+          trial_merging:
+            enum:
+              - average

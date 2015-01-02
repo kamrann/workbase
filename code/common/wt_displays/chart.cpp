@@ -43,7 +43,9 @@ chart_display::chart_display(chart_dd const& dd)
 	for(size_t i = 0; i < num_series; ++i)
 	{
 		m_model->setHeaderData(i + 1, dd.series[i].name);
-		chart_series.push_back(Wt::Chart::WDataSeries(i + 1, Wt::Chart::PointSeries));//Wt::Chart::LineSeries));
+		chart_series.push_back(Wt::Chart::WDataSeries(i + 1, 
+			Wt::Chart::LineSeries));
+			// TODO: configurable: Wt::Chart::PointSeries));
 	}
 
 	chart->setSeries(chart_series);

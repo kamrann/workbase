@@ -22,6 +22,9 @@
     <Filter Include="terminal_io">
       <UniqueIdentifier>{75317678-b12f-43d5-986e-fec2fc8c4854}</UniqueIdentifier>
     </Filter>
+    <Filter Include="components">
+      <UniqueIdentifier>{123f7a38-cb35-4ca7-a56e-094c601e7fcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -161,6 +164,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\code\common\ddl\node_ref.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\values\yaml_conversion.cpp">
+      <Filter>values</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\dependencies.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\dependency_graph.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\sd_tree.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\conditional_sch_node.cpp">
+      <Filter>schema_inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\reset_cmd_parser.cpp">
+      <Filter>commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,6 +484,36 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_defn\conditional_specifiers.h">
       <Filter>schema_defn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\yaml_conversion.h">
+      <Filter>values</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\dependencies.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\dependency_graph.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\sd_tree.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\sd_node_ref.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\conditional_sch_node.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\conditional_sch_node_impl.h">
+      <Filter>schema_inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\schema_validation.h">
+      <Filter>values</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\reset_cmd_parser.h">
+      <Filter>commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\components\enum_choice.h">
+      <Filter>components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

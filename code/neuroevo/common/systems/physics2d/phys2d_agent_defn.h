@@ -22,7 +22,7 @@ namespace sys {
 			public i_agent_defn
 		{
 		public:
-			virtual std::string update_schema_providor_for_instance(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const override;
+			virtual ddl::defn_node get_instance_defn(ddl::specifier& spc) override;
 
 		protected:
 			typedef fixed_or_random< double, std::uniform_real_distribution< double >, rgen_t > random_val_t;
@@ -42,7 +42,7 @@ namespace sys {
 				double angvel;
 */			};
 
-			static void initialize_instance_data(instance_data& inst, prm::param_accessor acc);
+			static void initialize_instance_data(instance_data& inst, ddl::navigator nav);
 			static void initialize_object_state(object* obj, instance_data const& st, rgen_t& rgen);
 		};
 

@@ -9,9 +9,16 @@
 namespace sys {
 	namespace ev {
 
-		fixed_ffnn_genetic_mapping::fixed_ffnn_genetic_mapping(state_value_id_list inputs, nnet::mlp::layer_counts_t nn_layers, gene_mut_fn_t mut_fn):
+		fixed_ffnn_genetic_mapping::fixed_ffnn_genetic_mapping(
+			state_value_id_list inputs,
+			nnet::mlp::layer_counts_t nn_layers,
+			nnet::activation_function hidden_af,
+			nnet::activation_function output_af,
+			gene_mut_fn_t mut_fn):
 			inputs_(inputs),
 			layer_counts_(nn_layers),
+			hidden_af_(hidden_af),
+			output_af_(output_af),
 			gene_mut_fn_(mut_fn)
 		{
 		}
@@ -112,11 +119,11 @@ namespace sys {
 			std::unique_ptr< nnet::mlp > nn = std::make_unique< nnet::mlp >();
 			nn->create(layer_counts_);
 			
-			// TODO: from params
-			for(size_t layer = 1; layer < layer_counts_.size(); ++layer)
+			for(size_t layer = 1; layer < layer_counts_.size() - 1; ++layer)
 			{
-				nn->set_activation_function_layer(layer, nnet::activation_function{ nnet::ActivationFnType::SigmoidSymmetric });
+				nn->set_activation_function_layer(layer, hidden_af_);
 			}
+			nn->set_activation_function_layer(layer_counts_.size() - 1, output_af_);
 
 			nnet::weight_array_t weights{ std::begin(weight_gn), std::end(weight_gn) };
 			nn->load_weights(weights);

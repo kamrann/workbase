@@ -12,16 +12,6 @@ namespace ga {
 		namespace fnopt {
 			namespace functions {
 
-				class ackley_defn
-				{
-				public:
-					void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const;
-					function_opt_domain::function_defn generate(prm::param_accessor acc) const;
-
-					void update_schema_provider(prm::schema::schema_provider_map_handle, prm::qualified_path const&, int) const
-					{}
-				};
-
 				struct ackley_schema
 				{
 					ddl::defn_node get_defn(ddl::specifier& spc);

@@ -1,0 +1,214 @@
+composite:
+  domain_cfg:
+    composite:
+      contents:
+        conditional:
+          composite:
+            ev_con:
+              composite:
+                option:
+                  enum:
+                    - rnn
+                contents:
+                  conditional:
+                    composite:
+                      inputs:
+                        enum:
+                          - left_contact
+                          - right_contact
+                          - joint1/angle
+                          - joint2/angle
+                          - joint3/angle
+                          - joint4/angle
+                          - joint5/angle
+                          - joint6/angle
+                          - joint7/angle
+                      hidden_neuron_count:
+                        integer: 10
+                      hidden_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      hidden_steepness:
+                        real: 0.5
+                      output_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      output_steepness:
+                        real: 0.5
+                      temp_mutation:
+                        composite:
+                          contents:
+                            conditional:
+                              composite:
+                                initial_std_dev:
+                                  real: 0.4
+                                cutoff_generations:
+                                  integer: 1000
+                                cutoff_std_dev:
+                                  real: 0.01
+                          option:
+                            enum:
+                              - variable_gaussian
+            sys:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      core:
+                        composite:
+                          updates_per_sec:
+                            integer: 30
+                          velocity_iterations:
+                            integer: 4
+                          scenario:
+                            conditional:
+                              composite:
+                                incline:
+                                  real: 0
+                                ground_expanse:
+                                  real: 500
+                                friction:
+                                  real: 0.25
+                                gravity:
+                                  real: 9.810000000000001
+                          scenario_type:
+                            enum:
+                              - ground_based
+                          duration:
+                            real: 20
+                          position_iterations:
+                            integer: 2
+                      instances:
+                        list:
+                          - composite:
+                              inst_controller:
+                                composite:
+                                  class_contents:
+                                    conditional:
+                                      composite:
+                                        controller_type:
+                                          enum:
+                                            - evolved
+                                        controller_contents:
+                                          conditional:
+                                            composite:
+                                              details:
+                                                conditional:
+                                                  composite: ~
+                                  controller_class:
+                                    enum:
+                                      - evolved_cls
+                              inst_contents:
+                                composite:
+                                  spec_reference:
+                                    enum:
+                                      - the_snake
+                                  inst_details:
+                                    conditional:
+                                      composite:
+                                        initial_conditions:
+                                          composite:
+                                            init_angvel:
+                                              real: 0
+                                            init_linear_speed:
+                                              real: 0
+                                            init_linear_angle:
+                                              real: 0
+                                            init_x:
+                                              real: 0
+                                            init_y:
+                                              real: 0
+                                            init_orientation:
+                                              real: 0
+                      specs:
+                        list:
+                          - composite:
+                              agent_role:
+                                enum:
+                                  - default
+                              role_contents:
+                                conditional:
+                                  composite:
+                                    agent_type:
+                                      enum:
+                                        - snakebot
+                                    agent_contents:
+                                      conditional:
+                                        composite:
+                                          details:
+                                            conditional:
+                                              composite:
+                                                friction:
+                                                  real: 0.5
+                                                max_angle:
+                                                  real: 45
+                                                num_segments:
+                                                  integer: 8
+                                                max_torque:
+                                                  real: 5
+                                                segment_size:
+                                                  real: 0.75
+                                          name:
+                                            string: the_snake
+                option:
+                  enum:
+                    - physics_2d
+            obj:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      timespan:
+                        conditional:
+                          enum:
+                            - End
+                      state_val:
+                        enum:
+                          - pos_x
+                      value_type:
+                        enum:
+                          - Value
+                      direction_type:
+                        enum:
+                          - Maximise
+                option:
+                  enum:
+                    - single_objective
+      option:
+        enum:
+          - syssim
+  ga_cfg:
+    composite:
+      crossover:
+        composite:
+          cx_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 1
+              option:
+                enum:
+                  - fixed
+      mutation:
+        composite:
+          mut_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 0.1
+              option:
+                enum:
+                  - fixed
+      pop_size:
+        integer: 30
+      trials:
+        composite:
+          num_trials:
+            integer: 1
+          trial_merging:
+            enum:
+              - average

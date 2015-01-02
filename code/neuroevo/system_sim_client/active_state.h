@@ -18,6 +18,10 @@
 #include <mutex>
 
 
+namespace input {
+	class input_stream;
+}
+
 namespace sys_control {
 	namespace fsm {
 
@@ -75,7 +79,7 @@ namespace sys_control {
 			bool step_system(size_t frames, frame_update_cfg const& cfg = frame_update_cfg{});
 			void output_state_values(sys::state_value_id_list const& svids);
 			void add_chart(sys::state_value_id_list vals);
-			void add_drawer();
+			void add_drawer(double zoom);
 			void clear_chart_data(unsigned long id);
 			void clear_all_chart_data();
 			void store_chart_series_data();
@@ -89,6 +93,8 @@ namespace sys_control {
 			sys::state_value_id_list result_vals;
 			size_t frame;
 			bool complete;
+
+			std::shared_ptr< input::input_stream > in_strm;
 
 			struct chart_defn
 			{

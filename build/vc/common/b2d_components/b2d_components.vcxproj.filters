@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="effectors">
+      <UniqueIdentifier>{0c3bedb5-14f2-4673-83c5-82ff12185148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="components">
+      <UniqueIdentifier>{5cf9c6df-fb76-44fb-99ea-de80b7edf8ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{baf28486-0350-4d2d-ac16-3d1be4a85fb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sensors">
+      <UniqueIdentifier>{6d8501b8-7c8b-4818-814c-fd353c554ba4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\effectors\magnet.cpp">
+      <Filter>effectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\effectors\sucker.cpp">
+      <Filter>effectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\components\rotation_joint.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\core\entity_data.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\sensors\basic_contact_sensor.cpp">
+      <Filter>sensors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\sensors\sensors.cpp">
+      <Filter>sensors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_components\components\sucker_cmp.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\effectors\magnet.h">
+      <Filter>effectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\effectors\sucker.h">
+      <Filter>effectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\components\rotation_joint.h">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\core\entity_data.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\sensors\basic_contact_sensor.h">
+      <Filter>sensors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\sensors\sensors.h">
+      <Filter>sensors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\core\contacts.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_components\components\sucker_cmp.h">
+      <Filter>components</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

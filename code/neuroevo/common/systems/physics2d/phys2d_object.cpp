@@ -6,6 +6,10 @@
 namespace sys {
 	namespace phys2d {
 
+		object::object(phys2d_system* system):
+			m_sys(system)
+		{}
+
 		state_value_id_list object::get_state_values()
 		{
 			state_value_id_list svs;

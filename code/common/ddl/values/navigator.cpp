@@ -1,11 +1,12 @@
 // navigator.cpp
 
 #include "navigator.h"
+#include "../sd_node_ref.h"
 
 
 namespace ddl {
 
-	navigator::navigator():
+/*	navigator::navigator():
 		node_{},
 		deactivated_{ false }
 	{
@@ -27,55 +28,123 @@ namespace ddl {
 	{
 
 	}
+*/
+
+	navigator::navigator():
+		tree_{ nullptr },
+		pos_{},
+		deactivated_{ false }
+	{}
+
+	navigator::navigator(sd_tree const* tree, sd_node_ref pos):
+		tree_(tree),
+		pos_(pos),
+		deactivated_{ false }
+	{}
+
 
 	navigator::operator bool() const
 	{
-		return node_;
+		return tree_ != nullptr;//node_;
 	}
 
 	bool navigator::is_parent() const
 	{
-		return !ancestor_stk_.empty();
+		return tree_->has_parent(pos_.nd);
+			//!ancestor_stk_.empty();
 	}
 
 	navigator navigator::parent() const
 	{
-		auto anc = ancestor_stk_;
+/*		auto anc = ancestor_stk_;
 		auto nd = anc.top();
 		anc.pop();
 		auto p = path_;
 		p.pop();
 		return navigator{ nd, anc, p };
+*/
+
+		return navigator{ tree_, sd_node_ref{ tree_->get_parent(pos_.nd).first } };
 	}
 
 	bool navigator::at_leaf() const
 	{
-		return node_.is_leaf();
+		//return node_.is_leaf();
+		return tree_->child_count(pos_.nd) == 0;
 	}
 
 	path navigator::where() const
 	{
-		return path_;
+//		return path_;
+
+		std::list< sd_tree::edge_descriptor > edges;
+		auto node = pos_.nd;
+		while(tree_->has_parent(node))
+		{
+			auto e = tree_->in_edge(node).first;
+			edges.push_front(e);
+			node = tree_->get_parent(node).first;
+		}
+
+		path pth;
+		for(auto e : edges)
+		{
+			auto const& attribs = tree_->edge_attribs(e);
+			switch(attribs.type)
+			{
+				case sd_edge_attribs::ChildType::Composite:
+				pth.append(attribs.child_name);
+				break;
+				case sd_edge_attribs::ChildType::ListItem:
+				pth.append(attribs.item_idx);
+				break;
+				case sd_edge_attribs::ChildType::Conditional:
+				pth.append(path::conditional{});
+				break;
+			}
+		}
+
+		return pth;
 	}
 
 	bool navigator::is_child(node_name child_id) const
 	{
-		if(!node_.is_composite())
+/*		if(!node_.is_composite())
 		{
 			return false;
 		}
 		auto comp = node_.as_composite();
 		return comp.find(child_id) != comp.end();
+*/
+		for(auto e : tree_->branches(pos_.nd))
+		{
+			if(tree_->edge_attribs(e).type == sd_edge_attribs::ChildType::Composite &&
+				tree_->edge_attribs(e).child_name == child_id)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	navigator navigator::child(node_name child_id) const
 	{
-		auto anc = ancestor_stk_;
+		for(auto e : tree_->branches(pos_.nd))
+		{
+			if(tree_->edge_attribs(e).type == sd_edge_attribs::ChildType::Composite &&
+				tree_->edge_attribs(e).child_name == child_id)
+			{
+				return navigator{ tree_, sd_node_ref{ tree_->target(e) } };
+			}
+		}
+		return{};
+
+/*		auto anc = ancestor_stk_;
 		anc.push(node_);
 		auto p = path_;
 		p += child_id;
 		return navigator{ node_.as_composite().find(child_id)->second, anc, p };
-	}
+*/	}
 	
 	navigator navigator::operator[] (node_name child_id) const
 	{
@@ -89,7 +158,17 @@ namespace ddl {
 
 	std::vector< node_name > navigator::child_names() const
 	{
-		if(!node_.is_composite())
+		std::vector< node_name > names;
+		for(auto e : tree_->branches(pos_.nd))
+		{
+			if(tree_->edge_attribs(e).type == sd_edge_attribs::ChildType::Composite)
+			{
+				names.push_back(tree_->edge_attribs(e).child_name);
+			}
+		}
+		return names;
+
+/*		if(!node_.is_composite())
 		{
 			return{};
 		}
@@ -101,21 +180,34 @@ namespace ddl {
 			names.push_back(entry.first);
 		}
 		return names;
+		*/
 	}
 
 	size_t navigator::list_num_items() const
 	{
-		return node_.as_list().size();
+//		return node_.as_list().size();
+
+		return tree_->child_count(pos_.nd);
 	}
 
 	navigator navigator::operator[] (size_t item_idx) const
 	{
-		auto anc = ancestor_stk_;
+		auto child = tree_->get_nth_child(pos_.nd, item_idx);
+		if(child.second)
+		{
+			return navigator{ tree_, sd_node_ref{ child.first } };
+		}
+		else
+		{
+			return{};
+		}
+
+/*		auto anc = ancestor_stk_;
 		anc.push(node_);
 		auto p = path_;
 		p += item_idx;
 		return navigator{ node_.as_list()[item_idx], anc, p };
-	}
+*/	}
 
 	navigator navigator::deactivated() const
 	{
@@ -131,7 +223,13 @@ namespace ddl {
 
 	value_node navigator::get() const
 	{
-		return node_;
+		return tree_->node_attribs(pos_.nd).data;
+//		return node_;
+	}
+
+	sd_node_ref navigator::get_ref() const
+	{
+		return pos_;
 	}
 
 	navigator navigator::operator[] (path const& pth) const
@@ -152,6 +250,10 @@ namespace ddl {
 
 				case path::ComponentType::ListItem:
 				nav = nav[cmp.as_index()];
+				break;
+
+				case path::ComponentType::Conditional:
+				nav = nav[(size_t)0];
 				break;
 			}
 		}
@@ -195,7 +297,26 @@ namespace ddl {
 
 	navigator::find_results::path_list navigator::find_descendent_r_id(node_id id) const
 	{
-		if(node_.is_composite())
+		find_results::path_list results;
+
+		auto const& attribs = tree_->node_attribs(pos_.nd);
+		if(attribs.defn && attribs.defn.get_id() == id)
+		{
+			results.push_back(where());
+		}
+
+		for(auto child : tree_->children(pos_.nd))
+		{
+			auto cnav = navigator{ tree_, sd_node_ref{ child } };
+			auto c_res = cnav.find_descendent_r_id(id);
+			results.insert(std::end(results), std::begin(c_res), std::end(c_res));
+		}
+
+		return results;
+
+#if 0
+		auto const& attribs = tree_->node_attribs(pos_.nd);
+		if(attribs.data.is_composite())//node_.is_composite())
 		{
 			find_results::path_list results;
 			auto cnames = child_names();
@@ -217,7 +338,7 @@ namespace ddl {
 			}
 			return results;
 		}
-		else if(node_.is_list())
+		else if(attribs.data.is_list())//node_.is_list())
 		{
 			find_results::path_list results;
 			auto count = list_num_items();
@@ -243,6 +364,7 @@ namespace ddl {
 		{
 			return{};
 		}
+#endif
 	}
 
 	navigator::find_results navigator::find_by_id(node_id id) const
@@ -329,31 +451,30 @@ namespace ddl {
 
 	navigator::find_results::path_list navigator::find_descendent_r(node_name str/*, find_results::result_location offset*/) const
 	{
-		if(node_.is_composite())
+		find_results::path_list results;
+
+		// TODO: search by list index also
+		auto in = tree_->in_edge(pos_.nd);
+		if(in.second)
 		{
-			find_results::path_list results = find_child(str/*, offset*/);
-//			offset.down_count += 1;
-			auto cnames = child_names();
-			for(auto const& cn : cnames)
+			auto const& edge = tree_->edge_attribs(in.first);
+			if(edge.type == sd_edge_attribs::ChildType::Composite)
 			{
-				auto cnav = child(cn);
-				auto from_child = cnav.find_descendent_r(str/*, offset*/);
-				results.insert(
-					std::end(results),
-					std::begin(from_child),
-					std::end(from_child)
-					);
+				if(edge.child_name == str)
+				{
+					results.push_back(where());
+				}
 			}
-			return results;
 		}
-		else if(node_.is_list())
+
+		for(auto child : tree_->children(pos_.nd))
 		{
-			return{};	// TODO:
+			auto cnav = navigator{ tree_, sd_node_ref{ child } };
+			auto c_res = cnav.find_descendent_r(str);
+			results.insert(std::end(results), std::begin(c_res), std::end(c_res));
 		}
-		else
-		{
-			return{};
-		}
+
+		return results;
 	}
 
 	navigator::find_results navigator::find_descendent(node_name str) const

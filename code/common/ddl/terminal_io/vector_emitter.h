@@ -1,7 +1,7 @@
 // vector_emitter.h
 
-#ifndef __WB_PARAMS_VECTOR_EMITTER_H
-#define __WB_PARAMS_VECTOR_EMITTER_H
+#ifndef __WB_DDL_VECTOR_EMITTER_H
+#define __WB_DDL_VECTOR_EMITTER_H
 
 #include "param.h"
 #include "value_parsing_ast.h"

@@ -4,7 +4,7 @@
 #include "control_fsm.h"
 #include "../ga_params.h"
 
-#include "params/param_accessor.h"
+//#include "params/param_accessor.h"
 
 #include <chrono>
 #include <thread>
@@ -15,21 +15,23 @@ namespace ga_control {
 
 		ga_controller::ga_controller(
 			ga::ga_defn& _ga_def,
-			prm::param_tree _pt,
-			prm::schema::schema_provider_map_handle _provider,
+			ddl::defn_node _ddl_defn,
 			ga::i_ga_serializer* _serializer,
 			evodb_session* _dbs,
 			std::function< void(std::string) > _output_sink,
 			std::function< void(std::string) > _prompt_callback
 			):
 			ga_def{ _ga_def },
-			ptree{ std::move(_pt) },
-			provider{ _provider },
+			ddl_defn{ _ddl_defn },
 			serializer{ _serializer },
 			db_session{ _dbs },
 			output_sink{ _output_sink },
 			prompt_callback{ _prompt_callback }
 		{
+			auto root_attribs = ddl::sd_node_attribs{};
+			root_attribs.defn = ddl_defn;
+			ddl_data.create_root(root_attribs);
+
 			// TODO: default to what?
 			// ALSO: Currently reset command will modify the seed, but if exit and then init, seed will remain
 			// the same as previously...
@@ -82,8 +84,6 @@ namespace ga_control {
 
 		bool ga_controller::is_defn_complete() const
 		{
-			auto tree_copy = ptree;
-			auto acc = prm::param_accessor{ &tree_copy };
 			// TODO:
 			return true;// !prm::extract_as< std::string >(acc["target_str"]).empty();
 		}

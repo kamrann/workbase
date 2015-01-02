@@ -6,6 +6,7 @@
 #include "nav_cmd_parser.h"
 #include "list_cmd_parser.h"
 #include "setvalue_cmd_parser.h"
+#include "reset_cmd_parser.h"
 #include "repeat_add_cmd_parser.h"
 #include "repeat_remove_cmd_parser.h"
 #include "save_cmd_parser.h"
@@ -24,6 +25,7 @@ namespace ddl {
 		nav_cmd
 		, list_cmd
 		, setvalue_cmd
+		, reset_cmd
 		, repeat_add_cmd
 		, repeat_remove_cmd
 		, save_cmd
@@ -41,6 +43,7 @@ namespace ddl {
 		nav_cmd_parser< Iterator > nav;
 		list_cmd_parser< Iterator > list;
 		setvalue_cmd_parser< Iterator > setvalue;
+		reset_cmd_parser< Iterator > reset;
 		repeat_add_cmd_parser< Iterator > repeat_add;
 		repeat_remove_cmd_parser< Iterator > repeat_rm;
 		save_cmd_parser< Iterator > save;

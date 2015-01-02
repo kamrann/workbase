@@ -29,7 +29,7 @@ namespace ddl {
 		void default(value_t val);
 		value_t default() const;
 
-	private:
+	public:
 		detail::boolean_sch_node_ptr ptr() const
 		{
 			return obj_;

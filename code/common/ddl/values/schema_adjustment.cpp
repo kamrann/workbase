@@ -1,60 +1,92 @@
 // schema_adjustment.cpp
 
+#include "schema_validation.h"
 #include "value_node.h"
+#include "../sd_node_ref.h"
 
 
 namespace ddl {
 
+	// TODO: Seems wrong that removing unwanted children is done here, yet ensuring wanted children are in 
+	// place is dealt with within the local instantiation visitor...
 	struct adjust_visitor
 	{
 		typedef void result_type;
 
-		adjust_visitor(value_node& val):
-			val_{ val }
+		adjust_visitor(sd_node_ref nref, sd_tree& tree):
+			nref_(nref),
+			tree_(tree)
 		{}
 
 		inline void operator() (boolean_sch_node const& nd) //const
 		{
-			if(!val_.is_bool() || !fits_schema(val_, nd))
+			auto& node = tree_[nref_.nd];
+
+			// TODO: HACK for null schema node using boolean
+			if(!nd.ptr())
 			{
-				val_ = nd.default();
+				node.data = value_node{};
+//				cull_sd_children(nref_, tree_);
+				return;
+			}
+
+			if(!node.data.is_bool() || !fits_schema(node.data, nd))
+			{
+				node.data = nd.default();
+//				cull_sd_children(nref_, tree_);
 			}
 		}
 
 		inline void operator() (integer_sch_node const& nd) //const
 		{
-			if(!val_.is_int() || !fits_schema(val_, nd))
+			auto& node = tree_[nref_.nd];
+
+			if(!node.data.is_int() || !fits_schema(node.data, nd))
 			{
-				val_ = nd.default();
+				node.data = nd.default();
+//				cull_sd_children(nref_, tree_);
 			}
 		}
 
 		inline void operator() (realnum_sch_node const& nd) //const
 		{
-			if(!val_.is_real() || !fits_schema(val_, nd))
+			auto& node = tree_[nref_.nd];
+
+			if(!node.data.is_real() || !fits_schema(node.data, nd))
 			{
-				val_ = nd.default();
+				node.data = nd.default();
+//				cull_sd_children(nref_, tree_);
 			}
 		}
 
 		inline void operator() (string_sch_node const& nd) //const
 		{
-			if(!val_.is_string() || !fits_schema(val_, nd))
+			auto& node = tree_[nref_.nd];
+
+			if(!node.data.is_string() || !fits_schema(node.data, nd))
 			{
-				val_ = nd.default();
+				node.data = nd.default();
+//				cull_sd_children(nref_, tree_);
 			}
 		}
 
 		inline void operator() (enum_sch_node const& nd) //const
 		{
-			if(!val_.is_enum() || !fits_schema(val_, nd))
+			auto& node = tree_[nref_.nd];
+
+			if(!node.data.is_enum() || !fits_schema(node.data, nd))
 			{
-				val_ = nd.default();
+				node.data = nd.default();
+//				cull_sd_children(nref_, tree_);
 			}
 		}
 
 		inline void operator() (list_sch_node const& nd) //const
 		{
+			auto& node = tree_[nref_.nd];
+			node.data = std::vector < value_node > {};
+
+#if 0
 /*			if(!val_.is_list() || !fits_schema(val_, nd))
 			{
 				val_ = std::vector < value_node > {};
@@ -88,10 +120,33 @@ namespace ddl {
 			}
 
 			val_ = items;
+#endif
 		}
 
 		inline void operator() (composite_sch_node const& nd) //const
 		{
+			auto& node = tree_[nref_.nd];
+			node.data = std::map < node_name, value_node > {};
+
+			/*
+			// Remove child nodes which shouldn't exist
+			std::list< sd_tree::node_descriptor > to_remove;
+			for(auto c : tree_.children(nref_.nd))
+			{
+				auto const& edge = tree_[tree_.in_edge(c).first];
+				if(edge.type != sd_edge_attribs::ChildType::Composite ||
+					!nd.has_child(edge.child_name))
+				{
+					to_remove.push_back(c);
+				}
+			}
+			for(auto c : to_remove)
+			{
+				tree_.remove_branch(c);
+			}
+			*/
+
+#if 0
 			std::map< node_name, value_node > components;
 			// If already composite, start off with existing child values
 			if(val_.is_composite())
@@ -130,17 +185,29 @@ namespace ddl {
 			}
 
 			val_ = components;
+#endif
 		}
 
-		value_node& val_;
+		inline void operator() (conditional_sch_node const& nd) //const
+		{
+			auto& node = tree_[nref_.nd];
+			node.data = value_node{};	// TODO: ?
+		}
+
+//		value_node& val_;
+		sd_tree& tree_;
+		sd_node_ref nref_;
 	};
 
-	void adjust_to_schema(value_node& vals, sch_node const& sch)
+//	void adjust_to_schema(value_node& vals, sch_node const& sch)
+	void adjust_to_schema(sd_node_ref nref, sd_tree& tree)
 	{
-		vals.set_id(sch.get_id());
+		auto& node = tree[nref.nd];
 
-		auto vis = adjust_visitor{ vals };
-		sch.apply_visitor(vis);
+		node.data.set_id(node.schema.get_id());
+
+		auto vis = adjust_visitor{ nref, tree };
+		node.schema.apply_visitor(vis);
 	}
 
 }

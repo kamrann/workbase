@@ -24,7 +24,23 @@ namespace sys {
 		return *this;
 	}
 
-	state_value_id state_value_id::operator + (std::string const& rhs)
+	state_value_id state_value_id::operator + (std::string const& rhs) const
+	{
+		state_value_id svid{ *this };
+		svid += rhs;
+		return svid;
+	}
+
+	state_value_id& state_value_id::operator += (state_value_id const& rhs)
+	{
+		m_components.insert(std::end(m_components),
+			std::begin(rhs.m_components),
+			std::end(rhs.m_components)
+			);
+		return *this;
+	}
+
+	state_value_id state_value_id::operator + (state_value_id const& rhs) const
 	{
 		state_value_id svid{ *this };
 		svid += rhs;

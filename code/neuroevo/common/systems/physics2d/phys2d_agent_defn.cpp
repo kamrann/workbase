@@ -3,96 +3,40 @@
 #include "phys2d_agent_defn.h"
 #include "phys2d_object.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
+#include "util/dimensionality.h"
 
-
-namespace sb = prm::schema;
 
 namespace sys {
 	namespace phys2d {
 
-		std::string phys2d_agent_defn::update_schema_providor_for_instance(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+		ddl::defn_node phys2d_agent_defn::get_instance_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
-
 			// TODO: following dependent on agent type
 			// this class will probably become useless and just override in relevant xxx_agent_defn
 
-			path += std::string{ "initial_conditions" };
+			ddl::defn_node init_conditions = spc.composite("initial_conditions")(ddl::define_children{}
+				("init_x", spc.realnum("init_x"))
+				("init_y", spc.realnum("init_y"))
+				("init_orientation", spc.realnum("init_orientation")(ddl::spc_range< ddl::realnum_defn_node::value_t >{ -180., 180. }))
+				("init_linear_angle", spc.realnum("init_linear_angle")(ddl::spc_range< ddl::realnum_defn_node::value_t >{ 0., 360. }))
+				("init_linear_speed", spc.realnum("init_linear_speed")(ddl::spc_range < ddl::realnum_defn_node::value_t > { 0., boost::none }))
+				("init_angvel", spc.realnum("init_angvel"))
+				);
 
-			(*provider)[path + std::string("init_x")] = [](prm::param_accessor)
-			{
-				auto s = sb::random("init_x", 0.0, boost::none, boost::none, -10.0, 10.0);
-				sb::label(s, "X Pos");
-				return s;
-			};
-			(*provider)[path + std::string("init_y")] = [](prm::param_accessor)
-			{
-				auto s = sb::random("init_y", 0.0, boost::none, boost::none, -10.0, 10.0);
-				sb::label(s, "Y Pos");
-				return s;
-			};
-			(*provider)[path + std::string("init_orientation")] = [](prm::param_accessor)
-			{
-				auto s = sb::random("init_orientation", 0.0, -180.0, 180.0);
-				sb::label(s, "Orientation");
-				return s;
-			};
-			(*provider)[path + std::string("init_linear_angle")] = [](prm::param_accessor)
-			{
-				auto s = sb::random("init_linear_angle", 0.0, 0.0, 360.0);
-				sb::label(s, "Linear Motion Angle");
-				return s;
-			};
-			(*provider)[path + std::string("init_linear_speed")] = [](prm::param_accessor)
-			{
-				auto s = sb::random("init_linear_speed", 0.0, 0.0, boost::none, 0.0, 10.0);
-				sb::label(s, "Linear Speed");
-				return s;
-			};
-			(*provider)[path + std::string("init_ang_vel")] = [](prm::param_accessor)
-			{
-				auto s = sb::random("init_ang_vel", 0.0, boost::none, boost::none, -90.0, 90.0);
-				sb::label(s, "Angular Velocity");
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list("initial_conditions");
-				sb::append(s, provider->at(path + std::string("init_x"))(acc));
-				sb::append(s, provider->at(path + std::string("init_y"))(acc));
-				sb::append(s, provider->at(path + std::string("init_orientation"))(acc));
-				sb::append(s, provider->at(path + std::string("init_linear_angle"))(acc));
-				sb::append(s, provider->at(path + std::string("init_linear_speed"))(acc));
-				sb::append(s, provider->at(path + std::string("init_ang_vel"))(acc));
-				sb::label(s, "Initial Conditions");
-				return s;
-			};
-
-			path.pop();
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string("initial_conditions"))(acc));
-				sb::unborder(s);
-				//			sb::enable_import(s, "TODO:");
-				return s;
-			};
-
-			return path.leaf().name();
+			return spc.composite("phys2d_agent_inst")(ddl::define_children{}
+				("initial_conditions", init_conditions)
+				);
 		}
 
-		void phys2d_agent_defn::initialize_instance_data(instance_data& inst, prm::param_accessor acc)
+		void phys2d_agent_defn::initialize_instance_data(instance_data& inst, ddl::navigator nav)
 		{
-			inst.pos_x = prm::extract_fixed_or_random(acc["init_x"]);
-			inst.pos_y = prm::extract_fixed_or_random(acc["init_y"]);
-			inst.orientation = prm::extract_fixed_or_random(acc["init_orientation"]) * (b2_pi / 180);
-			inst.linvel_angle = prm::extract_fixed_or_random(acc["init_linear_angle"]) * (b2_pi / 180);
-			inst.linvel_mag = prm::extract_fixed_or_random(acc["init_linear_speed"]);
-			inst.angvel = prm::extract_fixed_or_random(acc["init_ang_vel"]) * (b2_pi / 180);
+			nav = nav["initial_conditions"];
+			inst.pos_x = nav["init_x"].get().as_real();
+			inst.pos_y = nav["init_y"].get().as_real();
+			inst.orientation = nav["init_orientation"].get().as_real() * (b2_pi / 180);
+			inst.linvel_angle = nav["init_linear_angle"].get().as_real() * (b2_pi / 180);
+			inst.linvel_mag = nav["init_linear_speed"].get().as_real();
+			inst.angvel = nav["init_angvel"].get().as_real() * (b2_pi / 180);
 		}
 
 		void phys2d_agent_defn::initialize_object_state(object* obj, instance_data const& st, rgen_t& rgen)
@@ -106,7 +50,9 @@ namespace sys {
 
 			auto motion_angle = st.linvel_angle.get(rgen);
 			auto linear_speed = st.linvel_mag.get(rgen);
-			auto linvel = DimensionalityTraits< WorldDimensionality::dim2D >::bearing_to_vector(motion_angle) * linear_speed;
+
+			// NOTE: Using auto here fails. Seems like a bug in Eigen, maybe fixed in latest version?
+			Eigen::Vector2d linvel = DimensionalityTraits< WorldDimensionality::dim2D >::bearing_to_vector(motion_angle) * linear_speed;
 			obj->set_linear_velocity(b2Vec2(linvel[0], linvel[1]));
 
 			auto angular_vel = st.angvel.get(rgen);

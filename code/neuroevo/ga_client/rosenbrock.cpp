@@ -2,61 +2,50 @@
 
 #include "rosenbrock.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
-
 
 namespace ga {
 	namespace domain {
 		namespace fnopt {
 			namespace functions {
 
-				namespace sb = prm::schema;
-
-				void rosenbrock_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+				ddl::defn_node rosenbrock_schema::get_defn(ddl::specifier& spc)
 				{
-					auto path = prefix;
+					using ddl::defn_node;
 
-					(*provider)[path + std::string{ "dimensions" }] = [=](prm::param_accessor acc)
-					{
-						return sb::integer("dimensions", 2, 1);
-					};
-					(*provider)[path + std::string{ "param_lower_bound" }] = [=](prm::param_accessor acc)
-					{
-						return sb::real("param_lower_bound", -50.0);
-					};
-					(*provider)[path + std::string{ "param_upper_bound" }] = [=](prm::param_accessor acc)
-					{
-						return sb::real("param_upper_bound", 50.0);
-					};
-					(*provider)[path + std::string{ "a" }] = [=](prm::param_accessor acc)
-					{
-						return sb::real("a", 1.0);
-					};
-					(*provider)[path + std::string{ "b" }] = [=](prm::param_accessor acc)
-					{
-						return sb::real("b", 100.0);
-					};
+					defn_node dims = spc.integer("dims")
+						(ddl::spc_min < ddl::integer_defn_node::value_t > { 1 })
+						(ddl::spc_default< ddl::integer_defn_node::value_t >{ 2 })
+						;
+					defn_node lower = spc.realnum("lower")
+						(ddl::spc_default< ddl::realnum_defn_node::value_t >{ -50.0 })
+						;
+					defn_node upper = spc.realnum("upper")
+						(ddl::spc_default< ddl::realnum_defn_node::value_t >{ 50.0 })
+						;
+					// TODO: Should these constants be bounded?
+					defn_node a = spc.realnum("a")
+						(ddl::spc_default< ddl::realnum_defn_node::value_t >{ 1.0 })
+						;
+					defn_node b = spc.realnum("b")
+						(ddl::spc_default< ddl::realnum_defn_node::value_t >{ 100.0 })
+						;
 
-					(*provider)[path] = [=](prm::param_accessor acc)
-					{
-						auto s = sb::list(path.leaf().name());
-						sb::append(s, provider->at(path + std::string{ "dimensions" })(acc));
-						sb::append(s, provider->at(path + std::string{ "param_lower_bound" })(acc));
-						sb::append(s, provider->at(path + std::string{ "param_upper_bound" })(acc));
-						sb::append(s, provider->at(path + std::string{ "a" })(acc));
-						sb::append(s, provider->at(path + std::string{ "b" })(acc));
-						return s;
-					};
+					return spc.composite("ackley")(ddl::define_children{}
+						("dimensions", dims)
+						("lower_bound", lower)
+						("upper_bound", upper)
+						("a", a)
+						("b", b)
+						);
 				}
 
-				function_opt_domain::function_defn rosenbrock_defn::generate(prm::param_accessor acc) const
+				function_opt_domain::function_defn rosenbrock_schema::generate(ddl::navigator nav) const
 				{
-					auto dim = prm::extract_as< int >(acc["dimensions"]);
-					auto lower = prm::extract_as< double >(acc["param_lower_bound"]);
-					auto upper = prm::extract_as< double >(acc["param_upper_bound"]);
-					auto a = prm::extract_as< double >(acc["a"]);
-					auto b = prm::extract_as< double >(acc["b"]);
+					auto dim = nav["dimensions"].get().as_int();
+					auto lower = nav["lower_bound"].get().as_real();
+					auto upper = nav["upper_bound"].get().as_real();
+					auto a = nav["a"].get().as_real();
+					auto b = nav["b"].get().as_real();
 
 					return function_opt_domain::function_defn(rosenbrock(
 						dim,
@@ -67,7 +56,7 @@ namespace ga {
 						));
 				}
 
-
+				
 				function_opt_domain::function_defn rosenbrock(
 					size_t n_dimensions,
 					double lower,

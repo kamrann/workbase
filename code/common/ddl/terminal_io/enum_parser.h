@@ -1,7 +1,7 @@
 // enum_parser.h
 
-#ifndef __WB_PARAMS_ENUM_PARSER_H
-#define __WB_PARAMS_ENUM_PARSER_H
+#ifndef __WB_DDL_ENUM_PARSER_H
+#define __WB_DDL_ENUM_PARSER_H
 
 #include "../values/value.h"
 #include "enum_element_parser.h"

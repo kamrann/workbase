@@ -47,8 +47,8 @@ namespace sys {
 			double const GridSquareSize = avail_size / GridDim;
 
 			// TODO: Hack - locking onto first agent
-			auto agent_ptr = dynamic_cast<object const*>(m_sys.m_agents.front().agent.get());
-			b2Vec2 grid_ref_pos = agent_ptr->get_position();
+//			auto agent_ptr = dynamic_cast<object const*>(m_sys.m_agents.front().agent.get());
+			b2Vec2 grid_ref_pos = b2Vec2(0, 0);//agent_ptr->get_position();
 
 			double x_off = std::fmod(-grid_ref_pos.x * scale, GridSquareSize);
 			if(x_off < 0.0)

@@ -22,7 +22,16 @@ namespace ddl {
 		define_enum_fixed operator() (enum_defn_node::enum_value_t opt)
 		{
 			auto result = *this;
-			result.enum_values_.insert(opt);
+			//result.enum_values_.insert(opt);
+			result.enum_values_.insert(std::end(result.enum_values_), opt);
+			return result;
+		}
+
+		define_enum_fixed operator() (std::string opt_str)
+		{
+			auto result = *this;
+			auto opt = enum_defn_node::enum_value_t{ opt_str, boost::any{} };
+			result.enum_values_.insert(std::end(result.enum_values_), opt);
 			return result;
 		}
 
@@ -36,6 +45,23 @@ namespace ddl {
 		define_enum_func(enum_defn_node::enum_values_fn_t fn):
 			fn_{ fn }
 		{}
+
+		define_enum_func(enum_defn_node::enum_values_str_fn_t fn)
+		{
+			fn_ = enum_defn_node::enum_values_fn_t{
+				[fn](ddl::navigator nav)
+				{
+					auto enum_strings = fn(nav);
+					enum_defn_node::enum_set_t enum_values;
+					for(auto const& str : enum_strings)
+					{
+						enum_values.push_back(enum_defn_node::enum_value_t{ str, boost::any{} });
+					}
+					return enum_values;
+				}
+			};
+			fn_.add_dependency(fn);
+		}
 
 	public:
 		enum_defn_node::enum_values_fn_t fn_;
@@ -64,15 +90,30 @@ namespace ddl {
 			return result;
 		}
 
+		enum_specifier operator() (spc_default< enum_defn_node::str_value_t > const& dft)
+		{
+			auto result = std::move(*this);
+			enum_defn_node::value_t vals;
+			for(auto const& str : dft.val_)
+			{
+				vals.push_back(enum_defn_node::enum_value_t{ str, boost::any{} });
+			}
+			result.node_.default(vals);
+			return result;
+		}
+
 		enum_specifier operator() (define_enum_fixed const& fixed)
 		{
 			auto result = std::move(*this);
 			// Need to capture by value
 			auto vals = fixed.enum_values_;
-			result.node_.enumvalues_fn([vals](navigator)
-			{
-				return vals;
-			});
+			auto fn = enum_defn_node::enum_values_fn_t{
+				[vals](navigator)
+				{
+					return vals;
+				}
+			};
+			result.node_.enumvalues_fn(fn);
 			return result;
 		}
 

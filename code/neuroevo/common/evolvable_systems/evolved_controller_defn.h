@@ -6,8 +6,10 @@
 #include "ev_controller_genetic_mapping.h"
 
 #include "system_sim/controller_defn.h"
+#include "system_sim/system_state_values.h"
 
-#include "params/dynamic_enum_schema.h"
+#include "ddl/ddl.h"
+#include "ddl/components/enum_choice.h"
 
 
 namespace sys {
@@ -19,8 +21,8 @@ namespace sys {
 			// i_controller_defn interface
 		public:
 			virtual std::string get_name() const override;
-			virtual std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const override;
-			virtual controller_ptr create_controller(prm::param_accessor acc) const override;
+			virtual ddl::defn_node get_defn(ddl::specifier& spc) override;
+			virtual controller_ptr create_controller(ddl::navigator nav) const override;
 		};
 
 		class evolvable_controller_impl_defn
@@ -31,16 +33,17 @@ namespace sys {
 				MutationOp,
 			};
 
-			typedef std::function< i_system_defn const*(prm::param_accessor) > sys_defn_fn_t;
+			typedef ddl::dep_function< i_system_defn const* > sys_defn_fn_t;
+			typedef ddl::dep_function< state_value_id_list > state_vals_fn_t;
 
 		public:
-			void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
-			std::unique_ptr< i_genetic_mapping > generate(prm::param_accessor acc) const;
+			ddl::defn_node get_defn(ddl::specifier& spc);
+			std::unique_ptr< i_genetic_mapping > generate(ddl::navigator nav) const;
 
-			evolvable_controller_impl_defn(sys_defn_fn_t sys_defn_fn);
+			evolvable_controller_impl_defn(sys_defn_fn_t& sys_defn_fn, state_vals_fn_t& sv_fn);
 
 		public:
-			prm::dynamic_enum_schema< std::unique_ptr< i_genetic_mapping > > ev_controller_type_defn;
+			ddl::enum_choice< std::unique_ptr< i_genetic_mapping > > ev_controller_type_defn;
 		};
 
 	}

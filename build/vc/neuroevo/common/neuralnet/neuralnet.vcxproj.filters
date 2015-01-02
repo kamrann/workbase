@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\stream_io.cpp">
       <Filter>interface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\fc_rnn.cpp">
+      <Filter>implementations\mlf</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\stdafx.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\modifiable.h">
       <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\fc_rnn.h">
+      <Filter>implementations\mlf</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

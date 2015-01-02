@@ -27,6 +27,7 @@ namespace ddl {
 		typedef detail::enum_sch_node_t impl_t;
 		typedef impl_t::enum_value_t enum_value_t;
 		typedef impl_t::value_t value_t;
+		typedef impl_t::str_value_t str_value_t;
 		typedef impl_t::enum_set_t enum_set_t;
 
 	public:
@@ -37,6 +38,8 @@ namespace ddl {
 //		void add_option(enum_value_t val);
 		void enum_values(enum_set_t values);
 		enum_set_t enum_values() const;
+		std::vector< std::string > enum_values_str() const;
+		boost::any get_data_from_id_string(std::string str) const;
 		void minsel(size_t count);
 		size_t minsel() const;
 		void maxsel(boost::optional< size_t > count);

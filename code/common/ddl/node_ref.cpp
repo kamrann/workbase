@@ -9,28 +9,10 @@ namespace ddl {
 
 	navigator nav_to_ref(node_ref const& ref, navigator nav)
 	{
-		if(nav)
+		auto rf = resolve_reference_unique(ref, nav);
+		if(rf)
 		{
-			auto id = ref.nd.get_id();
-			auto results = nav.find_by_id(id);	// todo: specify exclude descendents
-			if(results.by_location.empty())
-			{
-				return{};
-			}
-			// TODO: this will need looking into. if the same defn is used multiple places in the tree,
-			// we may resolve the wrong instance as a result of the one we are looking for (the closest)
-			// currently not existing, due to, for example, it's parent node just having been activated
-			// in a condition as a result of changing some other value, but not yet created.
-			// In this case the desired result would be to fail the reference resolution, but chance that
-			// it will instead resolve something else...
-			auto first = results.by_location.begin()->second;
-			if(first.size() > 1)
-			{
-				throw std::runtime_error("ambiguous reference id lookup");
-			}
-
-			auto pth = first.front();
-			return nav[pth];
+			return navigator{ nav.tree_, rf };
 		}
 		else
 		{
@@ -38,12 +20,68 @@ namespace ddl {
 		}
 	}
 
-	value_node resolve_reference(node_ref const& ref, navigator nav)
+	sd_node_ref_list resolve_reference(node_ref const& ref, navigator nav)
 	{
-		nav = nav_to_ref(ref, nav);
 		if(nav)
 		{
-			return nav.get();
+			auto id = ref.nd.get_id();
+			auto fr = nav.find_by_id(id);	// todo: perhaps this call will need to be passed info from node_ref::res context settings
+
+			if(!fr.by_location.empty())
+			{
+				if(ref.res == node_ref::Resolution::Unique)
+				{
+					auto const& first_list = fr.by_location.begin()->second;
+					if(first_list.size() == 1)
+					{
+						auto const& pth = first_list.front();
+						auto rnav = nav[pth];
+						return{ rnav.get_ref() };
+					}
+					else
+					{
+						throw std::runtime_error("ambiguous reference id lookup");
+					}
+				}
+				else // todo: more fine grained control of resolving context done here...
+						// currently just accept any matching id anywhere in hierarchy
+				{
+					sd_node_ref_list results;
+					for(auto const& entry : fr.by_location)
+					{
+						auto const& res_list = entry.second;
+						for(auto const& pth : res_list)
+						{
+							auto rnav = nav[pth];
+							results.insert(rnav.get_ref());
+						}
+					}
+					return results;
+				}
+			}
+		}
+
+		return{};
+	}
+
+	sd_node_ref resolve_reference_unique(node_ref const& ref, navigator nav)
+	{
+		auto res = resolve_reference(ref, nav);
+		if(res.size() != 1)
+		{
+			throw std::runtime_error("ambiguous reference id lookup");
+		}
+		else
+		{
+			return *res.begin();
+		}
+	}
+
+	sd_node_ref unique_reference(sd_node_ref_list const& list)
+	{
+		if(list.size() == 1)
+		{
+			return *list.begin();
 		}
 		else
 		{

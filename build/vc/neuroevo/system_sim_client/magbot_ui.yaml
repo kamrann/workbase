@@ -1,0 +1,149 @@
+composite:
+  results:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        core:
+          composite:
+            duration:
+              real: 60
+            scenario_type:
+              enum:
+                - ground_based
+            updates_per_sec:
+              integer: 60
+            velocity_iterations:
+              integer: 4
+            position_iterations:
+              integer: 2
+            scenario:
+              conditional:
+                composite:
+                  gravity:
+                    real: 9.810000000000001
+                  friction:
+                    real: 0.5
+                  ball_count:
+                    integer: 2
+                  ground_expanse:
+                    real: 100
+                  incline:
+                    real: 0
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    spec_reference:
+                      enum:
+                        - the_magbot
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_angvel:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_x:
+                                real: 0
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite:
+                                      modulation_bindings:
+                                        list:
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - I
+                                              modulation:
+                                                real: -1
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - O
+                                              modulation:
+                                                real: 0
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - P
+                                              modulation:
+                                                real: 1
+                                      effector_bindings:
+                                        list:
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Q
+                                              effector:
+                                                enum:
+                                                  - effector_1
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - W
+                                              effector:
+                                                enum:
+                                                  - effector_2
+                          controller_type:
+                            enum:
+                              - generic_ui_controller
+                    controller_class:
+                      enum:
+                        - interactive
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_type:
+                        enum:
+                          - magbot
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  arm_length:
+                                    real: 1
+                                  arm_thickness:
+                                    real: 0.1
+                                  magnet_strength:
+                                    real: 1
+                                  max_arm_torque:
+                                    real: 2
+                                  torso_height:
+                                    real: 0.5
+                                  torso_width:
+                                    real: 0.75
+                            name:
+                              string: the_magbot
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []

@@ -1,0 +1,101 @@
+composite:
+  results:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        specs:
+          list:
+            - composite:
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            name:
+                              string: the_cart
+                            details:
+                              conditional:
+                                composite:
+                                  fail_angle:
+                                    real: 0.2094395160675049
+                                  cart_mass:
+                                    real: 1
+                                  max_force:
+                                    real: 10
+                                  pole_mass:
+                                    real: 0.1000000014901161
+                                  pole_length:
+                                    real: 1
+                                  fail_displacement:
+                                    real: 2.400000095367432
+                      agent_type:
+                        enum:
+                          - pole_cart
+                agent_role:
+                  enum:
+                    - default
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    spec_reference:
+                      enum:
+                        - the_cart
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_x:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_angvel:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite: ~
+                          controller_type:
+                            enum:
+                              - passive
+                    controller_class:
+                      enum:
+                        - preset
+        core:
+          composite:
+            scenario:
+              conditional:
+                composite:
+                  ground_expanse:
+                    real: 0
+                  gravity:
+                    real: 9.810000000000001
+            scenario_type:
+              enum:
+                - ground_based
+            updates_per_sec:
+              integer: 60
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []

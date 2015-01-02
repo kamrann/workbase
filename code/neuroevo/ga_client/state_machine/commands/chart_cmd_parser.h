@@ -3,9 +3,6 @@
 #ifndef __WB_GA_CLIENT_CHART_CMD_PARSER_H
 #define __WB_GA_CLIENT_CHART_CMD_PARSER_H
 
-#include "params/param.h"
-#include "params/enum_parser.h"
-
 #include <boost/spirit/include/qi.hpp>
 #include <boost/optional.hpp>
 

@@ -40,6 +40,28 @@ namespace ddl {
 	{
 		return obj_->enum_values_;
 	}
+
+	std::vector< std::string > enum_sch_node::enum_values_str() const
+	{
+		std::vector< std::string > strings;
+		for(auto const& val : obj_->enum_values_)
+		{
+			strings.push_back(val.str);
+		}
+		return strings;
+	}
+
+	boost::any enum_sch_node::get_data_from_id_string(std::string str) const
+	{
+		for(auto const& val : obj_->enum_values_)
+		{
+			if(val.str == str)
+			{
+				return val.data;
+			}
+		}
+		return boost::any{};
+	}
 	
 	void enum_sch_node::minsel(size_t count)
 	{

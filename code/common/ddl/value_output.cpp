@@ -31,7 +31,7 @@ namespace ddl {
 		os << "{ ";
 		for(auto ev : val)
 		{
-			os << ev << " ";
+			os << ev.str << " ";
 		}
 		os << "}" << std::endl;
 		return os;

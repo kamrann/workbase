@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="parsing">
+      <UniqueIdentifier>{e66578e6-532e-490d-b682-31eec21f2198}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\body_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\box_shape_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\single_coord_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\coord2d_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\relative_coord2d_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\joint_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\joint_limits_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\object_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\name_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\load_script.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\material_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\common\b2d_script\parsing\sucker_parser.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\body_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\box_shape_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\name_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\parsing_common.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\single_coord_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\coord2d_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\relative_coord2d_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\joint_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\joint_limits_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\object_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\load_script.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\material_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\common\b2d_script\parsing\sucker_parser.h">
+      <Filter>parsing</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

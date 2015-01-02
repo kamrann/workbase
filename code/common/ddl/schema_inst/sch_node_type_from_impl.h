@@ -13,6 +13,7 @@ namespace ddl {
 	class enum_sch_node;
 	class list_sch_node;
 	class composite_sch_node;
+	class conditional_sch_node;
 
 	namespace detail {
 
@@ -23,6 +24,7 @@ namespace ddl {
 		class enum_sch_node_t;
 		class list_sch_node_t;
 		class composite_sch_node_t;
+		class conditional_sch_node_t;
 
 		template < typename NodeImpl >
 		struct sch_node_type_from_impl;
@@ -67,6 +69,12 @@ namespace ddl {
 		struct sch_node_type_from_impl< composite_sch_node_t >
 		{
 			typedef composite_sch_node type;
+		};
+
+		template <>
+		struct sch_node_type_from_impl< conditional_sch_node_t >
+		{
+			typedef conditional_sch_node type;
 		};
 
 	}

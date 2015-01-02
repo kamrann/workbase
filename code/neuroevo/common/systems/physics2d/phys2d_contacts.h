@@ -12,6 +12,16 @@ namespace sys {
 			End,
 		};
 
+		struct collision_filter
+		{
+			int group_index;
+			// todo: masks
+
+			collision_filter():
+				group_index{ 0 }
+			{}
+		};
+
 	}
 }
 

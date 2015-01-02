@@ -34,6 +34,34 @@ namespace nnet {
 		"Cosine",
 	};
 
+	const char* const ActivationFnNames2[(int)ActivationFnType::Count] = {
+		"sigmoid",
+		"gaussian",
+		"bounded_linear",
+		"threshold",
+		"symm_sigmoid",
+		"symm_gaussian",
+		"linear",
+		"symm_bounded_linear",
+		"symm_threshold",
+		"sine",
+		"cosine",
+	};
+
+	const std::map< std::string, ActivationFnType > ActivationFnNameMap = {
+		{ "sigmoid", ActivationFnType::Sigmoid },
+		{ "gaussian", ActivationFnType::Gaussian },
+		{ "bounded_linear", ActivationFnType::LinearBounded },
+		{ "threshold", ActivationFnType::Threshold },
+		{ "symm_sigmoid", ActivationFnType::SigmoidSymmetric },
+		{ "symm_gaussian", ActivationFnType::GaussianSymmetric },
+		{ "linear", ActivationFnType::Linear },
+		{ "symm_bounded_linear", ActivationFnType::LinearBoundedSymmetric },
+		{ "symm_threshold", ActivationFnType::ThresholdSymmetric },
+		{ "sine", ActivationFnType::Sine },
+		{ "cosine", ActivationFnType::Cosine },
+	};
+
 }
 
 

@@ -5,8 +5,10 @@
 
 #include "genetic_algorithm/genalg.h"
 
-#include "params/param_fwd.h"
-#include "params/dynamic_enum_schema.h"
+//#include "params/param_fwd.h"
+//#include "params/dynamic_enum_schema.h"
+#include "ddl/ddl.h"
+#include "ddl/components/enum_choice.h"
 
 
 namespace ga {
@@ -27,15 +29,15 @@ namespace ga {
 	{
 		ga_defn();
 
-		std::string update_schema_provider_for_ga(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
-		void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
+		ddl::defn_node get_defn_for_ga(ddl::specifier& spc);
+		ddl::defn_node get_defn(ddl::specifier& spc);
 
-		std::shared_ptr< i_problem_domain > generate_domain(prm::param_accessor acc);
-		std::unique_ptr< genalg > generate_alg(prm::param_accessor acc, std::shared_ptr< i_problem_domain > domain);
+		std::shared_ptr< i_problem_domain > generate_domain(ddl::navigator nav);
+		std::unique_ptr< genalg > generate_alg(ddl::navigator nav, std::shared_ptr< i_problem_domain > domain);
 
 
-		prm::dynamic_enum_schema< rate_fn_t > rate_fn_defn;	// Used for both cx and mut rates
-		prm::dynamic_enum_schema< std::shared_ptr< i_problem_domain > > domain_defn;
+		ddl::enum_choice< rate_fn_t > rate_fn_defn;	// Used for both cx and mut rates
+		ddl::enum_choice< std::shared_ptr< i_problem_domain > > domain_defn;
 	};
 
 }

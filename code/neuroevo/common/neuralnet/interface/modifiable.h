@@ -15,7 +15,7 @@ namespace nnet {
 	class i_modifiable
 	{
 	public:
-		virtual void set_activation_fn(neuron_id neuron, activation_function fn) = 0;
+// TODO: probably don't want per neuron		virtual void set_activation_fn(neuron_id neuron, activation_function fn) = 0;
 		virtual void set_weight(connection_id conn, value_t weight) = 0;
 
 	public:

@@ -29,6 +29,8 @@ namespace ddl {
 		void set_default(defn_node defn);
 		defn_node evaluate(ref_resolver const& rr, navigator nav) const;
 
+		dep_list deps() const;
+
 	public:
 		std::vector< component > components_;
 		defn_node default_;

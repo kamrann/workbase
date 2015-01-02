@@ -62,5 +62,8 @@
     <ClInclude Include="..\..\..\..\..\code\common\ddl_test\funcopt_rosenbrock_ddl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\common\ddl_test\test_ddl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

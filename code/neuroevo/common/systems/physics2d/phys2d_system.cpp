@@ -2,19 +2,16 @@
 
 #include "phys2d_system.h"
 #include "phys2d_system_defn.h"
-#include "phys2d_entity_data.h"
-#include "phys2d_object.h"
-#include "phys2d_sensors.h"
 #include "phys2d_systemstatevalues.h"
 #include "scenario.h"
 
 #include "phys2d_system_drawer.h"
 
+#include "b2d_components/core/entity_data.h"
+#include "b2d_components/sensors/sensors.h"
+
 #include "system_sim/basic_agent.h"
 #include "system_sim/interactive_controller.h"
-
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
 
 #include "b2d_util.h"
 
@@ -47,10 +44,18 @@ namespace sys {
 
 
 
-		phys2d_system::phys2d_system(std::unique_ptr< scenario > scen, double hertz):
+		phys2d_system::phys2d_system(
+			std::unique_ptr< scenario > scen,
+			double duration,
+			double hertz,
+			size_t vel_its,
+			size_t pos_its):
 			m_scenario(std::move(scen))
 		{
+			m_max_duration = duration;
 			m_hertz = hertz;
+			m_vel_iterations = vel_its;
+			m_pos_iterations = pos_its;
 		}
 
 		phys2d_system::~phys2d_system()
@@ -67,7 +72,7 @@ namespace sys {
 					auto ud = body->GetUserData();
 					if(ud)
 					{
-						delete static_cast<entity_data*>(ud);
+						delete static_cast<b2dc::entity_data*>(ud);
 						body->SetUserData(nullptr);
 					}
 				}
@@ -91,7 +96,7 @@ namespace sys {
 				auto ud = fix->GetUserData();
 				if(ud)
 				{
-					delete static_cast<entity_fix_data*>(ud);
+					delete static_cast<b2dc::entity_fix_data*>(ud);
 					fix->SetUserData(nullptr);
 				}
 			}
@@ -101,7 +106,7 @@ namespace sys {
 				auto ud = joint->GetUserData();
 				if(ud)
 				{
-					delete static_cast<entity_joint_data*>(ud);
+					delete static_cast<b2dc::entity_joint_data*>(ud);
 					joint->SetUserData(nullptr);
 				}
 			}
@@ -109,16 +114,13 @@ namespace sys {
 
 		bool phys2d_system::initialize()
 		{
-			if(!basic_system::initialize())
-			{
-				return false;
-			}
-
 			m_world = std::make_unique< b2World >(b2Vec2(0.0f, 0.0f));
 			m_world->SetContactListener(this);
 
 			m_world_destructor = std::make_unique< phys_world_destruction_listener >();
 			m_world->SetDestructionListener(m_world_destructor.get());
+
+			m_updatables.clear();
 
 			if(!m_scenario->create(this))
 			{
@@ -136,6 +138,13 @@ namespace sys {
 			//m_scenario->load_initial_state(scenario_init, m_world.get());
 
 			m_time = 0.0;
+
+			// TODO: Moved this to end since agents must be created before the bindings can be initialized.
+			// Assuming this doesn't cause problem, want to ensure that this is always done in this order.
+			if(!basic_system::initialize())
+			{
+				return false;
+			}
 
 			return true;
 		}
@@ -275,6 +284,11 @@ namespace sys {
 			}
 		}
 
+		void phys2d_system::register_updatable(updatable_fn_t fn)
+		{
+			m_updatables.push_back(fn);
+		}
+
 		bool phys2d_system::update(i_observer* obs)
 		{
 			float const timestep = 1.0f / m_hertz;
@@ -321,12 +335,19 @@ namespace sys {
 				agent.activate_effectors(outputs);
 			}
 
+
+			for(auto const& ud : m_updatables)
+			{
+				ud(this);
+			}
+
+
 			auto end_ = std::chrono::high_resolution_clock::now();
 			m_agent_update_time += end_ - start_;
 
 			start_ = std::chrono::high_resolution_clock::now();
 
-			m_world->Step(timestep, 4, 2);	// TODO: iterations?
+			m_world->Step(timestep, m_vel_iterations, m_pos_iterations);
 
 			end_ = std::chrono::high_resolution_clock::now();
 			m_b2d_update_time += end_ - start_;
@@ -345,30 +366,30 @@ namespace sys {
 			}
 
 			return !m_scenario->is_complete()
-				&& m_time < 10.0;	// TODO: Temp
+				&& m_time < m_max_duration;
 		}
 
-		void phys2d_system::on_contact(b2Contact* contact, ContactType ctype)
+		void phys2d_system::on_contact(b2Contact* contact, b2dc::ContactType ctype)
 		{
 			auto fixA = contact->GetFixtureA();
 			auto fixB = contact->GetFixtureB();
 
-			auto efdA = get_fixture_data(fixA);
-			auto efdB = get_fixture_data(fixB);
+			auto efdA = b2dc::get_fixture_data(fixA);
+			auto efdB = b2dc::get_fixture_data(fixB);
 
-			if(efdA && efdA->type == entity_fix_data::Type::Sensor)
+			if(efdA && efdA->type == b2dc::entity_fix_data::Type::Sensor)
 			{
 				// TODO: generic sensor
-				auto sen = boost::any_cast<contact_based_sensor*>(efdA->value);
-				sen->on_contact(ctype);	// TODO: Probably want to pass entity data for sensed fixture
+				auto sen = boost::any_cast<b2dc::contact_based_sensor*>(efdA->value);
+				sen->on_contact(ctype, fixB->GetBody());	// TODO: Probably want to pass entity data for sensed fixture
 			}
-			else if(efdB && efdB->type == entity_fix_data::Type::Sensor)
+			else if(efdB && efdB->type == b2dc::entity_fix_data::Type::Sensor)
 			{
 				// TODO: generic sensor
-				auto sen = boost::any_cast<contact_based_sensor*>(efdB->value);
-				sen->on_contact(ctype);	// TODO: Probably want to pass entity data for sensed fixture
+				auto sen = boost::any_cast<b2dc::contact_based_sensor*>(efdB->value);
+				sen->on_contact(ctype, fixA->GetBody());	// TODO: Probably want to pass entity data for sensed fixture
 			}
-			else
+/*			else
 			{
 				auto bodyA = fixA->GetBody();
 				auto bodyB = fixB->GetBody();
@@ -393,16 +414,18 @@ namespace sys {
 					}
 				}
 			}
+*/
+			m_scenario->on_contact(contact, ctype);
 		}
 
 		void phys2d_system::BeginContact(b2Contact* contact)
 		{
-			on_contact(contact, ContactType::Begin);
+			on_contact(contact, b2dc::ContactType::Begin);
 		}
 
 		void phys2d_system::EndContact(b2Contact* contact)
 		{
-			on_contact(contact, ContactType::End);
+			on_contact(contact, b2dc::ContactType::End);
 		}
 
 		void phys2d_system::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)

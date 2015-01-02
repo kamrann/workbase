@@ -15,17 +15,20 @@ namespace ddl {
 
 		paramtree_editor::paramtree_editor(
 			defn_node _defn,
+			//value_node _data,
+			sd_tree _data,
 			std::function< void(std::string) > _output_sink,
 			std::string _quit_str
 			):
 			defn{ _defn },
-			schema{},
-			data{},
-			nav{},
+//			schema{},
+			data{ std::move(_data) },
+			nav{ &data, sd_node_ref{ data.get_root() } },
 			output_sink{ _output_sink },
 			quit_str{ _quit_str }
 		{
-			reload_pt_schema();
+//			reset_node(nav.get_ref(), data);
+			update_sd_tree(nav.get_ref(), data, true);
 		}
 
 		std::string paramtree_editor::get_prompt() const
@@ -46,29 +49,19 @@ namespace ddl {
 
 		void paramtree_editor::reload_pt_schema()
 		{
-/*			auto pos = acc.where();
-			auto rootname = ptree.rootname();
-			auto sch = (*provider)[rootname](acc);
-
-			// Make a deep copy of the accessor/param tree
-			param_tree pt_copy{ ptree };
-			param_accessor acc_copy{ &pt_copy };
-			acc_copy.move_to(pos);
-
-			ptree = param_tree::generate_from_schema(sch, acc_copy, provider);
-
-			acc = param_accessor{ &ptree };
-			acc.move_to(pos);
-			*/
-
 			ref_resolver rr = &resolve_reference;
 
 			auto& editor = context< paramtree_editor >();
-			auto pos = editor.nav.where();
+/*			auto pos = editor.nav.where();
 			schema = instantiate(editor.defn, navigator{ editor.data }, rr);
 			adjust_to_schema(editor.data, schema);
 			editor.nav = navigator{ editor.data };
 			editor.nav = editor.nav[pos];	// TODO: may no longer exist, should move to deepest valid subpath
+*/
+
+			auto pos = editor.nav.where();
+			update_sd_tree(sd_node_ref{ data.get_root() }, data, false);
+			editor.nav = editor.nav[pos];
 		}
 
 	}

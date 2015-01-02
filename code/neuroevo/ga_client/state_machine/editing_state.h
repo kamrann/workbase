@@ -5,7 +5,7 @@
 
 #include "clsm/clsm.h"
 #include "root_state.h"
-#include "params/state_machine/paramtree_fsm.h"
+#include "ddl/state_machine/paramtree_fsm.h"
 
 
 namespace ga_control {
@@ -34,7 +34,7 @@ namespace ga_control {
 
 			virtual std::string get_prompt() const override;
 
-			prm::fsm::paramtree_editor editor;
+			ddl::fsm::paramtree_editor editor;
 		};
 
 	}

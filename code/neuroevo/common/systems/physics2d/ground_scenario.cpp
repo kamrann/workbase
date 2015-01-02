@@ -13,28 +13,57 @@ namespace sys {
 		}
 
 		ground_scenario::ground_scenario(ground_scenario_defn::spec_data spec):
-			m_spec(std::move(spec))
+			m_spec(std::move(spec)),
+			m_ground(nullptr)
 		{}
 
 		bool ground_scenario::create(phys2d_system const* sys)
 		{
 			auto world = sys->get_world();
 
-			world->SetGravity(b2Vec2(0.0f, -9.81f));
+			world->SetGravity(b2Vec2(0.0f, -m_spec.gravity));
 
 			auto const expanse = m_spec.expanse;
 
-			b2BodyDef bd;
-			m_ground = world->CreateBody(&bd);
+			if(expanse > 0.0)
+			{
+				b2BodyDef bd;
+				m_ground = world->CreateBody(&bd);
 
-			b2EdgeShape shape;
-			shape.Set(b2Vec2(-expanse / 2.0f, 0.0f), b2Vec2(expanse / 2.0f, 0.0f));
+				b2EdgeShape shape;
+				shape.Set(
+					b2Vec2(-(expanse / 2.0f) * std::cos(m_spec.incline), -(expanse / 2.0f) * std::sin(m_spec.incline)),
+					b2Vec2((expanse / 2.0f) * std::cos(m_spec.incline), (expanse / 2.0f) * std::sin(m_spec.incline))
+					);
 
-			b2FixtureDef fd;
-			fd.shape = &shape;
-			fd.friction = 0.5f;	// TODO:
+				b2FixtureDef fd;
+				fd.shape = &shape;
+				fd.friction = m_spec.friction;
 
-			m_ground->CreateFixture(&fd);
+				m_ground->CreateFixture(&fd);
+			}
+
+			for(size_t i = 0; i < m_spec.ball_count; ++i)
+			{
+				auto const Radius = 0.1;
+
+				b2BodyDef bd;
+				bd.type = b2_dynamicBody;
+				bd.position.Set(1.0 + i * 0.5, Radius);
+				auto ball = world->CreateBody(&bd);
+
+				b2CircleShape shape;
+				shape.m_p.Set(0, 0);
+				shape.m_radius = Radius;
+
+				b2FixtureDef fd;
+				fd.shape = &shape;
+				fd.density = 1.0;
+				fd.friction = 1.0;
+				fd.restitution = 0.5;
+
+				ball->CreateFixture(&fd);
+			}
 
 			return true;
 		}

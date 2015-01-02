@@ -46,28 +46,35 @@ namespace sys {
 			return mapping_->rectify_genome(gn);
 		}
 
-		ga::objective_value evolved_system_domain::evaluate_genome(ga::genome const& gn) const
+		std::vector< ga::objective_value > evolved_system_domain::evaluate_genome(ga::genome const& gn, ga::rgen_t& rgen, size_t trials) const
 		{
 			auto controller = mapping_->decode(gn);
 
 			/* TODO: !!!!!!!!!! temp hack */
 			system_->register_agent_controller(0, std::move(controller));
-			system_->initialize();
-			// rand seed? 
 
-			objective_->reset();
-
-			bool still_going = true;
-			while(still_going)
+			std::vector< ga::objective_value > results(trials, ga::objective_value{});
+			for(size_t t = 0; t < trials; ++t)
 			{
-				still_going = system_->update();
-				objective_->update();
+				// TODO: Not sure how best to deal with this. Perhaps ideally domains do not have their own rgens
+				// (as currently i_system does) but are passed a reference to an external rgen.
+				auto seeder = std::uniform_int_distribution < unsigned long > {};
+				system_->set_random_seed(seeder(rgen));
+				system_->initialize();
+				// rand seed? 
+
+				objective_->reset();
+
+				bool still_going = true;
+				while(still_going)
+				{
+					still_going = system_->update();
+					objective_->update();
+				}
+
+				results[t] = objective_->evaluate();
 			}
-
-//			auto bound = system_->get_state_value_binding(state_value_id::from_string("pos_x"));
-//			auto value = system_->get_state_value(bound);
-
-			return objective_->evaluate();
+			return results;
 		}
 
 		ga::diversity_t evolved_system_domain::population_genetic_diversity(ga::genetic_population const& pop) const

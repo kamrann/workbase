@@ -10,8 +10,8 @@ namespace sys_control {
 		editing::editing(my_context ctx):
 			base(ctx)
 			, editor(
-			std::move(context< system_controller >().ptree),
-			context< system_controller >().provider,
+			context< system_controller >().ddl_defn,
+			std::move(context< system_controller >().ddl_data),
 			context< system_controller >().output_sink,
 			"exit"
 			)
@@ -24,7 +24,7 @@ namespace sys_control {
 			editor.process_event(cmd);
 			if(editor.terminated())
 			{
-				context< system_controller >().ptree = std::move(editor.ptree);
+				context< system_controller >().ddl_data = editor.data;
 				return transit< inactive >();
 			}
 			else

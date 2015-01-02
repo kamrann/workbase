@@ -7,6 +7,7 @@
 #include "realnum_defn_node.h"
 #include "default_specifier.h"
 #include "range_specifier.h"
+#include "min_specifier.h"
 
 
 namespace ddl {
@@ -30,6 +31,13 @@ namespace ddl {
 			auto result = std::move(*this);
 			result.node_.min(rg.min_);
 			result.node_.max(rg.max_);
+			return result;
+		}
+
+		realnum_specifier operator() (spc_min< realnum_defn_node::value_t > const& min)
+		{
+			auto result = std::move(*this);
+			result.node_.min(min.val_);
 			return result;
 		}
 

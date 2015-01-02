@@ -6,8 +6,6 @@
 #include "system_sim/system_defn.h"
 #include "system_sim/system.h"
 
-#include "params/param_accessor.h"
-
 #include <chrono>
 #include <thread>
 
@@ -17,18 +15,18 @@ namespace sys_control {
 
 		system_controller::system_controller(
 			std::map< std::string, std::shared_ptr< sys::i_system_defn > > _sys_defns,
-			prm::param_tree _pt,
-			prm::schema::schema_provider_map_handle _provider,
+			ddl::defn_node _ddl_defn,
 			std::function< void(std::string) > _output_sink,
 			std::function< void(std::string) > _prompt_callback
 			):
 			sys_defns{ std::move(_sys_defns) },
-			ptree{ std::move(_pt) },
-			provider{ _provider },
+			ddl_defn{ _ddl_defn },
 			output_sink{ _output_sink },
 			prompt_callback{ _prompt_callback }
 		{
-
+			auto root_attribs = ddl::sd_node_attribs{};
+			root_attribs.defn = ddl_defn;
+			ddl_data.create_root(root_attribs);
 		}
 
 		std::string system_controller::get_prompt() const

@@ -4,14 +4,11 @@
 
 #include "evo_database/evo_db.h"
 
-#include "params/param_tree.h"
-#include "params/param_accessor.h"
-
 #include <yaml-cpp/yaml.h>
 
 
 namespace ga {
-
+#if 0
 	bool compare_equal(
 		prm::param_tree /*const&*/ pt1,
 		prm::param_tree /*const&*/ pt2,
@@ -64,7 +61,7 @@ namespace ga {
 		t.commit();
 		return result;
 	}
-
+#endif
 }
 
 

@@ -3,7 +3,9 @@
 #ifndef __WB_DDL_NAVIGATOR_H
 #define __WB_DDL_NAVIGATOR_H
 
-#include "value_node.h"
+//#include "value_node.h"
+#include "../sd_tree.h"
+#include "../sd_node_ref.h"
 #include "../path.h"
 
 #include <stack>
@@ -15,10 +17,11 @@ namespace ddl {
 	{
 	public:
 		navigator();
-		navigator(value_node nd);
+//		navigator(value_node nd);
+		navigator(sd_tree const* tree, sd_node_ref pos);
 
 	private:
-		navigator(value_node nd, std::stack< value_node > anc, path pth);
+//		navigator(value_node nd, std::stack< value_node > anc, path pth);
 
 	public:
 		bool is_parent() const;
@@ -42,6 +45,7 @@ namespace ddl {
 		bool is_active() const;
 
 		value_node get() const;
+		sd_node_ref get_ref() const;
 //		ref_resolver get_ref_resolver() const;
 
 		navigator operator[] (path const& pth) const;
@@ -89,10 +93,12 @@ namespace ddl {
 
 		find_results find_descendent(node_name str) const;
 
-	private:
-		value_node node_;
-		std::stack< value_node > ancestor_stk_;
-		path path_;
+	public:
+		sd_tree const* tree_;
+		sd_node_ref pos_;
+//		value_node node_;
+//		std::stack< value_node > ancestor_stk_;
+//		path path_;
 		bool deactivated_;
 	};
 

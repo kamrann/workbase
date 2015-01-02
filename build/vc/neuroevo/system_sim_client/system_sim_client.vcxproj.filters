@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\editing_state.cpp">
       <Filter>state machine\app</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\system_sim_client\client_ddl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\neuroevo\system_sim_client\stdafx.h">

@@ -28,6 +28,9 @@
     <Filter Include="Problem Domains\Function Optimization\Functions">
       <UniqueIdentifier>{e9b960d5-7890-4390-93f6-8e9ba14e88e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Problem Domains\Timer">
+      <UniqueIdentifier>{8bdc5017-3cd7-4faf-bfa9-4088535c8049}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -110,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\state_machine\commands\store_cmd_parser.cpp">
       <Filter>state_machine\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\neuroevo\ga_client\simple_timer_domain.cpp">
+      <Filter>Problem Domains\Timer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\state_machine\commands\store_cmd_parser.h">
       <Filter>state_machine\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\neuroevo\ga_client\simple_timer_domain.h">
+      <Filter>Problem Domains\Timer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

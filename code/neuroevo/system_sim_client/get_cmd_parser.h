@@ -3,8 +3,7 @@
 #ifndef __WB_SYSSIM_CLIENT_GET_CMD_PARSER_H
 #define __WB_SYSSIM_CLIENT_GET_CMD_PARSER_H
 
-#include "params/param.h"
-#include "params/enum_parser.h"
+#include "ddl/terminal_io/enum_parser.h"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/optional.hpp>
@@ -16,7 +15,7 @@ namespace sys_control {
 
 	struct get_cmd
 	{
-		prm::enum_param_val values;
+		ddl::enum_param_val values;
 	};
 
 	template < typename Iterator >
@@ -26,7 +25,7 @@ namespace sys_control {
 
 		qi::rule< Iterator, get_cmd(), qi::space_type > start;
 
-		typename prm::enum_parser< Iterator >::lax enum_vals;
+		typename ddl::enum_parser< Iterator >::lax enum_vals;
 	};
 
 }

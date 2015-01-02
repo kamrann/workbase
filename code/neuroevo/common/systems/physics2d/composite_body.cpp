@@ -2,6 +2,7 @@
 
 #include "composite_body.h"
 #include "phys2d_entity_data.h"
+#include "phys2d_system.h"
 
 #include "b2d_util.h"
 
@@ -47,6 +48,7 @@ namespace sys {
 		{
 			b2Vec2 com = get_com_position();
 			b2Vec2 v_com = get_com_linear_velocity();
+
 			for(b2Body* b : m_bodies)
 			{
 				b->SetAngularVelocity(angvel);
@@ -103,8 +105,8 @@ namespace sys {
 
 		state_value_id_list composite_body::get_state_values()
 		{
-			// todo: composite specific
-			return object::get_state_values();
+			state_value_id_list svs = object::get_state_values();
+			return svs;
 		}
 
 		size_t composite_body::initialize_state_value_bindings_(sv_bindings_t& bindings, sv_accessors_t& accessors) const
@@ -138,6 +140,12 @@ namespace sys {
 				return get_kinetic_energy();
 			});
 
+			// TODO: what about joints added or removed dynamically? can these be supported?
+			for(auto const& rev : m_revolutes)
+			{
+				rev.rev->initialize_state_value_bindings_(bindings, accessors, rev.name);
+			}
+
 			return bindings.size() - initial_count;
 		}
 
@@ -169,6 +177,21 @@ namespace sys {
 			ed.type_value = static_cast<object*>(this);
 			ed.value = std::move(data);
 			set_body_data(comp, std::move(ed));
+		}
+
+		void composite_body::add_revolute(std::string name, std::shared_ptr< revolute_joint > rev)
+		{
+			m_revolutes.push_back(named_revolute{ name, rev });
+		}
+
+		void composite_body::activate_effectors(effector_activations const& activations)
+		{
+			auto const count = m_revolutes.size();
+			assert(count == activations.size());
+			for(size_t i = 0; i < count; ++i)
+			{
+				m_revolutes[i].rev->apply_activation(activations[i]);
+			}
 		}
 
 	}

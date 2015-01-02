@@ -1,7 +1,7 @@
 // boolean_emitter.h
 
-#ifndef __WB_PARAMS_BOOLEAN_EMITTER_H
-#define __WB_PARAMS_BOOLEAN_EMITTER_H
+#ifndef __WB_DDL_BOOLEAN_EMITTER_H
+#define __WB_DDL_BOOLEAN_EMITTER_H
 
 #include <boost/spirit/include/karma.hpp>
 

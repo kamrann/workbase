@@ -63,6 +63,12 @@
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\objective_defn.cpp">
       <Filter>objectives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\rnn_ev_controller_defn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\fixed_rnn_genetic_mapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\stdafx.h">
@@ -106,6 +112,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\pareto_objective.h">
       <Filter>objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\objective_defn.h">
+      <Filter>objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\rnn_ev_controller_defn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\fixed_rnn_genetic_mapping.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

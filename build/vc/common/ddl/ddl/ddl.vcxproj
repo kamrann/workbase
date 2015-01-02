@@ -33,12 +33,14 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\workbase.props" />
+    <Import Project="..\..\..\yaml_cpp_dbg.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\..\workbase.props" />
+    <Import Project="..\..\..\yaml_cpp_rls.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -88,8 +90,11 @@
     <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\nav_parser.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\repeat_add_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\repeat_remove_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\reset_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\save_cmd_parser.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\commands\setvalue_cmd_parser.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\dependencies.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\dependency_graph.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\node_ref.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\output.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\path.cpp" />
@@ -106,6 +111,7 @@
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_defn\string_defn_node.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\boolean_sch_node.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\composite_sch_node.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\conditional_sch_node.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\enum_sch_node.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\instantiate.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\integer_sch_node.cpp" />
@@ -113,6 +119,7 @@
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\sch_node.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\realnum_sch_node.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\schema_inst\string_sch_node.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\sd_tree.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\base_node_state.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\general_state.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\state_machine\paramtree_fsm_defn.cpp" />
@@ -125,6 +132,7 @@
     <ClCompile Include="..\..\..\..\..\code\common\ddl\values\schema_adjustment.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\values\schema_validation.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\values\value_node.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\common\ddl\values\yaml_conversion.cpp" />
     <ClCompile Include="..\..\..\..\..\code\common\ddl\value_output.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -138,10 +146,14 @@
     <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\nav_parser.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\repeat_add_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\repeat_remove_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\reset_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\save_cmd_parser.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\commands\setvalue_cmd_parser.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\components\enum_choice.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\ddl.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\ddl_types.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\dependencies.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\dependency_graph.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\node_ref.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\output.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\path.h" />
@@ -184,6 +196,8 @@
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\boolean_sch_node_impl.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\composite_sch_node.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\composite_sch_node_impl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\conditional_sch_node.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\conditional_sch_node_impl.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\enum_sch_node.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\enum_sch_node_impl.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\instantiate.h" />
@@ -198,6 +212,8 @@
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\realnum_sch_node_impl.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\string_sch_node.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\schema_inst\string_sch_node_impl.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\sd_node_ref.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\sd_tree.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\base_node_state.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\enum_state.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\state_machine\general_state.h" />
@@ -226,8 +242,10 @@
     <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\vector_emitter.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\terminal_io\vector_parser.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\values\navigator.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\schema_validation.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\values\value.h" />
     <ClInclude Include="..\..\..\..\..\code\common\ddl\values\value_node.h" />
+    <ClInclude Include="..\..\..\..\..\code\common\ddl\values\yaml_conversion.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

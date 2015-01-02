@@ -1,0 +1,126 @@
+composite:
+  sys_details:
+    conditional:
+      composite:
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  script:
+                                    string: test_script.b2d
+                            name:
+                              string: test_agent
+                      agent_type:
+                        enum:
+                          - generic_agent
+        core:
+          composite:
+            scenario:
+              conditional:
+                composite:
+                  ball_count:
+                    integer: 0
+                  gravity:
+                    real: 9.810000000000001
+                  ground_expanse:
+                    real: 100
+                  friction:
+                    real: 0.5
+                  incline:
+                    real: 0
+            velocity_iterations:
+              integer: 4
+            scenario_type:
+              enum:
+                - ground_based
+            position_iterations:
+              integer: 2
+            duration:
+              real: 20
+            updates_per_sec:
+              integer: 60
+        instances:
+          list:
+            - composite:
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_type:
+                            enum:
+                              - direct_ui_controller
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite:
+                                      effector_bindings:
+                                        list:
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Left-Thumb-X
+                                              effector:
+                                                enum:
+                                                  - effector_1
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Right-Thumb-X
+                                              effector:
+                                                enum:
+                                                  - effector_2
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Y
+                                              effector:
+                                                enum:
+                                                  - effector_3
+                    controller_class:
+                      enum:
+                        - interactive
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_linear_angle:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_angvel:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - test_agent
+  results:
+    enum:
+      []
+  updates:
+    enum:
+      []
+  sys_type:
+    enum:
+      - physics_2d

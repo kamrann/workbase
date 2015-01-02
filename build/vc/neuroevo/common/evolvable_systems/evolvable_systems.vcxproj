@@ -91,8 +91,10 @@
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\evolved_system_domain_defn.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\ffnn_ev_controller_defn.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\fixed_ffnn_genetic_mapping.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\fixed_rnn_genetic_mapping.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\objective_defn.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\pareto_objective.cpp" />
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\rnn_ev_controller_defn.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\single_objective.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -110,8 +112,11 @@
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\ffnn_ev_controller_defn.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\ev_controller_genetic_mapping.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\fixed_ffnn_genetic_mapping.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\fixed_rnn_genetic_mapping.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\objective.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\objective_defn.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\pareto_objective.h" />
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\rnn_ev_controller_defn.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\single_objective.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\stdafx.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\evolvable_systems\targetver.h" />

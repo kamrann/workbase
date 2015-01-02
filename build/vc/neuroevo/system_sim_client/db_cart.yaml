@@ -1,0 +1,84 @@
+composite:
+  results:
+    enum:
+      []
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        core:
+          composite:
+            scenario:
+              conditional:
+                composite:
+                  gravity:
+                    real: 9.810000000000001
+                  ground_expanse:
+                    real: 0
+            updates_per_sec:
+              integer: 60
+            scenario_type:
+              enum:
+                - ground_based
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  pole_mass:
+                                    real: 0.1000000014901161
+                                  cart_mass:
+                                    real: 1
+                                  fail_angle:
+                                    real: 0.2094395160675049
+                                  fail_displacement:
+                                    real: 2.400000095367432
+                                  max_force:
+                                    real: 10
+                                  pole_length:
+                                    real: 1
+                            name:
+                              string: the_cart
+                      agent_type:
+                        enum:
+                          - pole_cart
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_angvel:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_x:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_cart               

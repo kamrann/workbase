@@ -8,7 +8,7 @@ namespace ddl {
 		void enumeration::on_add(clsm::ev_cmd< enum_add_cmd > const& cmd)
 		{
 			auto& editor = context< paramtree_editor >();
-			auto acc = editor.acc;
+			auto nav = editor.nav;
 
 			qualified_path path = acc.where();
 			auto& pd = acc.find_param(path);

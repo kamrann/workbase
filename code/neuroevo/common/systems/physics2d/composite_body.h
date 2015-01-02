@@ -4,6 +4,9 @@
 #define __NE_RTP_PHYS2D_COMPOSITE_BODY_H
 
 #include "phys2d_object.h"
+#include "phys2d_revolute_joint.h"
+
+#include "system_sim/agent.h"
 
 #include <list>
 
@@ -16,6 +19,9 @@ namespace sys {
 		class composite_body:
 			public object
 		{
+		public:
+			using object::object;
+
 		public:
 			virtual void translate(b2Vec2 const& vec) override;
 			virtual void rotate(float angle) override;
@@ -34,9 +40,25 @@ namespace sys {
 
 		protected:
 			void add_component_body(b2Body* comp, boost::any&& data);
+			void add_revolute(std::string name, std::shared_ptr< revolute_joint > rev);
 
 		protected:
-			std::list< b2Body* > m_bodies;
+			struct named_revolute
+			{
+				std::string name;
+				std::shared_ptr< revolute_joint > rev;
+
+				named_revolute(std::string nm, std::shared_ptr< revolute_joint > j):
+					name{ nm }
+					, rev{ j }
+				{}
+			};
+
+			void activate_effectors(effector_activations const& activations);
+
+		protected:
+			std::list< b2Body* > m_bodies;	// why list?
+			std::vector< named_revolute > m_revolutes;
 		};
 
 	}

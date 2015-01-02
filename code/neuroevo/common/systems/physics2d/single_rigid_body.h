@@ -13,6 +13,9 @@ namespace sys {
 			public object
 		{
 		public:
+			using object::object;
+
+		public:
 			virtual void translate(b2Vec2 const& vec) override;
 			virtual void rotate(float angle) override;
 			virtual void set_linear_velocity(b2Vec2 const& linvel) override;

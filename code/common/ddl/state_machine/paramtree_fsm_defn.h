@@ -31,6 +31,8 @@ namespace ddl {
 		{
 			paramtree_editor(
 				defn_node _defn,
+//				value_node _data,
+				sd_tree _data,
 				std::function< void(std::string) > _output_sink,
 				std::string _quit_str = ":q"
 				);
@@ -47,8 +49,9 @@ namespace ddl {
 			void reload_pt_schema();
 
 			defn_node defn;
-			sch_node schema;
-			value_node data;
+//			sch_node schema;
+//			value_node data;
+			sd_tree data;
 			navigator nav;
 
 			std::function< void(std::string) > output_sink;

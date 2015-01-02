@@ -3,54 +3,39 @@
 #include "ground_scenario_defn.h"
 #include "ground_scenario.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
-
 
 namespace sys {
 	namespace phys2d {
-
-		namespace sb = prm::schema;
 
 		std::string ground_scenario_defn::get_name() const
 		{
 			return "ground_based";
 		}
 
-		std::string ground_scenario_defn::update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+		ddl::defn_node ground_scenario_defn::get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
-
-			(*provider)[path + std::string("ground_expanse")] = [](prm::param_accessor)
-			{
-				auto s = sb::real(
-					"ground_expanse",
-					10.0,
-					0.0
-					);
-				sb::label(s, "Ground Expanse");
-				return s;
-			};
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "ground_expanse" })(acc));
-				return s;
-			};
-
-			return path.leaf().name();
+			return spc.composite("ground_scenario")(ddl::define_children{}
+				("ground_expanse", spc.realnum("ground_expanse")(ddl::spc_min < ddl::realnum_defn_node::value_t > { 0. })(ddl::spc_default < ddl::realnum_defn_node::value_t > { 10. }))
+				("incline", spc.realnum("incline")(ddl::spc_range < ddl::realnum_defn_node::value_t > { -90.0, 90.0 })(ddl::spc_default < ddl::realnum_defn_node::value_t > { 0.0 }))
+				("friction", spc.realnum("friction")(ddl::spc_min < ddl::realnum_defn_node::value_t > { 0.0 })(ddl::spc_default < ddl::realnum_defn_node::value_t > { 0.5 }))
+				("gravity", spc.realnum("gravity")(ddl::spc_min < ddl::realnum_defn_node::value_t > { 0. })(ddl::spc_default < ddl::realnum_defn_node::value_t > { 9.81 }))
+				("ball_count", spc.integer("ball_count")(ddl::spc_min < ddl::integer_defn_node::value_t > { 0 })(ddl::spc_default < ddl::integer_defn_node::value_t > { 0 }))
+				);
 		}
 
-		state_value_id_list ground_scenario_defn::get_state_values(prm::param_accessor acc) const
+		state_value_id_list ground_scenario_defn::get_state_values(ddl::navigator nav) const
 		{
 			return{};
 		}
 
-		std::unique_ptr< scenario > ground_scenario_defn::create_scenario(prm::param_accessor acc) const
+		std::unique_ptr< scenario > ground_scenario_defn::create_scenario(ddl::navigator nav) const
 		{
 			spec_data spec;
-			spec.expanse = prm::extract_as< double >(acc["ground_expanse"]);
+			spec.expanse = nav["ground_expanse"].get().as_real();
+			spec.incline = nav["incline"].get().as_real() * b2_pi / 180.0;
+			spec.friction = nav["friction"].get().as_real();
+			spec.gravity = nav["gravity"].get().as_real();
+			spec.ball_count = nav["ball_count"].get().as_int();
 			return std::make_unique< ground_scenario >(spec);
 		}
 

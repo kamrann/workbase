@@ -1,0 +1,54 @@
+composite:
+  domain_cfg:
+    composite:
+      contents:
+        conditional:
+          composite:
+            temp_mutation:
+              composite:
+                option:
+                  enum:
+                    - gaussian
+                contents:
+                  conditional:
+                    composite:
+                      std_dev:
+                        real: 0.1
+      option:
+        enum:
+          - timer
+  ga_cfg:
+    composite:
+      mutation:
+        composite:
+          mut_rate:
+            composite:
+              option:
+                enum:
+                  - fixed
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 0.2
+      crossover:
+        composite:
+          cx_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 1
+              option:
+                enum:
+                  - fixed
+      trials:
+        composite:
+          num_trials:
+            integer: 1
+          trial_merging:
+            enum:
+              - average
+      pop_size:
+        integer: 30

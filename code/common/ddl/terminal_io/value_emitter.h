@@ -1,7 +1,7 @@
 // value_emitter.h
 
-#ifndef __WB_PARAMS_VALUE_EMITTER_H
-#define __WB_PARAMS_VALUE_EMITTER_H
+#ifndef __WB_DDL_VALUE_EMITTER_H
+#define __WB_DDL_VALUE_EMITTER_H
 
 #include "boolean_emitter.h"
 #include "integer_emitter.h"

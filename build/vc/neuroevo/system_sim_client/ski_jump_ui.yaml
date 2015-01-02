@@ -1,0 +1,146 @@
+composite:
+  results:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        specs:
+          list:
+            - composite:
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  script:
+                                    string: test_script.b2d
+                            name:
+                              string: the_skier
+                      agent_type:
+                        enum:
+                          - generic_agent
+                agent_role:
+                  enum:
+                    - default
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_angvel:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_y:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_skier
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite:
+                                      effector_bindings:
+                                        list:
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Left-Thumb-X
+                                              effector:
+                                                enum:
+                                                  - effector_1
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Right-Thumb-X
+                                              effector:
+                                                enum:
+                                                  - effector_2
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - A
+                                              effector:
+                                                enum:
+                                                  - effector_3
+                          controller_type:
+                            enum:
+                              - direct_ui_controller
+                    controller_class:
+                      enum:
+                        - interactive
+        core:
+          composite:
+            scenario:
+              conditional:
+                composite:
+                  landing_x1:
+                    real: 3.5
+                  landing_x2:
+                    real: -10
+                  overall_scale:
+                    real: 1
+                  platform_width:
+                    real: 5
+                  surface_friction:
+                    real: 0.2
+                  takeoff_incline:
+                    real: 0
+                  wall_height:
+                    real: 2
+                  transition1_radius:
+                    real: 8
+                  takeoff_length:
+                    real: 5
+                  jump_dropoff:
+                    real: 2
+                  landing_drop:
+                    real: 25
+                  landing_length:
+                    real: 140
+                  inrun_length:
+                    real: 30
+                  gravity:
+                    real: 9.810000000000001
+                  inrun_incline:
+                    real: 45
+            scenario_type:
+              enum:
+                - ski_jump
+            updates_per_sec:
+              integer: 30
+            position_iterations:
+              integer: 2
+            duration:
+              real: 60
+            velocity_iterations:
+              integer: 4
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []

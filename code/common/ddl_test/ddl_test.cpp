@@ -8,7 +8,8 @@
 #include "ddl/values/navigator.h"
 #include "ddl/state_machine/paramtree_fsm.h"
 
-#include "problem_domain_ddl.h"
+//#include "problem_domain_ddl.h"
+#include "test_ddl.h"
 
 #include "wt_cmdline_server/wt_server.h"
 
@@ -62,11 +63,16 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	specifier spc;
-	problem_domain_schema schema;
+	test_schema schema;
 	auto defn = schema.get_defn(spc);
+	sd_tree sdt;
+	auto root_attribs = sd_node_attribs{};
+	root_attribs.defn = defn;
+	sdt.create_root(root_attribs);
 
 	fsm::paramtree_editor ed{
 		defn,
+		std::move(sdt),
 		sink
 	};
 
@@ -139,20 +145,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	/////////////////////////////////////////
 
-	ref_resolver rr = [](node_ref const& ref, navigator nav) -> value_node
-	{
-		if(nav)
-		{
-			auto id = ref.nd.get_id();
-			auto results = nav.find_by_id(id);
-			// TODO:
-			return results.by_location.begin()->second.front();
-		}
-		else
-		{
-			return{};
-		}
-	};
+	ref_resolver rr = &resolve_reference;
 
 	value_node vals;
 	auto sch_nd = instantiate(defn, navigator{ vals }, rr);

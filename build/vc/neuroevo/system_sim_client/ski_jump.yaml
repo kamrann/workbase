@@ -1,0 +1,124 @@
+composite:
+  results:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        core:
+          composite:
+            velocity_iterations:
+              integer: 4
+            duration:
+              real: 20
+            position_iterations:
+              integer: 2
+            updates_per_sec:
+              integer: 30
+            scenario:
+              conditional:
+                composite:
+                  gravity:
+                    real: 9.810000000000001
+                  landing_x1:
+                    real: 3.5
+                  landing_x2:
+                    real: -10
+                  landing_length:
+                    real: 140
+                  jump_dropoff:
+                    real: 2
+                  landing_drop:
+                    real: 25
+                  overall_scale:
+                    real: 1
+                  takeoff_incline:
+                    real: 0
+                  platform_width:
+                    real: 5
+                  surface_friction:
+                    real: 0.2
+                  inrun_incline:
+                    real: 45
+                  transition1_radius:
+                    real: 8
+                  wall_height:
+                    real: 2
+                  takeoff_length:
+                    real: 5
+                  inrun_length:
+                    real: 30
+            scenario_type:
+              enum:
+                - ski_jump
+        specs:
+          list:
+            - composite:
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  script:
+                                    string: test_script.b2d
+                            name:
+                              string: the_skier
+                      agent_type:
+                        enum:
+                          - generic_agent
+                agent_role:
+                  enum:
+                    - default
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    spec_reference:
+                      enum:
+                        - the_skier
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_linear_speed:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_angvel:
+                                real: 0
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    enum:
+                                      - generic_skijumper
+                          controller_type:
+                            enum:
+                              - db_evolved
+                    controller_class:
+                      enum:
+                        - db
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []

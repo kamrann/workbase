@@ -6,7 +6,7 @@
 #include "objective.h"
 #include "value_objective.h"
 
-#include "params/param_fwd.h"
+#include "ddl/ddl.h"
 
 #include <vector>
 #include <memory>
@@ -36,15 +36,14 @@ namespace sys {
 		class pareto_objective_defn
 		{
 		public:
-			typedef std::function< state_value_id_list(prm::param_accessor) > state_val_access_fn_t;
+			typedef value_objective_defn::state_val_access_fn_t state_val_access_fn_t;
 
 		public:
-			pareto_objective_defn(state_val_access_fn_t sv_acc_fn);
+			pareto_objective_defn(state_val_access_fn_t& sv_acc_fn);
 
 		public:
-			void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);
-			void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, int) {}
-			std::unique_ptr< pareto_objective > generate(prm::param_accessor acc, std::function< double(state_value_id) > get_state_value_fn);
+			ddl::defn_node get_defn(ddl::specifier& spc);
+			std::unique_ptr< pareto_objective > generate(ddl::navigator nav, std::function< double(state_value_id) > get_state_value_fn);
 
 		protected:
 			value_objective_defn val_obj_defn_;

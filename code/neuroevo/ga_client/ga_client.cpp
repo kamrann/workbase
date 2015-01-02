@@ -6,9 +6,6 @@
 #include "plot_query.h"
 #include "state_machine/control_fsm.h"
 
-#include "params/schema_builder.h"
-#include "params/state_machine/paramtree_fsm.h"
-
 #include "wt_cmdline_server/wt_server.h"
 #include "wt_displays/chart.h"
 #include "wt_displays_ne/drawer.h"
@@ -19,7 +16,6 @@
 
 
 namespace po = boost::program_options;
-namespace sb = prm::schema;
 
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -46,11 +42,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	auto db_session = std::make_unique< evodb_session >(*db_cp);
 	//
-
-	auto sch_mp = std::make_shared< sb::schema_provider_map >();
-	prm::qualified_path root = std::string{ "root" };
-	ga::ga_defn defn;
-	defn.update_schema_provider(sch_mp, root);
 
 	arg_list server_args{
 		"ga_client.exe",
@@ -84,17 +75,16 @@ int _tmain(int argc, _TCHAR* argv[])
 //	register_display_defn(std::make_unique< drawer_display_defn >());
 
 
-	auto dummy_acc = prm::param_accessor{};
-	auto sch = (*sch_mp)[root](dummy_acc);
-	auto pt = prm::param_tree::generate_from_schema(sch, sch_mp);
+	ddl::specifier spc;
+	ga::ga_defn defn;
+	auto ddl_defn = defn.get_defn(spc);
 
 	ga::ga_db_serializer serializer(*db_session);
 	serializer.set_options(ga::i_ga_serializer::Generation::StoreBest);
 
 	ga_control::fsm::ga_controller ga_ctrl{
 		defn,
-		std::move(pt),
-		sch_mp,
+		ddl_defn,
 		&serializer,
 		db_session.get(),
 		sink,

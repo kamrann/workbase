@@ -11,10 +11,6 @@
 #include "../../webinterfaceapp.h"
 */
 
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
-#include "params/param_yaml.h"
-
 
 namespace sys
 {
@@ -99,6 +95,7 @@ namespace sys
 	}
 #endif
 
+#if 0
 	namespace sb = prm::schema;
 
 	std::string i_controller::update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
@@ -371,6 +368,8 @@ namespace sys
 		return result;
 #endif
 	}
+
+#endif
 
 }
 

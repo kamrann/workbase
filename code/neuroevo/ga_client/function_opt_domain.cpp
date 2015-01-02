@@ -7,11 +7,6 @@
 
 #include "genetic_algorithm/param_spec/real_valued_mutation_ps.h"
 
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
-
-
-namespace sb = prm::schema;
 
 namespace ga {
 	namespace domain {
@@ -22,30 +17,31 @@ namespace ga {
 			{
 				gene_mutation_defn.register_option(
 					"linear",
-					linear_real_gene_mutation_defn< double >::update_schema_provider,
+					linear_real_gene_mutation_defn< double >::get_defn,
 					linear_real_gene_mutation_defn< double >::generate
 					);
 				gene_mutation_defn.register_option(
 					"gaussian",
-					gaussian_real_gene_mutation_defn< double >::update_schema_provider,
+					gaussian_real_gene_mutation_defn< double >::get_defn,
 					gaussian_real_gene_mutation_defn< double >::generate
 					);
 				gene_mutation_defn.register_option(
 					"variable_gaussian",
-					variable_gaussian_real_gene_mutation_defn< double >::update_schema_provider,
+					variable_gaussian_real_gene_mutation_defn< double >::get_defn,
 					variable_gaussian_real_gene_mutation_defn< double >::generate
 					);
 
 				func_defn.register_option(
 					"ackley",
-					std::make_shared< functions::ackley_defn >()
+					std::make_shared< functions::ackley_schema >()
 					);
 				func_defn.register_option(
 					"rosenbrock",
-					std::make_shared< functions::rosenbrock_defn >()
+					std::make_shared< functions::rosenbrock_schema >()
 					);
 			}
 
+			/* TODO:
 			void function_opt_domain_defn::update_schema_provider_for_crossover_op(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) //const
 			{
 				auto path = prefix;
@@ -70,22 +66,14 @@ namespace ga {
 					return s;
 				};
 			}
+			*/
 
-			void function_opt_domain_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) //const
+			ddl::defn_node function_opt_domain_defn::get_defn(ddl::specifier& spc)
 			{
-				func_defn.update_schema_provider(provider, prefix);
-				
-/*				auto path = prefix;
+				return func_defn.get_defn(spc);
+			}
 
-				(*provider)[path] = [=](prm::param_accessor acc)
-				{
-					auto s = sb::list(path.leaf().name());
-					// TODO: stuff
-					return s;
-				};
-*/			}
-
-			void function_opt_domain_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, int component)// const
+/* todo:			void function_opt_domain_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, int component)// const
 			{
 				switch(component)
 				{
@@ -97,14 +85,15 @@ namespace ga {
 					break;
 				}
 			}
+			*/
 			
-			std::shared_ptr< ga::i_problem_domain > function_opt_domain_defn::generate(prm::param_accessor acc) const
+			std::shared_ptr< ga::i_problem_domain > function_opt_domain_defn::generate(ddl::navigator nav) const
 			{
-				function_opt_domain::function_defn fdef = func_defn.generate(acc);
+				function_opt_domain::function_defn fdef = func_defn.generate(nav);
 
-				auto gene_mut_fn = gene_mutation_defn.generate(acc("gene_mutation"));
+// todo:				auto gene_mut_fn = gene_mutation_defn.generate(nav["gene_mutation"]);
 
-				return std::make_shared< function_opt_domain >(fdef, function_opt_domain::Goal::Minimise, gene_mut_fn);
+				return{};// std::make_shared< function_opt_domain >(fdef, function_opt_domain::Goal::Minimise, gene_mut_fn);
 			}
 
 		}

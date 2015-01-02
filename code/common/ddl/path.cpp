@@ -19,15 +19,28 @@ namespace ddl {
 	{
 		push_component(idx);
 	}
+
+	void path::append(conditional)
+	{
+		push_component(conditional{});
+	}
 		
 	void path::pop()
 	{
 		components_.pop_back();
+
+#ifdef _DEBUG
+		dbg_update();
+#endif
 	}
 		
 	void path::reset()
 	{
 		components_.clear();
+
+#ifdef _DEBUG
+		dbg_update();
+#endif
 	}
 
 	size_t path::length() const
@@ -88,6 +101,12 @@ namespace ddl {
 		append(idx);
 		return *this;
 	}
+
+	path& path::operator+= (conditional)
+	{
+		append(conditional{});
+		return *this;
+	}
 		
 /*	path::operator bool() const
 	{
@@ -113,6 +132,12 @@ namespace ddl {
 
 	path::component::component(unsigned int idx):
 		var_{ idx }
+	{
+
+	}
+
+	path::component::component(conditional):
+		var_{ conditional{} }
 	{
 
 	}
@@ -147,6 +172,9 @@ namespace ddl {
 				result += "]";
 				return result;
 			}
+
+			case ComponentType::Conditional:
+			return "[cnd]";
 		}
 	}
 
@@ -181,6 +209,9 @@ namespace ddl {
 
 			case ComponentType::ListItem:
 			return as_index() < rhs.as_index();
+
+			default:
+			return false;
 		}
 	}
 
@@ -192,6 +223,10 @@ namespace ddl {
 	void path::push_component(component c)
 	{
 		components_.push_back(std::move(c));
+
+#ifdef _DEBUG
+		dbg_update();
+#endif
 	}
 
 	path::component_list::const_iterator path::begin() const
@@ -203,6 +238,14 @@ namespace ddl {
 	{
 		return std::end(components_);
 	}
+
+
+#ifdef _DEBUG
+	void path::dbg_update()
+	{
+		pathstr_ = to_string();
+	}
+#endif
 
 }
 

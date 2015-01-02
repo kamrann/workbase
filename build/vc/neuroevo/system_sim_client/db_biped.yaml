@@ -1,0 +1,98 @@
+composite:
+  results:
+    enum:
+      []
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        instances:
+          list:
+            - composite:
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_type:
+                            enum:
+                              - db_evolved
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    enum:
+                                      - test_biped
+                    controller_class:
+                      enum:
+                        - db
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_angvel:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_x:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_biped
+        core:
+          composite:
+            updates_per_sec:
+              integer: 30
+            scenario:
+              conditional:
+                composite:
+                  ground_expanse:
+                    real: 1000
+                  gravity:
+                    real: 9.810000000000001
+            scenario_type:
+              enum:
+                - ground_based
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  max_torques:
+                                    composite:
+                                      hip:
+                                        real: 75
+                                      knee:
+                                        real: 75
+                                  contact_damage:
+                                    boolean: true
+                            name:
+                              string: the_biped
+                      agent_type:
+                        enum:
+                          - basic_biped

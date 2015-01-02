@@ -36,7 +36,7 @@ namespace sys {
 			virtual ga::crossover_fn_t crossover_op() const override;
 			virtual ga::mutation mutation_op() const override;
 			virtual bool rectify_genome(ga::genome& gn) const override;
-			virtual ga::objective_value evaluate_genome(ga::genome const& gn) const override;
+			virtual std::vector< ga::objective_value > evaluate_genome(ga::genome const& gn, ga::rgen_t& rgen, size_t trials) const override;
 			virtual ga::diversity_t population_genetic_diversity(ga::genetic_population const& pop) const override;
 
 			// TODO: Temp

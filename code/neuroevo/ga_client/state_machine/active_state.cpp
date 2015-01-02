@@ -7,12 +7,12 @@
 #include "../ga_params.h"
 //
 
+#include "ddl/values/yaml_conversion.h"
+
 #include "genetic_algorithm/fitness_assignment.h"
 
 #include "wt_cmdline_server/wt_server.h"
 #include "wt_displays/chart.h"
-
-#include "params/param_accessor.h"
 
 
 namespace ga_control {
@@ -25,16 +25,16 @@ namespace ga_control {
 			reg_cmd< reset_cmd >(wrap_grammar< reset_cmd_parser< clsm::iter_t > >());
 
 			auto& ga_ctx = context< ga_controller >();
-			auto acc = prm::param_accessor{ &ga_ctx.ptree };
+			auto nav = ddl::navigator{ &ga_ctx.ddl_data, ddl::sd_node_ref{ ga_ctx.ddl_data.get_root() } };
 
 			auto& defn = ga_ctx.ga_def;
-			domain = defn.generate_domain(acc);
-			alg = defn.generate_alg(acc, domain);
+			domain = defn.generate_domain(nav);
+			alg = defn.generate_alg(nav, domain);
 
 			//ga_rseed = static_cast<uint32_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count() & 0xffffffff);
 			reset_ga(boost::none);
 
-			ga_ctx.serializer->serialize_start(ga_ctx.ptree.convert_to_yaml());
+			ga_ctx.serializer->serialize_start(ddl::export_yaml(ga_ctx.ddl_data, ddl::sd_node_ref(ga_ctx.ddl_data.get_root())));
 		}
 
 		active::~active()

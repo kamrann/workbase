@@ -1,0 +1,84 @@
+conditional:
+  composite:
+    core:
+      composite:
+        updates_per_sec:
+          integer: 30
+        scenario_type:
+          enum:
+            - ground_based
+        scenario:
+          conditional:
+            composite:
+              gravity:
+                real: 9.810000000000001
+              ground_expanse:
+                real: 1000
+    instances:
+      list:
+        - composite:
+            inst_contents:
+              composite:
+                spec_reference:
+                  enum:
+                    - the_biped
+                inst_details:
+                  conditional:
+                    composite:
+                      initial_conditions:
+                        composite:
+                          init_angvel:
+                            real: 0
+                          init_linear_angle:
+                            real: 0
+                          init_y:
+                            real: 0
+                          init_linear_speed:
+                            real: 0
+                          init_orientation:
+                            real: 0
+                          init_x:
+                            real: 0
+            inst_controller:
+              composite:
+                class_contents:
+                  conditional:
+                    composite:
+                      controller_type:
+                        enum:
+                          - passive
+                      controller_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite: ~
+                controller_class:
+                  enum:
+                    - preset
+    specs:
+      list:
+        - composite:
+            agent_role:
+              enum:
+                - default
+            role_contents:
+              conditional:
+                composite:
+                  agent_contents:
+                    conditional:
+                      composite:
+                        details:
+                          conditional:
+                            composite:
+                              max_torques:
+                                composite:
+                                  knee:
+                                    real: 75
+                                  hip:
+                                    real: 75
+                        name:
+                          string: the_biped
+                  agent_type:
+                    enum:
+                      - basic_biped

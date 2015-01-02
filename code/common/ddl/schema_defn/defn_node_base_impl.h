@@ -12,11 +12,19 @@ namespace ddl {
 		struct defn_node_base_impl
 		{
 			node_id id_;
+			std::string name_;
 
 			void set_id(node_id id)
 			{
 				id_ = id;
 			}
+
+//#ifdef _DEBUG
+			void set_name(std::string name)
+			{
+				name_ = name;
+			}
+//#endif
 		};
 
 	}

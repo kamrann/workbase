@@ -7,11 +7,6 @@
 #include "system.h"
 #include "agent.h"
 #include "controller.h"
-//#include "system_drawer.h"
-
-#include "params/param.h"
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
 
 
 namespace sys {
@@ -36,345 +31,591 @@ namespace sys {
 		mp_it->second->push_back(std::move(defn));
 	}
 
-	namespace sb = prm::schema;
-
-	std::string basic_system_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+	ddl::defn_node basic_system_defn::get_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
+		using ddl::defn_node;
 
-		auto core = std::string{ "core" };
-		auto spec_list = std::string{ "spec_list" };
-		auto inst_list = std::string{ "inst_list" };
+		defn_node core = get_system_core_defn(spc);
+		auto spec_list = get_agent_specification_list_defn(spc);
+		auto inst_list = get_agent_instance_list_defn(spc);
 
-		update_schema_provider_for_system_core(provider, path + core);
-		update_schema_provider_for_agent_specification_list(provider, path + spec_list);
-		update_schema_provider_for_agent_instance_list(provider, path + inst_list);
+		//////////////////
 
-		(*provider)[path] = [=](prm::param_accessor acc)
+		auto rf_core = ddl::node_ref{ core };	// TODO: if we have fully specified dependencies/triggers, shouldn't need this, since it is only used to position a navigator currently
+		auto rf_any_inst_spec_ref = ddl::node_ref{ inst_spec_ref_dn_, ddl::node_ref::Resolution::Any };
+		get_system_state_values_fn_.set_fn([this, rf_core, rf_any_inst_spec_ref](ddl::navigator nav) -> state_value_id_list
 		{
-			auto s = sb::list(path.leaf().name());
-			sb::append(s, provider->at(path + core)(acc));
-			sb::append(s, provider->at(path + spec_list)(acc));
-			sb::append(s, provider->at(path + inst_list)(acc));
-			return s;
-		};
+			// Perhaps classify values in hierarchical string form.
+			// eg. asteroids/<index>/speed, agents/role/agent_name/agent_value, etc.
+			// then in create_system, lock in the bindings
 
-		return path.leaf().name();
+			// TODO: Dependencies of this call...
+			auto svs = get_system_core_state_values_fn()(nav);
+				//ddl::nav_to_ref(rf_core, nav));
+
+			// For every agent instance
+			auto resolved = ddl::resolve_reference(rf_any_inst_spec_ref, nav);
+			for(auto ref : resolved)
+			{
+				auto rnav = ddl::navigator{ nav.tree_, ref.nd };
+				auto isr_values = rnav.get().as_enum();
+				if(isr_values.empty())
+				{
+					// No spec yet defined for this instance, skip.
+					continue;
+				}
+
+				auto spec_nav = get_inst_spec_nav_fn_(rnav);
+				auto role_type = get_spec_role_fn_(spec_nav);
+				auto spec_type = get_spec_type_fn_(spec_nav);
+
+				auto agent_defn = get_agent_defn(*role_type, *spec_type);
+
+				auto agent_svs = agent_defn->get_agent_state_values_fn()(spec_nav);
+				svs.insert(
+					std::end(svs),
+					std::begin(agent_svs),
+					std::end(agent_svs)
+					);
+			}
+			return svs;
+		});
+		get_system_state_values_fn_.add_dependency(ddl::node_dependency(rf_any_inst_spec_ref));
+		get_system_state_values_fn_.add_dependency(get_system_core_state_values_fn());
+		for(auto const& role_entry : m_agent_defns)
+		{
+			auto const& role_defns = *role_entry.second;
+			for(auto const& adefn : role_defns)
+			{
+				get_system_state_values_fn_.add_dependency(adefn->get_agent_state_values_fn());
+			}
+		}
+		get_system_state_values_fn_.add_dependency(get_inst_spec_nav_fn_);
+		get_system_state_values_fn_.add_dependency(get_spec_role_fn_);
+		get_system_state_values_fn_.add_dependency(get_spec_type_fn_);
+		//////////////////
+
+		auto rf_inst_list = ddl::node_ref{ inst_list };
+		get_connected_spec_navs_fn_impl_ = [this, rf_inst_list](
+			std::string controller_cls,
+			std::string controller_type,
+			ddl::navigator nav) -> std::vector< ddl::navigator >
+		{
+			std::vector< ddl::navigator > result;
+			nav = ddl::nav_to_ref(rf_inst_list, nav);
+			auto inst_count = nav.list_num_items();
+			// For every agent instance...
+			for(size_t i = 0; i < inst_count; ++i)
+			{
+				auto inst_nav = nav[i];
+
+				auto cclass = get_controller_class_fn_(inst_nav);
+				if(!cclass || *cclass != controller_cls)
+				{
+					continue;
+				}
+
+				auto ctype = get_controller_type_fn_(inst_nav);
+				if(!ctype || ctype != controller_type)
+				{
+					continue;
+				}
+
+				auto spec_nav = get_inst_spec_nav_fn_(inst_nav);
+				if(!spec_nav)
+				{
+					// As yet unspecified
+					continue;
+				}
+				
+				result.push_back(spec_nav);
+			}
+			return result;
+		};
+		get_connected_spec_navs_fn_.add_dependency(ddl::node_dependency(rf_inst_list));
+		get_connected_spec_navs_fn_.add_dependency(get_controller_class_fn_);
+		get_connected_spec_navs_fn_.add_dependency(get_controller_type_fn_);
+		get_connected_spec_navs_fn_.add_dependency(get_inst_spec_nav_fn_);
+
+		return spc.composite("basic_system")(ddl::define_children{}
+			("core", core)
+			("specs", spec_list)
+			("instances", inst_list)
+			);
 	}
 
-	std::string basic_system_defn::update_schema_provider_for_agent_specification(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+	ddl::defn_node basic_system_defn::get_agent_specification_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
+		using ddl::defn_node;
 
-		(*provider)[path + std::string("agent_role")] = [this](prm::param_accessor)
+		// TODO: Probably can omit this and used fixed enum, since we assume that all agent defns are registered
+		// before use.
+		auto get_agent_roles_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this](ddl::navigator nav)
 		{
-			std::vector< std::string > roles;
+			ddl::enum_defn_node::enum_str_set_t roles;
 			std::transform(
 				std::begin(m_agent_defns),
 				std::end(m_agent_defns),
-				std::back_inserter(roles),
+				std::inserter(roles, std::end(roles)),
 				[](agent_defn_map_t::value_type const& entry)
 			{
 				return entry.first;
 			});
-			auto s = sb::enum_selection(
-				"agent_role",
-				roles,
-				0,
-				1
-				);
-			sb::label(s, "Role");
-			return s;
+			return roles;
+		}
 		};
 
-		path += std::string("role_contents");
-
-		(*provider)[path + std::string{ "agent_type" }] = [this](prm::param_accessor acc)
+		defn_node role_type = spc.enumeration("role_type")
+			(ddl::spc_range< size_t >{ 1, 1 })
+			(ddl::define_enum_func{ get_agent_roles_fn })
+			;
+		////////
+		auto rf_role = ddl::node_ref{ role_type };
+		get_spec_role_fn_.set_fn([rf_role](ddl::navigator nav) -> boost::optional< std::string >
 		{
-			std::vector< std::string > agent_names;
-			auto role_name = prm::extract_as< prm::enum_param_val >(acc["agent_role"])[0];
+			nav = ddl::nav_to_ref(rf_role, nav);
+			if(nav)
+			{
+				auto vnode = nav.get();
+				if(!vnode.as_enum().empty())
+				{
+					return vnode.as_single_enum_str();
+				}
+			}
+
+			return boost::none;
+		});
+		get_spec_role_fn_.add_dependency(ddl::node_dependency(rf_role));
+		////////
+
+		auto get_agent_types_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this, rf_role](ddl::navigator nav)
+		{
+			nav = ddl::nav_to_ref(rf_role, nav);
+			ddl::enum_defn_node::enum_str_set_t agent_names;
+			auto role_name = nav.get().as_single_enum_str();
 			auto const& agents = *m_agent_defns.at(role_name);
 			for(auto const& a : agents)
 			{
-				agent_names.push_back(a->get_name());
+				agent_names.insert(std::end(agent_names), a->get_name());
 			}
-
-			auto s = sb::enum_selection(
-				"agent_type",
-				agent_names,
-				0,
-				1);
-			return s;
+			return agent_names;
+		}
 		};
+		// TODO: Need a nice way to ensure that any node reference captured and used in the lambda function
+		// is also registered as a dependency
+		get_agent_types_fn.add_dependency(ddl::node_dependency(rf_role));
 
-		path += std::string{ "agent_contents" };
-
-		(*provider)[path + std::string("name")] = [](prm::param_accessor param_vals)
+		defn_node agent_type = spc.enumeration("agent_type")
+			(ddl::spc_range< size_t >{ 1, 1 })
+			(ddl::define_enum_func{ get_agent_types_fn })
+			;
+		////////
+		auto rf_type = ddl::node_ref{ agent_type };
+		get_spec_type_fn_.set_fn([rf_type](ddl::navigator nav) -> boost::optional< std::string >
 		{
-			/*			auto default_name = std::string("Temp");
-			auto path = param_vals.get_current_path();
-			if(path.size() > 0)
+			nav = ddl::nav_to_ref(rf_type, nav);
+			if(nav)
 			{
-			auto node = param_vals["spec_type"];
-			auto spec_type = node[0].as< Type >();
-			default_name = Names[spec_type];
-
-			default_name += "[";
-			auto agent_it = path.find_anywhere("agent_list");
-			default_name += std::to_string(agent_it->index());
-			default_name += "]";
-
-			default_name += "[";
-			auto inst_it = path.find_anywhere("instance_list");
-			default_name += std::to_string(inst_it->index());
-			default_name += "]";
+				auto vnode = nav.get();
+				if(!vnode.as_enum().empty())
+				{
+					return vnode.as_single_enum_str();
+				}
 			}
-			*/
-			auto s = sb::string("name");// , default_name);
-			sb::label(s, "Name");
-			sb::trigger(s, "agentspec_name_modified");
-			return s;
-		};
 
-		// Store the schema provider components for every registered agent type
+			return boost::none;
+		});
+		get_spec_type_fn_.add_dependency(ddl::node_dependency(rf_type));
+		////////
+
+		defn_node spec_name = spc.string("spec_name");
+		spec_name_dn_ = spec_name;
+		///////////
+		auto rf_spec_name = ddl::node_ref{ spec_name, ddl::node_ref::Resolution::Any };
+		get_all_spec_names_fn_.set_fn([rf_spec_name](ddl::navigator nav)
+		{
+			std::vector< std::string > specs;
+
+			auto resolved = ddl::resolve_reference(rf_spec_name, nav);
+			for(auto ref : resolved)
+			{
+				auto rnav = ddl::navigator{ nav.tree_, ref.nd };
+				auto name = rnav.get().as_string();
+				if(!name.empty())
+				{
+					specs.push_back(name);
+				}
+			}
+
+			return specs;
+		});
+		get_all_spec_names_fn_.add_dependency(ddl::node_dependency(rf_spec_name));
+		///////////
+
+		auto agent_details_spc = spc.conditional("agent_details_?");
 		for(auto const& entry : m_agent_defns)
 		{
 			auto const& role_name = entry.first;
 			auto const& defns = *entry.second;
 			for(auto const& adefn : defns)
 			{
-				adefn->update_schema_providor_for_spec(provider, path + (adefn->get_name() + std::string{ "_spec" }));
+				defn_node dn = adefn->get_spec_defn(spc);
+				agent_details_spc = agent_details_spc
+					// TODO: just checking agent type name, should really check role also!?
+					(ddl::spc_condition{ ddl::cnd::equal{ ddl::node_ref{ agent_type }, adefn->get_name() }, dn });
 			}
 		}
 
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::list("agent_contents");
-			if(acc.is_available("agent_type") && !prm::is_unspecified(acc["agent_type"]))
-			{
-				// A name for the spec
-				sb::append(s, provider->at(path + std::string{ "name" })(acc));
+		defn_node agent_details = agent_details_spc;
 
-				// Spec-type specific params
-				auto agent_type_name = prm::extract_as< prm::enum_param_val >(acc["agent_type"])[0];
-				sb::append(s, provider->at(path + (agent_type_name + std::string{ "_spec" }))(acc));
-			}
-			return s;
-		};
+		defn_node agent_contents = spc.composite("agent_contents")(ddl::define_children{}
+			("name", spec_name)
+			("details", agent_details)
+			);
 
-		path.pop();
+		defn_node role_contents = spc.composite("role_contents")(ddl::define_children{}
+			("agent_type", agent_type)
+			("agent_contents", spc.conditional("agent_contents_?")(ddl::spc_condition{ ddl::cnd::is_selection{ ddl::node_ref{ agent_type } }, agent_contents }))
+			);
 
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::list("role_contents");
-			if(acc.is_available("agent_role") && !prm::is_unspecified(acc["agent_role"]))
-			{
-				sb::append(s, provider->at(path + std::string{ "agent_type" })(acc));
-				sb::append(s, provider->at(path + std::string{ "agent_contents" })(acc));
-			}
-			return s;
-		};
-
-		path.pop();
-
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::list(path.leaf().name());
-			sb::append(s, provider->at(path + std::string("agent_role"))(acc));
-			sb::append(s, provider->at(path + std::string("role_contents"))(acc));
-
-			sb::border(s, std::string{ "Agent Specification" });
-			return s;
-		};
-
-		return path.leaf().name();
+		return spc.composite("agent_spec")(ddl::define_children{}
+			("agent_role", role_type)
+			("role_contents", spc.conditional("role_contents_?")(ddl::spc_condition{ ddl::cnd::is_selection{ ddl::node_ref{ role_type } }, role_contents }))
+			);
 	}
-
+#if 0
 	// Returns a list of names of the defined agent specifications
-	std::vector< std::pair< prm::qualified_path, std::string > > basic_system_defn::get_available_agent_specs(prm::param_accessor acc)
+	std::vector< std::pair< int /* TODO: node_ref? */, std::string > > basic_system_defn::get_available_agent_specs(ddl::navigator nav) const
 	{
-		std::vector< std::pair< prm::qualified_path, std::string > > specs;
+		std::vector< std::pair< int, std::string > > specs;
 
-		acc.move_to(acc.find_path("spec_list"));
-		auto spec_paths = acc.children();
-		for(auto const& p : spec_paths)
+		nav = ddl::nav_to_ref(ddl::node_ref{ dn_spec_list_ }, nav);
+		auto count = nav.list_num_items();
+		for(size_t idx = 0; idx < count; ++idx)
 		{
-			acc.move_to(p);
-
-			if(acc.is_available("name"))
+			auto cnav = nav[idx];
+			if(cnav.is_child("name"))	// TODO: possible to do this using node_ref instead of hard coded string lookup??
 			{
-				auto name = prm::extract_as< std::string >(acc["name"]);
+				auto name = cnav["name"].get().as_string();
 				if(!name.empty())
 				{
-					specs.push_back(std::make_pair(p, name));
+					specs.push_back(std::make_pair(int{}, name));
 				}
 			}
-
-			acc.revert();
 		}
 
 		return specs;
 	}
 
 	// Given a spec name, find the path to the spec param subtree
-	prm::qualified_path basic_system_defn::get_agent_instance_spec_path(std::string spec_name, prm::param_accessor acc)
+	ddl::navigator basic_system_defn::get_agent_instance_spec_nav(std::string spec_name, ddl::navigator nav) const
 	{
-		acc.move_to(acc.find_path("spec_list"));
-
-		auto spec_paths = acc.children();
-		for(auto const& p : spec_paths)
+		nav = ddl::nav_to_ref(ddl::node_ref{ dn_spec_list_ }, nav);
+		auto spec_count = nav.list_num_items();
+		for(size_t idx = 0; idx < spec_count; ++idx)
 		{
-			acc.move_to(p);
-
-			auto name = prm::extract_as< std::string >(acc["name"]);
+			auto cnav = nav[idx];
+			auto name = cnav["name"].get().as_string();
 			if(name == spec_name)
 			{
-				return p;
+				return cnav;
 			}
-
-			acc.revert();
 		}
 
 		return{};
 	}
 
 	// Returns the name of the agent role for the agent spec at the current location of spec_acc
-	std::string basic_system_defn::get_agent_role_name(prm::param_accessor spec_acc)
+	std::string basic_system_defn::get_agent_role_name(ddl::navigator spec_nav) const
 	{
-		auto role_name_sel = prm::extract_as< prm::enum_param_val >(spec_acc["agent_role"]);
-		return role_name_sel[0];
+		return spec_nav["agent_role"].get().as_single_enum_str();
 	}
 
 	// Returns the name of the agent type for the agent spec at the current location of spec_acc
-	std::string basic_system_defn::get_agent_type_name(prm::param_accessor spec_acc)
+	std::string basic_system_defn::get_agent_type_name(ddl::navigator spec_nav) const
 	{
-		auto type_name_sel = prm::extract_as< prm::enum_param_val >(spec_acc["agent_type"]);
-		return type_name_sel[0];
+		return spec_nav["agent_type"].get().as_single_enum_str();
 	}
-
-	std::string basic_system_defn::update_schema_provider_for_agent_instance(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+#endif
+	ddl::defn_node basic_system_defn::get_agent_instance_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
+		using ddl::defn_node;
 
-		(*provider)[path + std::string{ "spec_reference" }] = [=](prm::param_accessor acc)
+		auto get_agent_spec_names_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this](ddl::navigator nav)
 		{
-			auto available_specs = get_available_agent_specs(acc);
-			auto num_available_specs = available_specs.size();
-			std::vector< std::pair< std::string, std::string > > spec_elements(num_available_specs);
-			int idx = 0;
+			ddl::enum_defn_node::enum_str_set_t names;	// todo: store a node_ref or something as the enum data component?
+			auto specs = get_all_spec_names_fn_(nav);
 			std::transform(
-				std::begin(available_specs),
-				std::end(available_specs),
-				begin(spec_elements),
-				[](std::pair< prm::qualified_path, std::string > const& in)
+				std::begin(specs),
+				std::end(specs),
+				std::inserter(names, std::end(names)),
+				[](std::string const& entry)
 			{
-				return std::make_pair(
-					in.second,// TODO: now using names to id, if keep this, need to enforce uniqueness
-					// in.first.to_string(),
-					in.second
-					);
+				return entry;
 			});
+			return names;
+		}
+		};
+		// TODO: This dependency comes from the call to get_available_agent_specs() in the above lambda.
+		// Perhaps that function should itself be a dep_function, so that we don't have to keep track of indirect
+		// dependencies in the code.
+		// FURTHER: This particular dependency is more complex, as it really needs to be a dependency not only
+		// on the spec list node, but on a number of subnodes within the spec defn (and indeed on every instance
+		// that it created within the list). Maybe allowing to create arbitrary named dependencies (like the
+		// events in the old param tree) which a node defn can be set to trigger would help here?
+		get_agent_spec_names_fn.add_dependency(get_all_spec_names_fn_);
 
-			auto spec_ref = sb::enum_selection(
-				"spec_reference",
-				spec_elements,
-				0, 1
-				);
-			sb::label(spec_ref, "Spec");
-			sb::update_on(spec_ref, "$agentspec_name_modified");
-			sb::update_on(spec_ref, "$agentspec_added_removed");
+		ddl::defn_node spec_ref = spc.enumeration("agent_inst_spec_ref")
+			(ddl::spc_range< size_t >{ 1, 1 })
+			(ddl::define_enum_func{ get_agent_spec_names_fn })
+			;
+		inst_spec_ref_dn_ = spec_ref;
 
-			return spec_ref;
+		auto rf_spec_ref = ddl::node_ref{ spec_ref };
+		get_inst_spec_ref_fn_.set_fn([rf_spec_ref](ddl::navigator nav) -> boost::optional< std::string >
+		{
+			nav = ddl::nav_to_ref(rf_spec_ref, nav);
+			if(nav)
+			{
+				auto node = nav.get();
+				if(!node.as_enum().empty())
+				{
+					return node.as_single_enum_str();
+				}
+			}
+
+			return boost::none;
+		});
+		get_inst_spec_ref_fn_.add_dependency(ddl::node_dependency(rf_spec_ref));
+
+
+		//////////////////
+		/* TODO: this is done here since we have dependency on a defn created as part of the spec defn, and
+		// also on the above get_inst_spec_ref_fn_. yet it must be defined before the below custom
+		// conditions since they make use of it, and dependency functions are copied by value.
+		// rather than store refs as basic_system_defn
+		// class members, may be better to have objects of spec_defn and inst_defn (or a component which wraps them)
+		// stored, and query that component for the desired internal defn which is chooses to expose.
+		*/
+		auto get_inst_spec_ref_fn = get_inst_spec_ref_fn_;
+		auto rf_any_spec_name = ddl::node_ref{ spec_name_dn_, ddl::node_ref::Resolution::Any };
+		get_inst_spec_nav_fn_.set_fn([get_inst_spec_ref_fn, rf_any_spec_name](ddl::navigator nav) -> ddl::navigator
+		{
+			// Get the spec reference name from the current instance
+			auto ref_name = get_inst_spec_ref_fn(nav);
+			if(!ref_name)
+			{
+				return{};
+			}
+
+			// Now resolve in turn every spec name
+			auto resolved = ddl::resolve_reference(rf_any_spec_name, nav);
+			for(auto ref : resolved)
+			{
+				auto rnav = ddl::navigator{ nav.tree_, ref.nd };
+				auto name = rnav.get().as_string();
+				if(name == ref_name)
+				{
+					// Successful match
+					return rnav.parent();
+				}
+			}
+
+			return{};
+		});
+		get_inst_spec_nav_fn_.add_dependency(get_inst_spec_ref_fn);
+		get_inst_spec_nav_fn_.add_dependency(ddl::node_dependency(rf_any_spec_name));
+		/////////////////////////
+
+		get_inst_num_effectors_fn_.set_fn([this](ddl::navigator nav) -> size_t
+		{
+			auto spec_nav = get_inst_spec_nav_fn_(nav);
+			if(!spec_nav)
+			{
+				return 0;
+			}
+
+			auto role = get_spec_role_fn_(spec_nav);
+			auto type = get_spec_type_fn_(spec_nav);
+			auto defn = get_agent_defn(*role, *type);
+			return defn->num_effectors_fn()(spec_nav);
+		});
+		get_inst_num_effectors_fn_.add_dependency(get_inst_spec_nav_fn_);
+		get_inst_num_effectors_fn_.add_dependency(get_spec_role_fn_);
+		get_inst_num_effectors_fn_.add_dependency(get_spec_type_fn_);
+		for(auto const& role_entry : m_agent_defns)
+		{
+			for(auto const& type_entry : *role_entry.second)
+			{
+				get_inst_num_effectors_fn_.add_dependency(type_entry->num_effectors_fn());
+			}
+		}
+		///////////////
+
+		auto details_cond_fn = [this](
+			std::string cond_role_name,
+			std::string cond_type_name,
+			ddl::ref_resolver const& rr,
+			ddl::navigator nav) -> ddl::cnd::ConditionResult
+		{
+			// Nav to associated spec
+			auto spec_nav = get_inst_spec_nav_fn_(nav);
+			if(!spec_nav)
+			{
+				return ddl::cnd::ConditionResult::Fail;
+			}
+
+			// Compare role and spec types
+			auto role_name = get_spec_role_fn_(spec_nav);
+			auto type_name = get_spec_type_fn_(spec_nav);
+			if(role_name == cond_role_name && type_name == cond_type_name)
+			{
+				return ddl::cnd::ConditionResult::Pass;
+			}
+			else
+			{
+				return ddl::cnd::ConditionResult::Fail;
+			}
 		};
 
-		// Store the instance schema provider components for every registered agent type
+		auto inst_details_spc = spc.conditional("inst_details_?");
 		for(auto const& entry : m_agent_defns)
 		{
 			auto const& role_name = entry.first;
 			auto const& defns = *entry.second;
 			for(auto const& adefn : defns)
 			{
-				adefn->update_schema_providor_for_instance(provider, path + (adefn->get_name() + std::string{ "_inst" }));
+				defn_node dn = adefn->get_instance_defn(spc);
+				auto bound_fn = std::bind(details_cond_fn, role_name, adefn->get_name(), std::placeholders::_1, std::placeholders::_2);
+				auto cust_cond = ddl::cnd::custom_condition{ bound_fn };
+				// Register dependencies (of the above details_cond_fn)
+				cust_cond.add_dependency(get_inst_spec_nav_fn_);
+				cust_cond.add_dependency(get_spec_role_fn_);
+				cust_cond.add_dependency(get_spec_type_fn_);
+				inst_details_spc = inst_details_spc
+					(ddl::spc_condition{ cust_cond, dn });
 			}
 		}
 
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::list(path.leaf().name());
-			sb::append(s, provider->at(path + std::string("spec_reference"))(acc));
-			if(acc.is_available("spec_reference") && !prm::is_unspecified(acc["spec_reference"]))
-			{
-				auto spec_name = prm::extract_as< prm::enum_param_val >(acc["spec_reference"])[0];
-				auto agent_spec_path = get_agent_instance_spec_path(spec_name, acc);
-				acc.move_to(agent_spec_path);
-				auto agent_type_name = get_agent_type_name(acc);
-				sb::append(s, provider->at(path + (agent_type_name + std::string{ "_inst" }))(acc));
-			}
-			sb::unborder(s);
-			return s;
-		};
+		defn_node inst_details = inst_details_spc;
 
-		return path.leaf().name();
+		return spc.composite("agent_inst")(ddl::define_children{}
+			("spec_reference", spec_ref)
+			("inst_details", inst_details)
+			);
 	}
 
-	std::string basic_system_defn::update_schema_provider_for_agent_controller(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+	ddl::defn_node basic_system_defn::get_agent_controller_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
-
-		(*provider)[path + std::string("controller_class")] = [this](prm::param_accessor)
+		auto get_all_controller_classes_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this](ddl::navigator nav)
 		{
-			std::vector< std::string > classes;
+			ddl::enum_defn_node::enum_str_set_t classes;
 			std::transform(
 				std::begin(m_controller_defns),
 				std::end(m_controller_defns),
-				std::back_inserter(classes),
+				std::inserter(classes, std::end(classes)),
 				[](controller_defn_map_t::value_type const& entry)
 			{
 				return entry.first;
 			});
-			auto s = sb::enum_selection(
-				"controller_class",
-				classes,
-				0,
-				1
-				);
-			sb::label(s, "Class");
-			return s;
+			return classes;
+		}
 		};
 
-		path += std::string("cclass_contents");
-
-		(*provider)[path + std::string{ "controller_type" }] = [this](prm::param_accessor acc)
+		ddl::defn_node con_class = spc.enumeration("controller_class")
+			(ddl::spc_range< size_t >{ 1, 1 })
+			(ddl::define_enum_func{ get_all_controller_classes_fn })
+			;
+		auto rf_con_class = ddl::node_ref{ con_class };
+		////////
+		get_controller_class_fn_.set_fn([rf_con_class](ddl::navigator nav) -> boost::optional< std::string >
 		{
-			std::vector< std::string > controller_names;
-			auto class_name = prm::extract_as< prm::enum_param_val >(acc["controller_class"])[0];
+			nav = ddl::nav_to_ref(rf_con_class, nav);
+			if(nav)
+			{
+				auto vnode = nav.get();
+				if(!vnode.as_enum().empty())
+				{
+					return vnode.as_single_enum_str();
+				}
+			}
+
+			return boost::none;
+		});
+		get_controller_class_fn_.add_dependency(ddl::node_dependency(rf_con_class));
+		////////
+
+		auto get_all_controller_types_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this, rf_con_class](ddl::navigator nav)
+		{
+			nav = ddl::nav_to_ref(rf_con_class, nav);
+			ddl::enum_defn_node::enum_str_set_t type_names;
+			auto class_name = nav.get().as_single_enum_str();
 			auto const& controllers = *m_controller_defns.at(class_name);
 			for(auto const& c : controllers)
 			{
-				controller_names.push_back(c->get_name());
+				type_names.insert(std::end(type_names), c->get_name());
+			}
+			return type_names;
+		}
+		};
+		// TODO: Need a nice way to ensure that any node reference captured and used in the lambda function
+		// is also registered as a dependency
+		get_all_controller_types_fn.add_dependency(ddl::node_dependency(rf_con_class));
+
+		ddl::defn_node controller_type = spc.enumeration("controller_type")
+			(ddl::spc_range< size_t >{ 1, 1 })
+			(ddl::define_enum_func{ get_all_controller_types_fn })
+			;
+		auto rf_controller_type = ddl::node_ref{ controller_type };
+		////////
+		get_controller_type_fn_.set_fn([rf_controller_type](ddl::navigator nav) -> boost::optional< std::string >
+		{
+			nav = ddl::nav_to_ref(rf_controller_type, nav);
+			if(nav)
+			{
+				auto vnode = nav.get();
+				if(!vnode.as_enum().empty())
+				{
+					return vnode.as_single_enum_str();
+				}
 			}
 
-			auto s = sb::enum_selection(
-				"controller_type",
-				controller_names,
-				0,
-				1);
-			return s;
-		};
-		
-		path += std::string{ "ctype_contents" };
+			return boost::none;
+		});
+		get_controller_type_fn_.add_dependency(ddl::node_dependency(rf_controller_type));
+		////////
 
-		// Store the schema provider components for every registered controller type
+		auto controller_details_spc = spc.conditional("controller_details_?");
 		for(auto const& entry : m_controller_defns)
 		{
-			auto const& class_name = entry.first;
+			auto const& cls_name = entry.first;
 			auto const& defns = *entry.second;
 			for(auto const& cdefn : defns)
 			{
-				cdefn->update_schema_providor(provider, path + cdefn->get_name());
+				ddl::defn_node dn = cdefn->get_defn(spc);
+				controller_details_spc = controller_details_spc
+					// TODO: just checking agent type name, should really check role also!?
+					(ddl::spc_condition{ ddl::cnd::equal{ rf_controller_type, cdefn->get_name() }, dn });
 			}
 		}
 
+		ddl::defn_node controller_details = controller_details_spc;
+
+		ddl::defn_node controller_contents = spc.composite("controller_contents")(ddl::define_children{}
+			("details", controller_details)
+			);
+
+		ddl::defn_node class_contents = spc.composite("class_contents")(ddl::define_children{}
+			("controller_type", controller_type)
+			("controller_contents", spc.conditional("controller_contents_?")(ddl::spc_condition{ ddl::cnd::is_selection{ rf_controller_type }, controller_contents }))
+			);
+
+		return spc.composite("controller")(ddl::define_children{}
+			("controller_class", con_class)
+			("class_contents", spc.conditional("class_contents_?")(ddl::spc_condition{ ddl::cnd::is_selection{ rf_con_class }, class_contents }))
+			);
+
+		/*
 		(*provider)[path] = [=](prm::param_accessor acc)
 		{
 			auto s = sb::list("ctype_contents");
@@ -412,107 +653,47 @@ namespace sys {
 		};
 
 		return path.leaf().name();
+		*/
 	}
 
-	std::string basic_system_defn::update_schema_provider_for_agent_specification_list(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+	ddl::defn_node basic_system_defn::get_agent_specification_list_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
-
-		auto spec = std::string{ "agent_spec" };
-		update_schema_provider_for_agent_specification(provider, path + spec);
-
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::repeating_list(path.leaf().name(), spec, 0, 0);
-			sb::label(s, "Agent Specificatons");
-			sb::trigger(s, "agentspec_added_removed");
-			//sb::enable_import(s, "physics2d.agent_spec_list");
-			return s;
-		};
-
-		return path.leaf().name();
+		return spc.list("spec_list")
+			(ddl::spc_item{ get_agent_specification_defn(spc) })
+			;
 	}
 
-	std::string basic_system_defn::update_schema_provider_for_agent_instance_list(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const
+	ddl::defn_node basic_system_defn::get_agent_instance_list_defn(ddl::specifier& spc)
 	{
-		auto path = prefix;
+		// NOTE: Currently order here is important, due to way dep functions are copied by value
+		// and so must be initialized before being passed.
+		ddl::defn_node inst_defn = get_agent_instance_defn(spc);
+		ddl::defn_node cont_defn = get_agent_controller_defn(spc);
 
-		path += std::string{ "agent_inst" };
+		ddl::defn_node inst_and_controller = spc.composite("inst_&_controller")(ddl::define_children{}
+			("inst_contents", inst_defn)
+			("inst_controller", cont_defn)
+			);
 
-		auto inst = std::string{ "inst_contents" };
-		update_schema_provider_for_agent_instance(provider, path + inst);
-		auto con = std::string{ "inst_controller" };
-		update_schema_provider_for_agent_controller(provider, path + con);
-
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::list(path.leaf().name());
-			sb::append(s, provider->at(path + inst)(acc));
-			sb::append(s, provider->at(path + con)(acc));
-			return s;
-		};
-
-		path.pop();
-
-		(*provider)[path] = [=](prm::param_accessor acc)
-		{
-			auto s = sb::repeating_list(path.leaf().name(), "agent_inst", 0, 0);
-			// TODO:			sb::trigger(s, "agent_modified");
-			sb::label(s, "Agent Instances");
-			//sb::enable_import(s, "physics2d.agent_instance_list");
-			return s;
-		};
-
-		return path.leaf().name();
+		return spc.list("inst_list")
+			(ddl::spc_item{ inst_and_controller })
+			;
 	}
 
 
-	state_value_id_list basic_system_defn::get_system_state_values(prm::param_accessor acc) const
+	state_value_id_list basic_system_defn::get_system_state_values(ddl::navigator nav) const
 	{
-		// Perhaps classify values in hierarchical string form.
-		// eg. asteroids/<index>/speed, agents/role/agent_name/agent_value, etc.
-		// then in create_system, lock in the bindings
+		return get_system_state_values_fn_(nav);
+	}
 
-		auto svs = get_system_core_state_values(acc);
-
-		auto inst_list_path = acc.find_path("inst_list");
-		if(inst_list_path)
-		{
-			acc.move_to(inst_list_path);
-			// For every agent instance...
-			auto inst_paths = acc.children();
-			for(auto const& p : inst_paths)
-			{
-				acc.move_to(p);
-				auto spec_name = get_agent_instance_spec_name(acc);
-				if(!spec_name)
-				{
-					// As yet unspecified
-					continue;
-				}
-				auto agent_spec_path = get_agent_instance_spec_path(*spec_name, acc);
-
-				acc.move_to(agent_spec_path);
-				auto agent_role_name = get_agent_role_name(acc);
-				auto agent_type_name = get_agent_type_name(acc);
-				auto agent_defn = get_agent_defn(agent_role_name, agent_type_name);
-
-				auto agent_svs = agent_defn->get_agent_state_values(acc);
-				svs.insert(
-					std::end(svs),
-					std::begin(agent_svs),
-					std::end(agent_svs)
-					);
-				acc.revert();
-				acc.revert();
-			}
-		}
-		return svs;
+	ddl::dep_function< state_value_id_list > basic_system_defn::get_system_state_values_fn() const
+	{
+		return get_system_state_values_fn_;
 	}
 
 	std::vector< std::string > basic_system_defn::get_agent_type_names() const
 	{
-		// TODO: Provide roll as argument?
+		// TODO: Provide role as argument?
 		std::vector< std::string > names;
 		for(auto const& role : m_agent_defns)
 		{
@@ -524,71 +705,57 @@ namespace sys {
 		}
 		return names;
 	}
-
+	/*
 	std::vector< std::string > basic_system_defn::get_agent_sensor_names(prm::param agent_type, prm::param_accessor param_vals) const
 	{
 		// TODO: through virtual of i_agent_defn
 		return{};
 	}
+	*/
 
-	size_t basic_system_defn::get_agent_num_effectors(prm::param_accessor spec_acc) const
+/*	size_t basic_system_defn::get_agent_num_effectors(ddl::navigator spec_nav) const
 	{
-		auto role = get_agent_role_name(spec_acc);
-		auto type = get_agent_type_name(spec_acc);
-		auto defn = get_agent_defn(role, type);
-		return defn->num_effectors(spec_acc);
+		auto role = get_spec_role_fn_(spec_nav);
+		auto type = get_spec_type_fn_(spec_nav);
+		auto defn = get_agent_defn(*role, *type);
+		return defn->num_effectors(spec_nav);
+	}
+	*/
+
+	ddl::dep_function< size_t > basic_system_defn::get_inst_num_effectors_fn() const
+	{
+		return get_inst_num_effectors_fn_;
 	}
 
-	std::vector< prm::qualified_path > basic_system_defn::get_connected_agent_specs(std::string controller_cls, std::string controller_type, prm::param_accessor acc) const
+	ddl::dep_function< std::vector< ddl::navigator > >
+		basic_system_defn::get_connected_spec_navs_fn(std::string controller_cls, std::string controller_type) const
 	{
-		std::vector< prm::qualified_path > result;
-		auto inst_list_path = acc.find_path("inst_list");
-		if(inst_list_path)
+		auto fn = get_connected_spec_navs_fn_;
+		fn.set_fn(std::bind(
+			get_connected_spec_navs_fn_impl_,
+			controller_cls,
+			controller_type,
+			std::placeholders::_1
+			));
+		return fn;
+	}
+
+#if 0
+	boost::optional< std::string > basic_system_defn::get_agent_instance_spec_name(ddl::navigator nav) const
+	{
+		nav = ddl::nav_to_ref(ddl::node_ref{ dn_inst_spec_ref_ }, nav);
+		if(nav)
 		{
-			acc.move_to(inst_list_path);
-			// For every agent instance...
-			auto inst_paths = acc.children();
-			for(auto const& p : inst_paths)
+			auto node = nav.get();
+			if(!node.as_enum().empty())
 			{
-				auto acc2 = acc;
-				acc2.move_to(p);
-
-				acc2.move_relative(std::string{ "inst_controller" });
-
-				auto cls_name = prm::extract_as< prm::enum_param_val >(acc2["controller_class"])[0];
-				if(cls_name != controller_cls)
-				{
-					continue;
-				}
-
-				auto type_name = prm::extract_as< prm::enum_param_val >(acc2["controller_type"])[0];
-				if(type_name != controller_type)
-				{
-					continue;
-				}
-
-				acc2.revert();
-
-				auto spec_name = get_agent_instance_spec_name(acc2);
-				if(!spec_name)
-				{
-					// As yet unspecified
-					continue;
-				}
-				auto agent_spec_path = get_agent_instance_spec_path(*spec_name, acc2);
-				acc2.revert();
-
-				result.push_back(agent_spec_path);
+				return node.as_single_enum_str();
 			}
 		}
-		return result;
-	}
 
-	boost::optional< std::string > basic_system_defn::get_agent_instance_spec_name(prm::param_accessor acc)
-	{
-		auto spec_sel = prm::extract_as< prm::enum_param_val >(acc["spec_reference"]);
-		return prm::is_unspecified(acc["spec_reference"]) ? boost::none : boost::make_optional(spec_sel[0]);
+		return boost::none;
 	}
+#endif
 
 	i_agent_defn* basic_system_defn::get_agent_defn(std::string const& role, std::string const& type) const
 	{
@@ -632,13 +799,42 @@ namespace sys {
 		}
 	}
 
-	system_ptr basic_system_defn::create_system(prm::param_accessor acc) const
+	system_ptr basic_system_defn::create_system(ddl::navigator nav) const
 	{
 		//auto controller = create_controller(acc);
 		//sys->register_agent_controller(0, std::move(controller));
 
-		auto sys = create_system_core(acc);
+		auto sys = create_system_core(nav["core"]);
 
+		auto inst_list_nav = nav["instances"];
+		auto inst_count = inst_list_nav.list_num_items();
+		for(size_t i_inst = 0; i_inst < inst_count; ++i_inst)
+		{
+			auto inst_nav = inst_list_nav[i_inst];
+			auto spec_nav = get_inst_spec_nav_fn_(inst_nav);
+			auto role = get_spec_role_fn_(spec_nav);
+			auto type = get_spec_type_fn_(spec_nav);
+			auto agent_defn = get_agent_defn(*role, *type);
+
+			auto agent = agent_defn->create_agent(
+				spec_nav["details"][(size_t)0],
+				inst_nav["inst_contents"]["inst_details"][(size_t)0]);
+			auto agent_id = sys->register_agent(std::move(agent));
+			// TODO: Maybe not necessary. Could leave to system implementation to do within register_agent()
+			//static_cast<basic_agent*>(agent.get())->create(sys.get());
+
+			auto con_nav = inst_nav["inst_controller"];
+			auto con_cls = get_controller_class_fn_(con_nav);
+			auto con_type = get_controller_type_fn_(con_nav);
+
+			auto con_defn = get_controller_defn(*con_cls, *con_type);
+			auto controller = con_defn->create_controller(
+				con_nav["class_contents"][(size_t)0]["controller_contents"][(size_t)0]["details"][(size_t)0]);
+
+			sys->register_agent_controller(agent_id, std::move(controller));
+		}
+
+#if 0
 		// Now create and register agents and their controllers
 		acc.move_to(acc.find_path("inst_list"));
 		// For every agent instance...
@@ -671,7 +867,7 @@ namespace sys {
 
 			acc.revert();
 		}
-
+#endif
 		return std::move(sys);
 	}
 

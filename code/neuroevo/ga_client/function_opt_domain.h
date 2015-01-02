@@ -11,8 +11,8 @@
 #include "genetic_algorithm/real_valued_diversity.h"
 #include "genetic_algorithm/genetic_population.h"
 
-#include "params/param_fwd.h"
-#include "params/dynamic_enum_schema.h"
+#include "ddl/ddl.h"
+#include "ddl/components/enum_choice.h"
 
 #include <string>
 
@@ -137,11 +137,12 @@ namespace ga {
 					return true;
 				}
 
-				virtual ga::objective_value evaluate_genome(ga::genome const& gn) const override
+				virtual std::vector< ga::objective_value > evaluate_genome(ga::genome const& gn, ga::rgen_t& rgen, size_t trials) const override
 				{
 					auto params = decode(gn.as< genome_t >());
 					auto output = m_defn.eval(params);
-					return m_goal == Goal::Maximise ? output : -output;
+					double value = (m_goal == Goal::Maximise) ? output : -output;
+					return{ value };
 				}
 
 				virtual diversity_t population_genetic_diversity(ga::genetic_population const& pop) const override
@@ -187,15 +188,14 @@ namespace ga {
 			class function_opt_domain_defn
 			{
 			public:
-				void update_schema_provider_for_crossover_op(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);// const;
-				void update_schema_provider_for_mutation_op(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);// const;
+//	todo:			void update_schema_provider_for_crossover_op(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);// const;
+//				void update_schema_provider_for_mutation_op(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);// const;
 
-				void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix);// const;
-				void update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix, int component);// const;
-				std::shared_ptr< ga::i_problem_domain > generate(prm::param_accessor acc) const;
+				ddl::defn_node get_defn(ddl::specifier& spc);
+				std::shared_ptr< ga::i_problem_domain > generate(ddl::navigator nav) const;
 
-				prm::dynamic_enum_schema< gene_mut_fn_t > gene_mutation_defn;
-				prm::dynamic_enum_schema< function_opt_domain::function_defn > func_defn;
+				ddl::enum_choice< gene_mut_fn_t > gene_mutation_defn;
+				ddl::enum_choice< function_opt_domain::function_defn > func_defn;
 
 				function_opt_domain_defn();
 			};

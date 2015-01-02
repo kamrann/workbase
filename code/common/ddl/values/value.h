@@ -20,7 +20,8 @@ namespace ddl {
 		integer_sch_node::value_t,
 		// vec2
 		// random
-		enum_sch_node::value_t,
+		//enum_sch_node::value_t,
+		std::vector< std::string >,	// enum strings
 		string_sch_node::value_t
 	>
 	value;

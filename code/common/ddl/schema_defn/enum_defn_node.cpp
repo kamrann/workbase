@@ -55,6 +55,11 @@ namespace ddl {
 		return default_;
 	}
 
+	dep_list enum_defn_node::deps() const
+	{
+		return enum_values_fn_.deps();
+	}
+
 }
 
 

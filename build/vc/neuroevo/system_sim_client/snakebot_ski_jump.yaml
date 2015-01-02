@@ -1,0 +1,132 @@
+composite:
+  sys_details:
+    conditional:
+      composite:
+        specs:
+          list:
+            - composite:
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  segment_size:
+                                    real: 0.75
+                                  num_segments:
+                                    integer: 4
+                                  friction:
+                                    real: 0.5
+                                  max_angle:
+                                    real: 30
+                                  max_torque:
+                                    real: 10
+                            name:
+                              string: the_snake
+                      agent_type:
+                        enum:
+                          - snakebot
+                agent_role:
+                  enum:
+                    - default
+        core:
+          composite:
+            duration:
+              real: 20
+            position_iterations:
+              integer: 2
+            scenario:
+              conditional:
+                composite:
+                  gravity:
+                    real: 9.810000000000001
+                  inrun_incline:
+                    real: 45
+                  jump_dropoff:
+                    real: 2
+                  inrun_length:
+                    real: 30
+                  landing_drop:
+                    real: 25
+                  landing_length:
+                    real: 140
+                  platform_width:
+                    real: 5
+                  surface_friction:
+                    real: 0.2
+                  takeoff_incline:
+                    real: 0
+                  takeoff_length:
+                    real: 5
+                  transition1_radius:
+                    real: 8
+                  wall_height:
+                    real: 2
+                  landing_x2:
+                    real: -10
+                  overall_scale:
+                    real: 1
+                  landing_x1:
+                    real: 3.5
+            scenario_type:
+              enum:
+                - ski_jump
+            updates_per_sec:
+              integer: 30
+            velocity_iterations:
+              integer: 4
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_linear_angle:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_angvel:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_snake
+                inst_controller:
+                  composite:
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    enum:
+                                      - testo
+                          controller_type:
+                            enum:
+                              - db_evolved
+                    controller_class:
+                      enum:
+                        - db
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []
+  results:
+    enum:
+      []

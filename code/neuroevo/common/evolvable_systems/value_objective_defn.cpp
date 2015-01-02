@@ -2,222 +2,150 @@
 
 #include "value_objective.h"
 
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
+//#include "params/schema_builder.h"
+//#include "params/param_accessor.h"
 
 
 namespace sys {
 	namespace ev {
 
-		value_objective_defn::value_objective_defn(state_val_access_fn_t sv_acc_fn):
+		value_objective_defn::value_objective_defn(state_val_access_fn_t& sv_acc_fn):
 			sv_acc_fn_(sv_acc_fn)
 		{
 			
 		}
 
-		namespace sb = prm::schema;
+		using namespace ddl;
 
-		void value_objective_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		defn_node value_objective_defn::get_defn(specifier& spc)
 		{
-			auto path = prefix;
-
-			(*provider)[path + std::string("direction_type")] = [](prm::param_accessor)
+			auto dir_enum_vals = ddl::define_enum_fixed{};
+			for(auto entry : value_objective::DirectionTypeMp.left)
 			{
-				auto dir_type_name_list = std::vector < std::string > {};
-				std::transform(
-					std::begin(value_objective::DirectionTypeMp.left),
-					std::end(value_objective::DirectionTypeMp.left),
-					std::back_inserter(dir_type_name_list),
-					[](value_objective::direction_type_map_t::left_value_type const& val)
-				{
-					return val.second;
-				});
-				auto s = sb::enum_selection(
-					"direction_type",
-					dir_type_name_list
-					);
-				sb::unlabel(s);
-				return s;
-			};
+				dir_enum_vals = dir_enum_vals(entry.second);
+			}
+			ddl::defn_node direction_type = spc.enumeration("direction_type")
+				(ddl::spc_range < size_t > { 1, 1 })
+				(dir_enum_vals)
+				;
 
-			(*provider)[path + std::string("state_val")] = [this](prm::param_accessor acc)
+			auto get_sv_names_fn = ddl::enum_defn_node::enum_values_str_fn_t{ [this](ddl::navigator nav)
 			{
-				auto sv_ids = sv_acc_fn_(acc);
+				auto sv_ids = sv_acc_fn_(nav);
 
-				auto val_names = std::vector < std::string > {};
+				auto val_names = ddl::enum_defn_node::enum_str_set_t{};
 				std::transform(
 					std::begin(sv_ids),
 					std::end(sv_ids),
-					std::back_inserter(val_names),
+					std::inserter(val_names, std::end(val_names)),
 					[](state_value_id const& svid)
 				{
 					return svid.to_string();
 				});
-
-				auto s = sb::enum_selection(
-					"state_val",
-					val_names,
-					0, 1
-					);
-//				sb::unlabel(s);
-//				sb::update_on(s, "evolved_controller_compatibility_changed");
-				return s;
+				return val_names;
+			}
 			};
+			get_sv_names_fn.add_dependency(sv_acc_fn_);
 
-			(*provider)[path + std::string("value_type")] = [](prm::param_accessor)
+			ddl::defn_node state_val = spc.enumeration("state_val")
+				(ddl::spc_range < size_t >((size_t)0, 1))
+				(define_enum_func{ get_sv_names_fn })
+				;
+
+			auto valtype_enum_vals = ddl::define_enum_fixed{};
+			for(auto entry : value_objective::ValueTypeMp.left)
 			{
-				auto value_type_name_list = std::vector < std::string > {};
-				std::transform(
-					std::begin(value_objective::ValueTypeMp.left),
-					std::end(value_objective::ValueTypeMp.left),
-					std::back_inserter(value_type_name_list),
-					[](value_objective::value_type_map_t::left_value_type const& val)
-				{
-					return val.second;
-				});
-				auto s = sb::enum_selection(
-					"value_type",
-					value_type_name_list
-					);
-//				sb::unlabel(s);
-//				sb::trigger(s, "obj_value_type_changed");
-				return s;
-			};
+				valtype_enum_vals = valtype_enum_vals(entry.second);
+			}
+			ddl::defn_node value_type = spc.enumeration("value_type")
+				(ddl::spc_range < size_t > { 1, 1 })
+				(valtype_enum_vals)
+				;
 
-
-			path += std::string("objective_timespan");
-
-			(*provider)[path + std::string("timepoint_type")] = [](prm::param_accessor)
-			{
-				auto s = sb::enum_selection(
-					"timepoint_type",
-					{
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::SimulationEnd),
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenFirst),
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenLast),
-					}
+			// TODO: just one enum defn node with conditional values function?
+			defn_node tp_type = spc.enumeration("timepoint_type")
+				(ddl::spc_range < size_t > { 1, 1 })
+				(define_enum_fixed{}
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::SimulationEnd))
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenFirst))
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenLast))
 				);
-				sb::label(s, "at");
-				return s;
-			};
 
-			(*provider)[path + std::string("from_timepoint_type")] = [](prm::param_accessor)
-			{
-				auto s = sb::enum_selection(
-					"from_timepoint_type",
-					{
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::SimulationStart),
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenFirst),
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenLast),
-					}
+			defn_node from_tp_type = spc.enumeration("from_timepoint_type")
+				(ddl::spc_range < size_t > { 1, 1 })
+				(define_enum_fixed{}
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::SimulationStart))
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenFirst))
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenLast))
 				);
-				sb::label(s, "between");
-				return s;
-			};
 
-			(*provider)[path + std::string("until_timepoint_type")] = [](prm::param_accessor)
-			{
-				auto s = sb::enum_selection(
-					"until_timepoint_type",
-					{
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::SimulationEnd),
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenFirst),
-					value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenLast),
-					}
+			defn_node until_tp_type = spc.enumeration("until_timepoint_type")
+				(ddl::spc_range < size_t > { 1, 1 })
+				(define_enum_fixed{}
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::SimulationEnd))
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenFirst))
+				(value_objective::TimePointTypeMp.at(value_objective::TimePointType::WhenLast))
 				);
-				sb::label(s, "and");
-				return s;
-			};
 
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list("objective_timespan");
+			defn_node extended_timespan = spc.composite("extended_timespan")(define_children{}
+				("from", from_tp_type)
+				("until", until_tp_type)
+				);
 
-				auto value_type = value_objective::DefaultValueType;
-				if(acc.is_available("value_type"))
-				{
-					auto value_type_str = prm::extract_as< prm::enum_param_val >(acc["value_type"])[0];
-					value_type = value_objective::ValueTypeMp.at(value_type_str);
-				}
-				switch(value_type)
-				{
-					case value_objective::ValueType::ValueAt:
-					sb::append(s, provider->at(path + std::string("timepoint_type"))(acc));
-					break;
+			auto rf_value_type = node_ref{ value_type };
+			defn_node timespan = spc.conditional("timespan")
+				(spc_condition{ cnd::equal{ rf_value_type, value_objective::ValueTypeMp.left.at(value_objective::ValueType::ValueAt) }, tp_type })
+				(spc_default_condition{ extended_timespan })
+				;
 
-					default:
-					sb::append(s, provider->at(path + std::string("from_timepoint_type"))(acc));
-					sb::append(s, provider->at(path + std::string("until_timepoint_type"))(acc));
-					break;
-				}
-
-				//sb::update_on(s, "obj_value_type_changed");
-				//sb::unborder(s);
-				//sb::layout_horizontal(s);
-				return s;
-			};
-
-			path.pop();
-
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string("direction_type"))(acc));
-				sb::append(s, provider->at(path + std::string("state_val"))(acc));
-				sb::append(s, provider->at(path + std::string("value_type"))(acc));
-				sb::append(s, provider->at(path + std::string("objective_timespan"))(acc));
-				//sb::layout_horizontal(s);
-				//sb::unborder(s);
-				return s;
-			};
+			return spc.composite("val_obj")(ddl::define_children{}
+				("direction_type", direction_type)
+				("state_val", state_val)
+				("value_type", value_type)
+				("timespan", timespan)
+				);
 		}
 
 		std::unique_ptr< value_objective > value_objective_defn::generate(
-			prm::param_accessor acc,
+			ddl::navigator nav,
 			std::function< double(state_value_id) > get_state_value_fn
 			)
 		{
-			acc.move_to(acc.find_path("value_objective"));
-
 			std::unique_ptr< value_objective > obj;
 
-			auto dir_type_str = prm::extract_as< prm::enum_param_val >(acc["direction_type"])[0];
-			auto dir_type = value_objective::DirectionTypeMp.at(dir_type_str);
+			auto dir_type = value_objective::DirectionTypeMp.at(
+				nav["direction_type"].get().as_single_enum_str());
 
-			auto state_val_str = prm::extract_as< prm::enum_param_val >(acc["state_val"])[0];
-			auto state_val_id = state_value_id::from_string(state_val_str);
+			auto state_val_id = state_value_id::from_string(
+				nav["state_val"].get().as_single_enum_str());
 
-			auto value_type_str = prm::extract_as< prm::enum_param_val >(acc["value_type"])[0];
-			auto value_type = value_objective::ValueTypeMp.at(value_type_str);
+			auto value_type = value_objective::ValueTypeMp.at(
+				nav["value_type"].get().as_single_enum_str());
 
-			acc.move_to(acc.find_path("objective_timespan"));
+			nav = nav["timespan"][(size_t)0];
 
 			switch(value_type)
 			{
 				case value_objective::ValueType::ValueAt:
 				{
-					auto tp_type_str = prm::extract_as< prm::enum_param_val >(acc["timepoint_type"])[0];
-					auto tp_type = value_objective::TimePointTypeMp.at(tp_type_str);
+					auto tp_type = value_objective::TimePointTypeMp.at(
+						nav.get().as_single_enum_str());
 					obj = std::make_unique< single_timepoint_objective >(dir_type, state_val_id, value_type, tp_type);
 				}
 				break;
 
 				default:
 				{
-					auto from_tp_type_str = prm::extract_as< prm::enum_param_val >(acc["from_timepoint_type"])[0];
-					auto from_tp_type = value_objective::TimePointTypeMp.at(from_tp_type_str);
-					auto until_tp_type_str = prm::extract_as< prm::enum_param_val >(acc["until_timepoint_type"])[0];
-					auto until_tp_type = value_objective::TimePointTypeMp.at(until_tp_type_str);
+					auto from_tp_type = value_objective::TimePointTypeMp.at(
+						nav["from"].get().as_single_enum_str());
+					auto until_tp_type = value_objective::TimePointTypeMp.at(
+						nav["until"].get().as_single_enum_str());
 					obj = std::make_unique< timespan_objective >(dir_type, state_val_id, value_type, from_tp_type, until_tp_type);
 				}
 				break;
 			}
 
 			obj->set_stateval_fn(get_state_value_fn);
-
-			acc.revert();
-			acc.revert();
 			return obj;
 		}
 

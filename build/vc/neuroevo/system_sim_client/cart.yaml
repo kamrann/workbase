@@ -1,0 +1,134 @@
+composite:
+  results:
+    enum:
+      []
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []
+  sys_details:
+    conditional:
+      composite:
+        instances:
+          list:
+            - composite:
+                inst_controller:
+                  composite:
+                    controller_class:
+                      enum:
+                        - interactive
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_type:
+                            enum:
+                              - generic_ui_controller
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite:
+                                      modulation_bindings:
+                                        list:
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - L
+                                              modulation:
+                                                real: -1
+                                          - composite:
+                                              modulation:
+                                                real: 1
+                                              binding:
+                                                enum:
+                                                  - P
+                                      effector_bindings:
+                                        list:
+                                          - composite:
+                                              binding:
+                                                enum:
+                                                  - Q
+                                              effector:
+                                                enum:
+                                                  - effector_1
+                inst_contents:
+                  composite:
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_orientation:
+                                real: 0
+                              init_y:
+                                real: 0
+                              init_x:
+                                real: 0
+                              init_linear_angle:
+                                real: 0
+                              init_linear_speed:
+                                real: 0
+                              init_angvel:
+                                real: 0
+                    spec_reference:
+                      enum:
+                        - the_cart
+        specs:
+          list:
+            - composite:
+                agent_role:
+                  enum:
+                    - default
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  max_force:
+                                    real: 10
+                                  cart_mass:
+                                    real: 1
+                                  pole_length:
+                                    real: 1
+                                  pole_mass:
+                                    real: 0.1000000014901161
+                                  fail_angle:
+                                    real: 0.2094395160675049
+                                  fail_displacement:
+                                    real: 2.400000095367432
+                            name:
+                              string: the_cart
+                      agent_type:
+                        enum:
+                          - pole_cart
+        core:
+          composite:
+            position_iterations:
+              integer: 2
+            velocity_iterations:
+              integer: 4
+            duration:
+              real: 10
+            scenario_type:
+              enum:
+                - ground_based
+            updates_per_sec:
+              integer: 60
+            scenario:
+              conditional:
+                composite:
+                  ground_expanse:
+                    real: 0
+                  incline:
+                    real: 0
+                  friction:
+                    real: 0.5
+                  gravity:
+                    real: 9.810000000000001

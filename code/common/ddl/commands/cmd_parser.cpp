@@ -11,6 +11,7 @@ namespace ddl {
 		nav{ !is_terminal },
 		list{ !is_terminal },
 		setvalue{ !is_terminal, !is_terminal },
+		reset{ !is_terminal },
 		save{ !is_terminal },
 		load{ !is_terminal }
 	{
@@ -21,6 +22,7 @@ namespace ddl {
 			nav
 			| list
 			| setvalue
+			| reset
 			| repeat_add
 			| repeat_rm
 			| save

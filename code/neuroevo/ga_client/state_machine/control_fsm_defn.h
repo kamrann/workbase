@@ -4,7 +4,7 @@
 #define __WB_GA_CLIENT_CONTROL_FSM_DEFN_H
 
 #include "clsm/clsm.h"
-#include "params/param_tree.h"
+#include "ddl/ddl.h"
 
 #include "../ga_serializer.h"
 
@@ -37,8 +37,7 @@ namespace ga_control {
 		{
 			ga_controller(
 				ga::ga_defn& _ga_def,
-				prm::param_tree _pt,
-				prm::schema::schema_provider_map_handle _provider,
+				ddl::defn_node _ddl_defn,
 				ga::i_ga_serializer* _serializer,
 				evodb_session* _dbs,
 				std::function< void(std::string) > _output_sink,
@@ -57,8 +56,8 @@ namespace ga_control {
 			void set_seed(unsigned int seed);
 
 			//std::map< std::string, std::shared_ptr< sys::i_system_defn > > sys_defns;
-			prm::param_tree ptree;
-			prm::schema::schema_provider_map_handle provider;
+			ddl::defn_node ddl_defn;
+			ddl::sd_tree ddl_data;
 
 			ga::ga_defn& ga_def;
 			ga::i_ga_serializer* serializer;

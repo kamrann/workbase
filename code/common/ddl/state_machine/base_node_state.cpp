@@ -4,6 +4,8 @@
 #include "node_type_choice.h"
 
 #include "../terminal_io/value_emitter.h"
+#include "../values/yaml_conversion.h"
+#include "../values/schema_validation.h"
 
 #include "util/gtree/generic_tree_depthfirst.hpp"
 
@@ -22,6 +24,7 @@ namespace ddl {
 			reg_cmd< nav_cmd >(wrap_grammar< nav_cmd_parser< clsm::iter_t > >(enable_indexed));
 			reg_cmd< list_cmd >(wrap_grammar< list_cmd_parser< clsm::iter_t > >(enable_indexed));
 			reg_cmd< setvalue_cmd >(wrap_grammar< setvalue_cmd_parser< clsm::iter_t > >(enable_indexed, require_nav));
+			reg_cmd< reset_cmd >(wrap_grammar< reset_cmd_parser< clsm::iter_t > >(enable_indexed));
 			reg_cmd< save_cmd >(wrap_grammar< save_cmd_parser< clsm::iter_t > >(enable_indexed));
 			reg_cmd< load_cmd >(wrap_grammar< load_cmd_parser< clsm::iter_t > >(enable_indexed));
 
@@ -67,13 +70,16 @@ namespace ddl {
 		sch_node base_node_state::schema_node_at(path const& pth) const
 		{
 			auto const& ed = context< paramtree_editor >();
-			auto nd = ed.schema;
+/*			auto nd = ed.schema;
 			for(auto const& cmp : pth)
 			{
 				schema_nav_visitor vis{ cmp };
 				nd = nd.apply_visitor(vis);
 			}
 			return nd;
+			*/
+			auto nav = ed.nav[pth];
+			return nav.tree_->node_attribs(nav.pos_.nd).schema;
 		}
 
 		sch_node base_node_state::current_schema_node() const
@@ -97,7 +103,18 @@ namespace ddl {
 				}
 
 				unsigned int index = *nv.nav_index - 1;
-				auto vnode = cur_nav.get();
+				auto nav = cur_nav[index];
+				if(nav)
+				{
+					return nav;
+				}
+				else
+				{
+					editor.output("index does not exist");
+					return{};
+				}
+
+/*				auto vnode = cur_nav.get();
 				if(vnode.is_composite())
 				{
 					auto children = cur_nav.child_names();
@@ -120,7 +137,7 @@ namespace ddl {
 					return cur_nav[index];
 				}
 				assert(false);
-			}
+*/			}
 			else if(nv.dir)
 			{
 				switch(*nv.dir)
@@ -205,23 +222,32 @@ namespace ddl {
 			//			karma::generate(sink, grammar, value(s));
 
 			std::stringstream ss;
+			ss << "<b>";
+
 			value_emitter< karma::ostream_iterator< char > > em;
 			ss << karma::format(em, val);
-
 			if(!ss)
 			{
 				ss.clear();
 				ss << "!! output failure !!";
+				return ss.str();
 			}
 
+			ss << "</b>";
 			return ss.str();
 		}
 
 		struct node_type_name_visitor:
 			public boost::static_visitor < std::string >
 		{
-			result_type operator() (boolean_sch_node const&)
+			result_type operator() (boolean_sch_node const& nd)
 			{
+				// TODO: Hack
+				if(!nd.ptr())
+				{
+					return "null";
+				}
+
 				return "boolean";
 			}
 
@@ -253,6 +279,11 @@ namespace ddl {
 			result_type operator() (composite_sch_node const&)
 			{
 				return "composite";
+			}
+
+			result_type operator() (conditional_sch_node const&)
+			{
+				return "conditional";
 			}
 		};
 
@@ -365,7 +396,7 @@ namespace ddl {
 				}
 
 				ss << "from { ";
-				auto vals = sn.enum_values();
+				auto vals = sn.enum_values_str();
 				for(auto const& v : vals)
 				{
 					ss << v << " ";
@@ -408,6 +439,11 @@ namespace ddl {
 			{
 				return "";
 			}
+
+			result_type operator() (conditional_sch_node const&)
+			{
+				return "";
+			}
 		};
 
 		std::string base_node_state::format_constraints(sch_node const& sch)
@@ -443,7 +479,7 @@ namespace ddl {
 					return;// todo: false;
 				}
 			}
-
+#if 0
 			std::function< void(navigator, std::string, unsigned int, unsigned int) > rec_fn;
 			rec_fn = [this, &editor, &cmd, &rec_fn](navigator nav, std::string prefix,  int depth, unsigned int indent)
 			{
@@ -504,60 +540,89 @@ namespace ddl {
 			};
 			
 			rec_fn(nav, "", 0, 0);
+#endif
 
-/* TODO:
-			auto node = acc.node_at(path);
+			auto node = nav.get_ref().nd;
+				//acc.node_at(path);
 
 			unsigned int depth = 0;
 			unsigned int max_depth = cmd.depth ? cmd.depth->value : 1u;
 			unsigned int indent = 0;
+			unsigned int index_indent = 3;	// indent for 'x. ' at far left
 
-			auto pre_op = [&](param_tree::tree_t::node_descriptor n)
+			auto pre_op = [&](sd_tree::node_descriptor n)
 			{
 				if(depth <= max_depth)
 				{
-					auto& pt = editor.ptree;
-					auto& tree = pt.tree();
+					auto& tree = editor.data;
 
 					std::stringstream output;
 
-					for(unsigned int i = 0; i < indent; ++i)
-					{
-						output << " ";
-					}
-
 					auto sibling_idx = tree.position_in_siblings(n);
-					if(depth == 1)
+					auto local_indent = indent;
+
+					auto parent = tree.get_parent(n);
+					if(parent.second && parent.first == editor.nav.pos_.nd)
 					{
 						// Index immediate children
-						output << (sibling_idx + 1) << ". ";
-
-						indent += 3;
+						output << "<b><font color=\"blue\">" << (sibling_idx + 1) << ". " << "</font></b>";
+//						indent += 3;
+					}
+					else
+					{
+						local_indent += index_indent;
 					}
 
-					output << tree[n].name;
+					for(unsigned int i = 0; i < local_indent; ++i)
+					{
+						output << "&nbsp;";
+					}
 
-					auto in = tree.in_edge(n).first;
+					if(tree.in_edge(n).second)
+					{
+						auto const& edge = tree[tree.in_edge(n).first];
+						switch(edge.type)
+						{
+							case sd_edge_attribs::ChildType::Composite:
+							output << edge.child_name << ": ";
+							break;
+							case sd_edge_attribs::ChildType::ListItem:
+							output << "/" << (edge.item_idx + 1) << ": ";
+							break;
+							case sd_edge_attribs::ChildType::Conditional:
+							// put anything here?
+							break;
+						}
+					}
+
+/*					auto in = tree.in_edge(n).first;
 					if(tree[in].repeat_idx)
 					{
 						output << " /" << (sibling_idx + 1);
 					}
-
-					output << ": ";
-					if(is_leaf_type(tree[n].type))
+*/
+//					output << ": ";
+					
+					// TODO: Differentiate value type and non-terminal type that just doesn't currently have any children
+//					if(is_leaf_type(tree[n].type))
+					if(tree[n].data.is_leaf())//tree.is_leaf(n) && tree[n].data)
 					{
-						output << format_value(*tree[n].value);
+						auto vnode = tree[n].data;
+						output << format_value(vnode.as_value());
+						output << " ";
 					}
 
 					if(cmd.type_info)
 					{
+						output << "<i>";
+						output << format_type_info(tree[n].schema);
 						output << " ";
-						output << format_type_info(tree[n]);
-						output << " ";
-						auto path = pt.node_qpath(n);
-						auto acc_copy = acc;
-						acc_copy.move_to(path);
-						output << format_constraints((*editor.provider)[path.unindexed()](acc_copy));
+						/*						auto path = pt.node_qpath(n);
+												auto acc_copy = acc;
+												acc_copy.move_to(path);
+												*/
+						output << format_constraints(tree[n].schema);//(*editor.provider)[path.unindexed()](acc_copy));
+						output << "</i>";
 					}
 
 					editor.output(output.str());
@@ -566,24 +631,24 @@ namespace ddl {
 				indent += 2;
 			};
 
-			auto post_op = [&](param_tree::tree_t::node_descriptor n)
+			auto post_op = [&](sd_tree::node_descriptor n)
 			{
 				--depth;
 				indent -= 2;
 				if(depth == 1)
 				{
-					indent -= 3;
+//					indent -= 3;
 				}
 			};
 
+			editor.output("");
 			wb::gtree::depth_first_traversal(
-				editor.ptree.tree(),
+				editor.data,
 				node,
 				pre_op,
 				wb::gtree::null_op{},
 				post_op
 				);
-*/
 		}
 
 		void base_node_state::on_setvalue(clsm::ev_cmd< setvalue_cmd > const& cmd)
@@ -613,35 +678,67 @@ namespace ddl {
 				return;// false;
 			}
 
+			// TODO: hack
+			if(vnode_tmp.is_enum())
+			{
+				// TODO: Feel like the data component should not be stored as part of the value node, only the id string
+				// id string -> data association is contained within the schema node.
+				// seems reasonable to not duplicate this, and to have to refer back to the schema node when
+				// we need the associated data value - ie. in an sd_tree/navigator::get_node_value_as<>() method
+				auto vals = vnode_tmp.as_enum();
+				auto en_sch = sch.get_as< enum_sch_node >();
+				for(auto& elem : vals)
+				{
+					elem.data = en_sch.get_data_from_id_string(elem.str);
+				}
+				vnode_tmp = vals;
+			}
+
 			// TODO: shouldn't need to repeat lookup
 //			pd.value = cmd.val;
 			auto vnode = nav.get();
-			vnode = cmd.val;
+			vnode = vnode_tmp.as_value();//cmd.val;
 
 			// TODO: Overkill
 			editor.reload_pt_schema();
 
 			editor.output("value set");
 		}
-#if 0
-		void base_node_state::on_save(clsm::ev_cmd< save_cmd > const& cmd)
-		{
-			auto const& editor = context< paramtree_editor >();
-			auto acc = editor.acc;
 
-			qualified_path path;
+		void base_node_state::on_reset(clsm::ev_cmd< reset_cmd > const& cmd)
+		{
+			auto& editor = context< paramtree_editor >();
+			auto nav = editor.nav;
+
 			if(cmd.nav)
 			{
-				path = nav_cmd_path(*cmd.nav);
-				if(!path)
+				nav = nav_to_node(*cmd.nav);
+				if(!nav)
 				{
 					editor.output("invalid path specified");
 					return;// false;
 				}
 			}
-			else
+
+			reset_node(nav.get_ref(), editor.data);
+			// TODO: nav position
+
+			editor.output("value reset");
+		}
+
+		void base_node_state::on_save(clsm::ev_cmd< save_cmd > const& cmd)
+		{
+			auto const& editor = context< paramtree_editor >();
+			auto nav = editor.nav;
+
+			if(cmd.nav)
 			{
-				path = acc.where();
+				nav = nav_to_node(*cmd.nav);
+				if(!nav)
+				{
+					editor.output("invalid path specified");
+					return;// false;
+				}
 			}
 
 			//			fs::path filepath{ cmd.filename };
@@ -652,9 +749,7 @@ namespace ddl {
 				return;// false;
 			}
 
-			auto subtree_root = acc.node_at(path);
-			auto as_yaml = editor.ptree.convert_to_yaml(subtree_root);
-
+			auto as_yaml = export_yaml(*nav.tree_, nav.get_ref());
 			file << YAML::Dump(as_yaml);
 
 			editor.output("subtree saved");
@@ -663,21 +758,16 @@ namespace ddl {
 		void base_node_state::on_load(clsm::ev_cmd< load_cmd > const& cmd)
 		{
 			auto& editor = context< paramtree_editor >();
-			auto acc = editor.acc;
+			auto nav = editor.nav;
 
-			qualified_path path;
 			if(cmd.nav)
 			{
-				path = nav_cmd_path(*cmd.nav);
-				if(!path)
+				nav = nav_to_node(*cmd.nav);
+				if(!nav)
 				{
 					editor.output("invalid path specified");
 					return;// false;
 				}
-			}
-			else
-			{
-				path = acc.where();
 			}
 
 			auto as_yaml = YAML::LoadFile(cmd.filename);
@@ -687,29 +777,25 @@ namespace ddl {
 				return;// false;
 			}
 
-			auto subtree_root = acc.node_at(path);
-			auto& tree = editor.ptree.tree();
-			tree.clear_children(subtree_root);
+/*			auto vnode = nav.get();
+			// Need to modify the internal variant that is already being pointed to by vnode
+			// **NOT reassign the pointer only**
+			vnode.assign(import_yaml(as_yaml));
 
-			editor.ptree.generate_from_yaml(as_yaml, subtree_root);
-
-			/* TODO: generate from yaml does not validate loaded params against schema...
-
-			bool ok = schema::validate_param(cmd.val, sch);
-			if(!ok)
-			{
-			os << "invalid value" << std::endl;
-			return false;
-			}
-			*/
-			// TODO: Overkill
 			editor.reload_pt_schema();
-
-			// TODO: if load into node which is above current location, current location may cease to exist,
-			// in which case need to move the accessor, and transition to node_type_choice
-			editor.output("subtree loaded");
+*/
+			if(import_yaml(as_yaml, editor.data, nav.get_ref()))
+			{
+				// TODO: if load into node which is above current location, current location may cease to exist,
+				// in which case need to move the accessor, and transition to node_type_choice
+				editor.output("subtree loaded");
+			}
+			else
+			{
+				editor.output("import failed");
+			}
 		}
-#endif
+
 	}
 }
 

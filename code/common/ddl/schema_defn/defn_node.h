@@ -4,7 +4,6 @@
 #define __WB_DDL_DEFN_NODE_H
 
 #include "../ddl_types.h"
-//#include "defn_node_type_from_impl.h"
 
 #include <memory>
 
@@ -41,6 +40,7 @@ namespace ddl {
 
 //		void set_id(node_id id);
 		node_id get_id() const;
+		std::string get_name() const;
 
 	private:
 /*		template < typename Vis >

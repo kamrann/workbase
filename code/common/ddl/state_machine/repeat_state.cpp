@@ -11,11 +11,23 @@ namespace ddl {
 			auto& editor = context< paramtree_editor >();
 			auto nav = editor.nav;
 
-			auto vnode = nav.get();
+			sd_edge_attribs edge;
+			edge.type = sd_edge_attribs::ChildType::ListItem;
+			edge.item_idx = nav.tree_->child_count(nav.pos_.nd);
+			sd_node_attribs node;
+			//node.defn = ? ;
+			// - this is dealt with within sd_tree update below...
+
+			// TODO: Temp. Maybe just change nav tree pointer to non const, but really need to decide exactly what
+			// nav should be used for, and when sd_tree should be used directly.
+			auto tree = const_cast<sd_tree*>(nav.tree_);
+			tree->add_node(nav.pos_.nd, edge, node);
+
+/*			auto vnode = nav.get();
 			auto list = vnode.as_list();
 			list.push_back(value_node{});
 			vnode = list;
-
+*/
 			// TODO: Overkill
 			editor.reload_pt_schema();
 
@@ -27,13 +39,18 @@ namespace ddl {
 			auto& editor = context< paramtree_editor >();
 			auto nav = editor.nav;
 
-			auto vnode = nav.get();
-			auto list = vnode.as_list();
+//			auto vnode = nav.get();
+//			auto list = vnode.as_list();
 
-			if(cmd.index < list.size())
+			if(cmd.index < nav.list_num_items())//list.size())
 			{
-				list.erase(std::begin(list) + cmd.index);
-				vnode = list;
+//				list.erase(std::begin(list) + cmd.index);
+//				vnode = list;
+
+				// TODO:
+				auto tree = const_cast<sd_tree*>(nav.tree_);
+				auto c = tree->get_nth_child(nav.pos_.nd, cmd.index).first;
+				tree->remove_branch(c);
 
 				// TODO: Overkill
 				editor.reload_pt_schema();

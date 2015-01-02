@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{988EFA57-6FED-452E-B08D-FE51E86A7ED4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>b2d_script_test</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\workbase.props" />
+    <Import Project="..\..\box2d_dbg.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\workbase.props" />
+    <Import Project="..\..\box2d_rls.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\Coding Projects\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\Coding Projects\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\DebugDraw.cpp" />
+    <ClCompile Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\imgui.cpp" />
+    <ClCompile Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\RenderGL3.cpp" />
+    <ClCompile Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\Test.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\b2d_script_test\b2d_script_test.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\b2d_script_test\callbacks.cpp" />
+    <ClCompile Include="..\..\..\..\code\common\b2d_script_test\stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\DebugDraw.h" />
+    <ClInclude Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\imgui.h" />
+    <ClInclude Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\RenderGL3.h" />
+    <ClInclude Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\stb_truetype.h" />
+    <ClInclude Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Testbed\Framework\Test.h" />
+    <ClInclude Include="..\..\..\..\code\common\b2d_script_test\ScriptTest.h" />
+    <ClInclude Include="..\..\..\..\code\common\b2d_script_test\stdafx.h" />
+    <ClInclude Include="..\..\..\..\code\common\b2d_script_test\targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Build\vs2013\Box2D.vcxproj">
+      <Project>{98400d17-43a5-1a40-95be-c53ac78e7694}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Build\vs2013\glew.vcxproj">
+      <Project>{cdd714dd-7f18-4478-9dd3-72369869acef}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\External Libraries\box2d v2.3.1\Box2D\Build\vs2013\glfw.vcxproj">
+      <Project>{eeb8858b-cafa-445b-8253-3a9c2571e132}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\b2d_components\b2d_components.vcxproj">
+      <Project>{ac311baf-4a8a-4c80-9d6d-1d54a3282c52}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\b2d_script\b2d_script.vcxproj">
+      <Project>{4cf874a0-be0d-41c3-aa5b-a4b4ee60ce78}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,25 @@
+composite:
+  contents:
+    conditional:
+      composite:
+        state_val:
+          enum:
+            - vel_x
+        timespan:
+          conditional:
+            composite:
+              from:
+                enum:
+                  - Start
+              until:
+                enum:
+                  - End
+        value_type:
+          enum:
+            - Maximum
+        direction_type:
+          enum:
+            - Maximise
+  option:
+    enum:
+      - single_objective

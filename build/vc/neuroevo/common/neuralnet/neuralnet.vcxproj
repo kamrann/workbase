@@ -35,11 +35,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="..\..\..\Wt_dbg.props" />
     <Import Project="..\..\neuroevo.props" />
+    <Import Project="..\..\..\eigen.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="..\..\..\Wt_rls.props" />
     <Import Project="..\..\neuroevo.props" />
+    <Import Project="..\..\..\eigen.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -81,6 +83,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\fc_rnn.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\mlp.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\algorithm.cpp" />
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\layer_filter.cpp" />
@@ -100,6 +103,7 @@
     <ClCompile Include="..\..\..\..\..\code\neuroevo\common\neuralnet\visualisation\wt_visualiser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\fc_rnn.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\implementations\mlf\mlp.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\access_options.h" />
     <ClInclude Include="..\..\..\..\..\code\neuroevo\common\neuralnet\interface\activation_functions.h" />

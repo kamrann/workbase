@@ -1,7 +1,7 @@
 // enum_emitter.h
 
-#ifndef __WB_PARAMS_ENUM_EMITTER_H
-#define __WB_PARAMS_ENUM_EMITTER_H
+#ifndef __WB_DDL_ENUM_EMITTER_H
+#define __WB_DDL_ENUM_EMITTER_H
 
 #include "../values/value.h"
 

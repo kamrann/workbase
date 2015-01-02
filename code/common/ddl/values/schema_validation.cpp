@@ -73,22 +73,24 @@ namespace ddl {
 
 		inline bool operator() (enum_sch_node const& nd) const
 		{
-			auto value = val_.as_enum();
+			auto value = val_.as_enum_str();
 			auto sel_count = value.size();
 			auto minsel = nd.minsel();
 			if(sel_count < minsel)
 			{
-				return false;
+				// TODO: need to enforce a default which conforms to these restrictions, before we
+				// can enforce them here (ie. if min>0, ensure that something is selected on creation.
+				//return false;
 			}
 			auto maxsel = nd.maxsel();
 			if(maxsel && sel_count > maxsel)
 			{
 				return false;
 			}
-			auto options = nd.enum_values();
+			auto options = nd.enum_values_str();
 			for(auto const& ev : value)
 			{
-				if(options.find(ev) == options.end())
+				if(std::find(std::begin(options), std::end(options), ev) == options.end())
 				{
 					return false;
 				}
@@ -120,6 +122,12 @@ namespace ddl {
 		}
 
 		inline bool operator() (composite_sch_node const& nd) const
+		{
+			// TODO: Need to do anything?
+			return true;
+		}
+
+		inline bool operator() (conditional_sch_node const& nd) const
 		{
 			// TODO: Need to do anything?
 			return true;

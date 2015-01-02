@@ -1,0 +1,143 @@
+composite:
+  sys_details:
+    conditional:
+      composite:
+        core:
+          composite:
+            scenario_type:
+              enum:
+                - ski_jump
+            scenario:
+              conditional:
+                composite:
+                  landing_length:
+                    real: 140
+                  wall_height:
+                    real: 2
+                  overall_scale:
+                    real: 1
+                  platform_width:
+                    real: 5
+                  surface_friction:
+                    real: 0.2
+                  gravity:
+                    real: 9.810000000000001
+                  landing_x2:
+                    real: -10
+                  landing_x1:
+                    real: 3.5
+                  inrun_length:
+                    real: 30
+                  landing_drop:
+                    real: 25
+                  inrun_incline:
+                    real: 45
+                  jump_dropoff:
+                    real: 2
+                  takeoff_incline:
+                    real: 0
+                  takeoff_length:
+                    real: 5
+                  transition1_radius:
+                    real: 8
+            updates_per_sec:
+              integer: 30
+            velocity_iterations:
+              integer: 4
+            duration:
+              real: 20
+            position_iterations:
+              integer: 2
+        specs:
+          list:
+            - composite:
+                role_contents:
+                  conditional:
+                    composite:
+                      agent_contents:
+                        conditional:
+                          composite:
+                            details:
+                              conditional:
+                                composite:
+                                  arm_thickness:
+                                    real: 0
+                                  max_shoulder_torque:
+                                    real: 30
+                                  max_wrist_torque:
+                                    real: 20
+                                  pole_friction:
+                                    real: 1
+                                  pole_length:
+                                    real: 0
+                                  arm_length:
+                                    real: 0
+                                  pole_thickness:
+                                    real: 0
+                                  ski_friction:
+                                    real: 0
+                                  torso_height:
+                                    real: 2.5
+                                  ski_length:
+                                    real: 3
+                                  torso_width:
+                                    real: 1
+                            name:
+                              string: the_skier
+                      agent_type:
+                        enum:
+                          - skier
+                agent_role:
+                  enum:
+                    - default
+        instances:
+          list:
+            - composite:
+                inst_contents:
+                  composite:
+                    spec_reference:
+                      enum:
+                        - the_skier
+                    inst_details:
+                      conditional:
+                        composite:
+                          initial_conditions:
+                            composite:
+                              init_linear_angle:
+                                real: 90
+                              init_angvel:
+                                real: 0
+                              init_linear_speed:
+                                real: 1
+                              init_x:
+                                real: 0
+                              init_orientation:
+                                real: 0
+                              init_y:
+                                real: 0
+                inst_controller:
+                  composite:
+                    controller_class:
+                      enum:
+                        - preset
+                    class_contents:
+                      conditional:
+                        composite:
+                          controller_contents:
+                            conditional:
+                              composite:
+                                details:
+                                  conditional:
+                                    composite: ~
+                          controller_type:
+                            enum:
+                              - passive
+  sys_type:
+    enum:
+      - physics_2d
+  updates:
+    enum:
+      []
+  results:
+    enum:
+      []

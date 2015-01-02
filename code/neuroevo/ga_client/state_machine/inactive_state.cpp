@@ -6,9 +6,6 @@
 
 #include "evo_database/evo_db.h"
 
-#include "params/param_tree.h"
-#include "params/qualified_path.h"
-
 #include "wt_cmdline_server/wt_server.h"
 #include "wt_displays/chart.h"
 
@@ -18,6 +15,8 @@ namespace ga_control {
 
 		void inactive::on_dbplot(clsm::ev_cmd< dbplot_cmd > const& cmd)
 		{
+			// TODO:
+#if 0
 			auto& ctx = context< ga_controller >();
 			prm::param_accessor acc{ &ctx.ptree };
 
@@ -85,6 +84,7 @@ namespace ga_control {
 			std::this_thread::sleep_for(std::chrono::seconds(5));
 			//
 			update_display(id);
+#endif
 		}
 
 	}

@@ -9,6 +9,7 @@
 #include "../commands/nav_cmd_parser.h"
 #include "../commands/list_cmd_parser.h"
 #include "../commands/setvalue_cmd_parser.h"
+#include "../commands/reset_cmd_parser.h"
 #include "../commands/save_cmd_parser.h"
 #include "../commands/load_cmd_parser.h"
 
@@ -48,15 +49,17 @@ namespace ddl {
 			sc::result react(clsm::ev_cmd< nav_cmd > const& cmd);
 			void on_list(clsm::ev_cmd< list_cmd > const& cmd);
 			void on_setvalue(clsm::ev_cmd< setvalue_cmd > const& cmd);
-//			void on_save(clsm::ev_cmd< save_cmd > const& cmd);
-//			void on_load(clsm::ev_cmd< load_cmd > const& cmd);
+			void on_reset(clsm::ev_cmd< reset_cmd > const& cmd);
+			void on_save(clsm::ev_cmd< save_cmd > const& cmd);
+			void on_load(clsm::ev_cmd< load_cmd > const& cmd);
 
 			typedef mpl::list<
 				sc::custom_reaction< clsm::ev_cmd< nav_cmd > >
 				, sc::in_state_reaction< clsm::ev_cmd< list_cmd >, base_node_state, &base_node_state::on_list >
 				, sc::in_state_reaction< clsm::ev_cmd< setvalue_cmd >, base_node_state, &base_node_state::on_setvalue >
-//				, sc::in_state_reaction< clsm::ev_cmd< save_cmd >, base_node_state, &base_node_state::on_save >
-//				, sc::in_state_reaction< clsm::ev_cmd< load_cmd >, base_node_state, &base_node_state::on_load >
+				, sc::in_state_reaction< clsm::ev_cmd< reset_cmd >, base_node_state, &base_node_state::on_reset >
+				, sc::in_state_reaction< clsm::ev_cmd< save_cmd >, base_node_state, &base_node_state::on_save >
+				, sc::in_state_reaction< clsm::ev_cmd< load_cmd >, base_node_state, &base_node_state::on_load >
 				, sc::termination< clsm::ev_cmd< quit_cmd > >
 			> my_reactions;
 

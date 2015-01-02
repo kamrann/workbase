@@ -9,9 +9,6 @@
 #include "radial_detection/rtp_radial_detection_system.h"
 #include "elevator/rtp_elevator_system.h"
 */
-#include "params/schema_builder.h"
-#include "params/param_accessor.h"
-#include "params/param_yaml.h"
 
 #include <iomanip>
 

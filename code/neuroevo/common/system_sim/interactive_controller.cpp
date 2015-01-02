@@ -4,8 +4,8 @@
 #include "interactive.h"
 #include "system.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
+//#include "params/param_accessor.h"
+//#include "params/schema_builder.h"
 
 #include "util/stl_util.hpp"
 
@@ -123,6 +123,8 @@ namespace sys {
 		return relative;
 	}
 #endif
+
+#if 0
 	std::unique_ptr< i_controller_factory > i_interactive_controller::create_factory(prm::param_accessor param_vals)
 	{
 		auto factory_fn = [=](i_agent const*) -> std::unique_ptr< i_controller >
@@ -132,6 +134,7 @@ namespace sys {
 
 		return std::make_unique< controller_factory >(factory_fn, true);
 	}
+#endif
 }
 
 

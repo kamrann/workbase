@@ -3,6 +3,8 @@
 #ifndef __WB_DDL_ENUM_SCHEMA_NODE_IMPL_H
 #define __WB_DDL_ENUM_SCHEMA_NODE_IMPL_H
 
+#include "../schema_defn/enum_defn_node.h"
+
 #include <boost/optional.hpp>
 
 #include <string>
@@ -16,10 +18,10 @@ namespace ddl {
 		class enum_sch_node_t
 		{
 		public:
-			typedef std::string enum_value_t;
-			// TODO: revert to set...typedef std::set< enum_value_t > value_t;
-			typedef std::vector< enum_value_t > value_t;
-			typedef std::set< enum_value_t > enum_set_t;
+			typedef ddl::enum_defn_node::enum_value_t enum_value_t;
+			typedef ddl::enum_defn_node::value_t value_t;
+			typedef ddl::enum_defn_node::str_value_t str_value_t;
+			typedef ddl::enum_defn_node::enum_set_t enum_set_t;
 
 		public:
 			enum_sch_node_t();

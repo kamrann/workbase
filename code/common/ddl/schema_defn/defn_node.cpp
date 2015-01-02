@@ -86,6 +86,22 @@ namespace ddl {
 		return apply_visitor(vis);
 	}
 
+	struct get_name_visitor:
+		public boost::static_visitor < std::string >
+	{
+		template < typename T >
+		inline result_type operator() (T const& v) const
+		{
+			return v.name_;
+		}
+	};
+
+	std::string defn_node::get_name() const
+	{
+		auto vis = get_name_visitor{};
+		return apply_visitor(vis);
+	}
+
 }
 
 

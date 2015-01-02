@@ -1,7 +1,7 @@
 // random_parser.h
 
-#ifndef __WB_PARAMS_RANDOM_PARSER_H
-#define __WB_PARAMS_RANDOM_PARSER_H
+#ifndef __WB_DDL_RANDOM_PARSER_H
+#define __WB_DDL_RANDOM_PARSER_H
 
 #include "param.h"
 #include "value_parsing_ast.h"

@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wt_cmdline_server", "..\wt_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wt_custom_widgets", "..\wt_custom_widgets\wt_custom_widgets.vcxproj", "{F7C9C12A-FC74-4498-BCAA-D46D3E788314}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "workbase_common", "..\workbase_common.vcxproj", "{78D223D2-D266-4DA3-89C6-73100A132FD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +41,10 @@ Global
 		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Debug|Win32.Build.0 = Debug|Win32
 		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|Win32.ActiveCfg = Release|Win32
 		{F7C9C12A-FC74-4498-BCAA-D46D3E788314}.Release|Win32.Build.0 = Release|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Debug|Win32.Build.0 = Debug|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Release|Win32.ActiveCfg = Release|Win32
+		{78D223D2-D266-4DA3-89C6-73100A132FD1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

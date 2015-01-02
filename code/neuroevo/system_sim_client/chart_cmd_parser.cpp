@@ -7,7 +7,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
 	sys_control::chart_cmd,
-	(prm::enum_param_val, values)
+	(ddl::enum_param_val, values)
 	);
 
 namespace sys_control {

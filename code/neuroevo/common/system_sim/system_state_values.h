@@ -20,7 +20,9 @@ namespace sys {
 		state_value_id(std::string name);
 
 		state_value_id& operator += (std::string const& rhs);
-		state_value_id operator + (std::string const& rhs);
+		state_value_id operator + (std::string const& rhs) const;
+		state_value_id& operator += (state_value_id const& rhs);
+		state_value_id operator + (state_value_id const& rhs) const;
 		void pop();
 
 		std::string root() const;

@@ -71,6 +71,16 @@ namespace ddl {
 		return *this;
 	}
 
+	value_node& value_node::operator= (enum_sch_node::str_value_t const& val)
+	{
+		enum_sch_node::value_t vals;
+		for(auto const& str : val)
+		{
+			vals.push_back(enum_sch_node::enum_value_t{ str, boost::any{} });
+		}
+		return (*this = vals);
+	}
+
 	value_node& value_node::operator= (std::vector< value_node > const& val)
 	{
 		if(!initialized())
@@ -114,6 +124,16 @@ namespace ddl {
 		return *this;
 	}
 
+	void value_node::assign(value_node rhs)
+	{
+		if(!initialized())
+		{
+			throw std::runtime_error{ "value_node not assignable" };
+		}
+
+		*storage_ = *rhs.storage_;
+	}
+
 
 	bool value_node::is_bool() const
 	{
@@ -153,7 +173,7 @@ namespace ddl {
 	bool value_node::is_leaf() const
 	{
 		// TODO: Clearer distinction - list with no items? uninitialized node?
-		return !is_list() && !is_composite();
+		return initialized() && !is_list() && !is_composite();
 	}
 
 
@@ -182,6 +202,17 @@ namespace ddl {
 		return boost::get< enum_sch_node::value_t >(*storage_);
 	}
 
+	std::vector< std::string > value_node::as_enum_str() const
+	{
+		auto values = as_enum();
+		std::vector< std::string > strings;
+		for(auto const& val : values)
+		{
+			strings.push_back(val.str);
+		}
+		return strings;
+	}
+
 	std::vector< value_node > value_node::as_list() const
 	{
 		return boost::get< std::vector< value_node > >(*storage_);
@@ -205,6 +236,16 @@ namespace ddl {
 			throw std::runtime_error("not leaf node");
 		}
 
+		inline result_type operator() (enum_sch_node::value_t const& v)
+		{
+			std::vector< std::string > str_vals;
+			for(auto const& elem : v)
+			{
+				str_vals.push_back(elem.str);
+			}
+			return value(str_vals);
+		}
+
 		template < typename T >
 		inline result_type operator() (T const& v)
 		{
@@ -221,6 +262,11 @@ namespace ddl {
 	enum_sch_node::enum_value_t value_node::as_single_enum() const
 	{
 		return *std::begin(as_enum());
+	}
+
+	std::string value_node::as_single_enum_str() const
+	{
+		return std::begin(as_enum())->str;
 	}
 
 	void value_node::set_id(node_id id)

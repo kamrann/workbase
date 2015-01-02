@@ -1,0 +1,37 @@
+object{
+body: lower_leg {
+	box{ 1x3 } @ (0, 0)
+	material{ metal{
+		friction{ 0.75 }
+		density{ 1.0 }
+	}}
+}
+body: upper_leg {
+	box{ 1x3 } @ (0, 2)
+	material{ metal }
+}
+body: torso {
+	box{ 3x3 } @ (-1, 4)
+	material{ metal }
+}
+
+joint: knee {
+	bodies{ lower_leg @ (0, 2), upper_leg @ (0, 0) }
+	limits{ 0, 135 }
+	control{ torque }
+	max_torque{ 250.0 }
+}
+
+joint: hip {
+	bodies{ upper_leg @ (0, 2), torso @ (1, 0) }
+	limits{ -135, 0 }
+	control{ torque }
+	max_torque{ 250.0 }
+}
+
+sucker: sucker_foot {
+	lower_leg @ (0, 0)
+}
+
+base{ lower_leg @ (0, 0) }
+}

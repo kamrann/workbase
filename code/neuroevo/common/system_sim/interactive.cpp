@@ -2,12 +2,10 @@
 
 #include "interactive.h"
 
-#include "params/param_accessor.h"
-#include "params/param_yaml.h"
-
 
 namespace sys
 {
+#if 0
 	boost::optional< unsigned long > interactive_controller::extract_input_binding(prm::param binding)
 	{
 		auto is_bound = !prm::is_unspecified(binding);
@@ -48,7 +46,7 @@ namespace sys
 		param_vals.revert();
 		return controller;
 	}
-
+#endif
 
 	interactive_controller::interactive_controller(size_t num_effectors)
 	{

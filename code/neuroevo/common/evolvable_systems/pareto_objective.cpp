@@ -2,8 +2,8 @@
 
 #include "pareto_objective.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
+//#include "params/param_accessor.h"
+//#include "params/schema_builder.h"
 
 
 namespace sys {
@@ -59,52 +59,38 @@ namespace sys {
 		}
 
 
-		pareto_objective_defn::pareto_objective_defn(state_val_access_fn_t sv_acc_fn):
+		pareto_objective_defn::pareto_objective_defn(state_val_access_fn_t& sv_acc_fn):
 			val_obj_defn_(sv_acc_fn)
 		{
 
 		}
 
-		namespace sb = prm::schema;
 
-		void pareto_objective_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		ddl::defn_node pareto_objective_defn::get_defn(ddl::specifier& spc)
 		{
-			auto path = prefix;
+			ddl::defn_node component_defn = val_obj_defn_.get_defn(spc);
 
-			path += std::string{ "components" };
+			ddl::defn_node component_list = spc.list("components")
+				(ddl::spc_range < size_t > { 1, boost::none })
+				(ddl::spc_item{ component_defn })
+				;
 
-			val_obj_defn_.update_schema_provider(provider, path + std::string{ "comp" });
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::repeating_list(path.leaf().name(), "comp");
-				return s;
-			};
-
-			path.pop();
-
-			(*provider)[path] = [=](prm::param_accessor acc)
-			{
-				auto s = sb::list(path.leaf().name());
-				sb::append(s, provider->at(path + std::string{ "components" })(acc));
+			return spc.composite("pareto")(ddl::define_children{}
+				("components", component_list)
 				// TODO: pareto config? fitness conversion should be left to ga probably.
-				return s;
-			};
+				);
 		}
 
-		std::unique_ptr< pareto_objective > pareto_objective_defn::generate(prm::param_accessor acc, std::function< double(state_value_id) > get_state_value_fn)
+		std::unique_ptr< pareto_objective > pareto_objective_defn::generate(ddl::navigator nav, std::function< double(state_value_id) > get_state_value_fn)
 		{
 			std::vector< std::unique_ptr< value_objective > > components;
 
-			acc.move_to(acc.find_path("components"));
-			auto comp_paths = acc.children();
-			for(auto const& p : comp_paths)
+			auto comp_list_nav = nav["components"];
+			auto count = comp_list_nav.list_num_items();
+			for(size_t i = 0; i < count; ++i)
 			{
-				acc.move_to(p);
-				components.push_back(val_obj_defn_.generate(acc, get_state_value_fn));
-				acc.revert();
+				components.push_back(val_obj_defn_.generate(comp_list_nav[i], get_state_value_fn));
 			}
-			acc.revert();
 
 			return std::make_unique< pareto_objective >(std::move(components));
 		}

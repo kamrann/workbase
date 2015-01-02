@@ -19,6 +19,12 @@
     <Filter Include="agents">
       <UniqueIdentifier>{a9f6a4d8-4815-4f07-8808-5e6a0853b606}</UniqueIdentifier>
     </Filter>
+    <Filter Include="controllers">
+      <UniqueIdentifier>{8c11fc98-c157-41bf-a62b-7872ef016279}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="components">
+      <UniqueIdentifier>{6d6e76ab-abbf-4b27-9f8d-53fcb9ce39d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -39,20 +45,8 @@
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_agent_defn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_sensors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_entity_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\obstacles_scenario_defn.cpp">
       <Filter>scenarios</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\basic_biped.cpp">
-      <Filter>agents</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\basic_biped_defn.cpp">
-      <Filter>agents</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ground_scenario_defn.cpp">
       <Filter>scenarios</Filter>
@@ -60,17 +54,35 @@
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ground_scenario.cpp">
       <Filter>scenarios</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\single_rigid_body.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\composite_body.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_system_drawer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\aerials_scenario_defn.cpp">
+      <Filter>scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\aerials_scenario.cpp">
+      <Filter>scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ski_jump_scenario_defn.cpp">
+      <Filter>scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ski_jump_scenario.cpp">
+      <Filter>scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\components\sucker_cmp.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\component_object.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\components\rotation_joint_cmp.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\generic_agent.cpp">
+      <Filter>agents</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\generic_agent_defn.cpp">
+      <Filter>agents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,28 +101,10 @@
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_contacts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_entity_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_sensors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_agent_defn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_agent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\composite_body.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\single_rigid_body.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\scenario_defn.h">
@@ -118,12 +112,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\obstacles_scenario_defn.h">
       <Filter>scenarios</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\basic_biped.h">
-      <Filter>agents</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\basic_biped_defn.h">
-      <Filter>agents</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ground_scenario_defn.h">
       <Filter>scenarios</Filter>
@@ -142,6 +130,42 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\phys2d_system_drawer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\aerials_scenario_defn.h">
+      <Filter>scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\aerials_scenario.h">
+      <Filter>scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ski_jump_scenario_defn.h">
+      <Filter>scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\ski_jump_scenario.h">
+      <Filter>scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\test_skier_controller.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\test_snakebot_controller.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\components\sucker_cmp.h">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\component_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\components\rotation_joint_cmp.h">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\generic_agent.h">
+      <Filter>agents</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\code\neuroevo\common\systems\physics2d\generic_agent_defn.h">
+      <Filter>agents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

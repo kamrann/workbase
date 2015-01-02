@@ -9,8 +9,10 @@ enumeration values
 #define __WB_DDL_ENUM_DEFN_NODE_H
 
 #include "defn_node_base_impl.h"
+#include "../dependencies.h"
 
 #include <boost/optional.hpp>
+#include <boost/any.hpp>
 
 #include <string>
 #include <vector>
@@ -25,13 +27,29 @@ namespace ddl {
 		public detail::defn_node_base_impl
 	{
 	public:
-		typedef std::string enum_value_t;
-		// TODO: typedef std::set< enum_value_t > value_t;
-		typedef std::vector< enum_value_t > value_t;
-		typedef std::set< enum_value_t > enum_set_t;
+		//typedef std::string enum_value_t;
+		//typedef std::vector< enum_value_t > value_t;
+		//typedef std::set< enum_value_t > enum_set_t;
 
-		// TODO: Eventually may want to have named functions, with generic return type
-		typedef std::function< enum_set_t(navigator) > enum_values_fn_t;
+		struct enum_value_t
+		{
+			std::string str;
+			boost::any data;
+		};
+
+		// TODO: ideally this would be a set, and would somehow reference an element of the enum_set_t
+		// in such a way as to prevent the same enum value being included twice.
+		// perhaps a set of integer indices into the enum_set_t vector, and then the schema node would be
+		// accessed to retrieve the actual string/data pair.
+		typedef std::vector< enum_value_t > value_t;	// Specifies selection (ie. the value type of the node instance)
+		typedef std::vector< std::string > str_value_t;
+
+		typedef std::vector< enum_value_t > enum_set_t;	// Specified all possible values
+		typedef std::vector< std::string > enum_str_set_t;	// Specified all possible values
+
+		// TODO: Eventually may want to have named functions
+		typedef dep_function< enum_set_t > enum_values_fn_t;
+		typedef dep_function< std::vector< std::string > > enum_values_str_fn_t;
 
 	public:
 		enum_defn_node();
@@ -45,6 +63,8 @@ namespace ddl {
 		boost::optional< size_t > maxsel() const;
 		void default(value_t val);
 		value_t default() const;
+
+		dep_list deps() const;
 
 	private:
 		enum_values_fn_t enum_values_fn_;

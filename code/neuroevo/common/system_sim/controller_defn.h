@@ -5,7 +5,7 @@
 
 #include "system_sim_fwd.h"
 
-#include "params/param_fwd.h"
+#include "ddl/ddl.h"
 
 #include <string>
 
@@ -16,9 +16,9 @@ namespace sys {
 	{
 	public:
 		virtual std::string get_name() const = 0;
-		virtual std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const = 0;
+		virtual ddl::defn_node get_defn(ddl::specifier& spc) = 0;
 
-		virtual controller_ptr create_controller(prm::param_accessor acc) const = 0;
+		virtual controller_ptr create_controller(ddl::navigator nav) const = 0;
 
 	public:
 		virtual ~i_controller_defn() noexcept

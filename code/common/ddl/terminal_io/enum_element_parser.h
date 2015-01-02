@@ -1,7 +1,7 @@
 // enum_element_parser.h
 
-#ifndef __WB_PARAMS_ENUM_ELEMENT_PARSER_H
-#define __WB_PARAMS_ENUM_ELEMENT_PARSER_H
+#ifndef __WB_DDL_ENUM_ELEMENT_PARSER_H
+#define __WB_DDL_ENUM_ELEMENT_PARSER_H
 
 #include <boost/spirit/include/qi.hpp>
 

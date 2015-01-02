@@ -447,6 +447,11 @@ namespace nnet {
 
 	/********** i_neural_net interface ***********/
 
+	std::string mlp::network_type_name() const
+	{
+		return "mlp";
+	}
+
 	class mlp::neuron_accessor:
 		public i_neuron_access
 	{
@@ -543,7 +548,7 @@ namespace nnet {
 		modifier(mlp& nn);
 
 	public:
-		virtual void set_activation_fn(neuron_id neuron, activation_function fn) override;
+//		virtual void set_activation_fn(neuron_id neuron, activation_function fn) override;
 		virtual void set_weight(connection_id conn, value_t weight) override;
 
 	private:
@@ -553,11 +558,11 @@ namespace nnet {
 	mlp::modifier::modifier(mlp& nn): m_nn(nn)
 	{}
 
-	void mlp::modifier::set_activation_fn(neuron_id neuron, activation_function fn)
+/*	void mlp::modifier::set_activation_fn(neuron_id neuron, activation_function fn)
 	{
 		m_nn.set_activation_function(neuron, fn);
 	}
-
+*/
 	void mlp::modifier::set_weight(connection_id conn, value_t weight)
 	{
 		m_nn.set_weight(conn, weight);

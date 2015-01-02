@@ -1,0 +1,233 @@
+composite:
+  domain_cfg:
+    composite:
+      contents:
+        conditional:
+          composite:
+            sys:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      instances:
+                        list:
+                          - composite:
+                              inst_contents:
+                                composite:
+                                  spec_reference:
+                                    enum:
+                                      - the_snake
+                                  inst_details:
+                                    conditional:
+                                      composite:
+                                        initial_conditions:
+                                          composite:
+                                            init_orientation:
+                                              real: 0
+                                            init_x:
+                                              real: 0
+                                            init_y:
+                                              real: 0
+                                            init_linear_angle:
+                                              real: 0
+                                            init_linear_speed:
+                                              real: 0
+                                            init_angvel:
+                                              real: 0
+                              inst_controller:
+                                composite:
+                                  class_contents:
+                                    conditional:
+                                      composite:
+                                        controller_contents:
+                                          conditional:
+                                            composite:
+                                              details:
+                                                conditional:
+                                                  composite: ~
+                                        controller_type:
+                                          enum:
+                                            - evolved
+                                  controller_class:
+                                    enum:
+                                      - evolved_cls
+                      specs:
+                        list:
+                          - composite:
+                              agent_role:
+                                enum:
+                                  - default
+                              role_contents:
+                                conditional:
+                                  composite:
+                                    agent_contents:
+                                      conditional:
+                                        composite:
+                                          details:
+                                            conditional:
+                                              composite:
+                                                friction:
+                                                  real: 0.5
+                                                max_angle:
+                                                  real: 30
+                                                max_torque:
+                                                  real: 10
+                                                num_segments:
+                                                  integer: 4
+                                                segment_size:
+                                                  real: 0.75
+                                          name:
+                                            string: the_snake
+                                    agent_type:
+                                      enum:
+                                        - snakebot
+                      core:
+                        composite:
+                          scenario:
+                            conditional:
+                              composite:
+                                takeoff_incline:
+                                  real: 0
+                                takeoff_length:
+                                  real: 5
+                                transition1_radius:
+                                  real: 8
+                                wall_height:
+                                  real: 2
+                                landing_x1:
+                                  real: 3.5
+                                overall_scale:
+                                  real: 1
+                                landing_x2:
+                                  real: -10
+                                platform_width:
+                                  real: 5
+                                surface_friction:
+                                  real: 0.2
+                                gravity:
+                                  real: 9.810000000000001
+                                inrun_incline:
+                                  real: 45
+                                inrun_length:
+                                  real: 30
+                                jump_dropoff:
+                                  real: 2
+                                landing_drop:
+                                  real: 25
+                                landing_length:
+                                  real: 140
+                          scenario_type:
+                            enum:
+                              - ski_jump
+                          updates_per_sec:
+                            integer: 30
+                          velocity_iterations:
+                            integer: 4
+                          duration:
+                            real: 20
+                          position_iterations:
+                            integer: 2
+                option:
+                  enum:
+                    - physics_2d
+            obj:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      state_val:
+                        enum:
+                          - jump_distance
+                      timespan:
+                        conditional:
+                          enum:
+                            - End
+                      value_type:
+                        enum:
+                          - Value
+                      direction_type:
+                        enum:
+                          - Maximise
+                option:
+                  enum:
+                    - single_objective
+            ev_con:
+              composite:
+                contents:
+                  conditional:
+                    composite:
+                      hidden_neuron_count:
+                        integer: 6
+                      hidden_steepness:
+                        real: 0.5
+                      inputs:
+                        enum:
+                          - joint1/angle
+                          - joint1/speed
+                          - joint2/angle
+                          - joint2/speed
+                          - joint3/angle
+                          - joint3/speed
+                      output_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      output_steepness:
+                        real: 0.5
+                      hidden_act_fn:
+                        enum:
+                          - symm_sigmoid
+                      temp_mutation:
+                        composite:
+                          contents:
+                            conditional:
+                              composite:
+                                cutoff_generations:
+                                  integer: 1000
+                                cutoff_std_dev:
+                                  real: 0.01
+                                initial_std_dev:
+                                  real: 0.4
+                          option:
+                            enum:
+                              - variable_gaussian
+                option:
+                  enum:
+                    - rnn
+      option:
+        enum:
+          - syssim
+  ga_cfg:
+    composite:
+      crossover:
+        composite:
+          cx_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 1
+              option:
+                enum:
+                  - fixed
+      mutation:
+        composite:
+          mut_rate:
+            composite:
+              contents:
+                conditional:
+                  composite:
+                    rate:
+                      real: 0.1
+              option:
+                enum:
+                  - fixed
+      pop_size:
+        integer: 30
+      trials:
+        composite:
+          num_trials:
+            integer: 1
+          trial_merging:
+            enum:
+              - average

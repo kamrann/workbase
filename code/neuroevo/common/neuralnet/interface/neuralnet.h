@@ -7,6 +7,7 @@
 #include "input.h"
 #include "access_options.h"
 
+#include <string>
 #include <memory>
 
 
@@ -23,11 +24,14 @@ namespace nnet {
 	class i_neuralnet
 	{
 	public:
+		virtual std::string network_type_name() const = 0;
+
 		virtual size_t neuron_count() const = 0;
 		virtual size_t input_count() const = 0;
 		virtual size_t output_count() const = 0;
 		virtual size_t hidden_count() const = 0;
 
+		virtual void reset_state() {}
 		virtual output run(input const& in) = 0;
 
 		virtual bool provides_access(AccessOptions opt) const = 0;

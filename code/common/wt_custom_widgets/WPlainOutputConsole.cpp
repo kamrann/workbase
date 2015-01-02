@@ -24,6 +24,13 @@ WPlainOutputConsole::WPlainOutputConsole()
 
 void WPlainOutputConsole::add_element(std::string elem)
 {
+	// TODO: temp hack for clearing console 
+	if(elem.empty())
+	{
+		clear();
+		return;
+	}
+
 	// This seems to help a bit, but there is still some double rendering going on with the scroll bar
 //	Wt::WApplication::instance()->deferRendering();
 //	auto row = m_model->rowCount();

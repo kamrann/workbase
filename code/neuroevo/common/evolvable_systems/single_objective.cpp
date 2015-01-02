@@ -2,8 +2,8 @@
 
 #include "single_objective.h"
 
-#include "params/param_accessor.h"
-#include "params/schema_builder.h"
+//#include "params/param_accessor.h"
+//#include "params/schema_builder.h"
 
 
 namespace sys {
@@ -47,20 +47,20 @@ namespace sys {
 		}
 
 
-		single_objective_defn::single_objective_defn(state_val_access_fn_t sv_acc_fn):
+		single_objective_defn::single_objective_defn(state_val_access_fn_t& sv_acc_fn):
 			val_obj_defn_(sv_acc_fn)
 		{
 
 		}
 
-		void single_objective_defn::update_schema_provider(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix)
+		ddl::defn_node single_objective_defn::get_defn(ddl::specifier& spc)
 		{
-			val_obj_defn_.update_schema_provider(provider, prefix);
+			return val_obj_defn_.get_defn(spc);
 		}
 
-		std::unique_ptr< single_objective > single_objective_defn::generate(prm::param_accessor acc, std::function< double(state_value_id) > get_state_value_fn)
+		std::unique_ptr< single_objective > single_objective_defn::generate(ddl::navigator nav, std::function< double(state_value_id) > get_state_value_fn)
 		{
-			return std::make_unique< single_objective >(val_obj_defn_.generate(acc, get_state_value_fn));
+			return std::make_unique< single_objective >(val_obj_defn_.generate(nav, get_state_value_fn));
 		}
 
 	}

@@ -15,16 +15,21 @@ namespace sys {
 		public:
 			virtual std::string get_name() const override;
 
-			virtual std::string update_schema_providor(prm::schema::schema_provider_map_handle provider, prm::qualified_path const& prefix) const override;
+			virtual ddl::defn_node get_defn(ddl::specifier& spc) override;
 
-			virtual state_value_id_list get_state_values(prm::param_accessor acc) const override;
+			virtual state_value_id_list get_state_values(ddl::navigator nav) const override;
 
-			virtual std::unique_ptr< scenario > create_scenario(prm::param_accessor acc) const override;
+			virtual std::unique_ptr< scenario > create_scenario(ddl::navigator nav) const override;
 
 		protected:
 			struct spec_data
 			{
 				double expanse;
+				double incline;
+				double friction;
+				double gravity;
+
+				size_t ball_count;
 			};
 
 			friend class ground_scenario;
